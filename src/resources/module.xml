@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.1" name="org.ovirt.engine-extensions.aaa.ldap">
+	<resources>
+		<resource-root path="ovirt-engine-extension-aaa-ldap.jar"/>
+		<resource-root path="unboundid-ldapsdk.jar"/>
+	</resources>
+	<dependencies>
+		<module name="javax.api"/>
+		<module name="org.ovirt.engine.api.ovirt-engine-extensions-api"/>
+		<module name="org.slf4j"/>
+		<module name="sun.jdk"/>
+	</dependencies>
+</module>

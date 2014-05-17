@@ -1,0 +1,280 @@
+oVirt LDAP authentication and authorization extension
+=====================================================
+
+Generic LDAP implementation for oVirt engine.
+
+IMPLEMENTATION NOTES
+--------------------
+
+Implementation uses UnboundID LDAP SDK for Java. Many of the terms and
+configuration options derived from the SDK terms. More information can
+be found at UnboundID site[1].
+
+Refer to README.unboundid-ldapsdk for known issues and limitations.
+
+[1] https://www.unboundid.com/products/ldap-sdk/
+
+EXTENSION CONFIGURATION
+-----------------------
+
+/etc/ovirt-enigne/extensions.d/<name>.conf
+
+ovirt.engine.extension.name = @AUTHN_NAME@
+ovirt.engine.extension.bindings.method = jbossmodule
+ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine-extensions.aaa.ldap
+ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engineextensions.aaa.ldap.AuthnExtension
+ovirt.engine.extension.provides = org.ovirt.engine.api.extensions.aaa.Authn
+ovirt.engine.aaa.authn.profile.name = @PROFILE@
+ovirt.engine.aaa.authn.authz.plugin = @AUTHZ_NAME@
+config.profile.file.1 = @PROFILE_CONFIGURATION@
+
+ovirt.engine.extension.name = @AUTHZ_NAME@
+ovirt.engine.extension.bindings.method = jbossmodule
+ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine-extensions.aaa.ldap
+ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engineextensions.aaa.ldap.AuthzExtension
+ovirt.engine.extension.provides = org.ovirt.engine.api.extensions.aaa.Authz
+config.profile.file.1 = @PROFILE_CONFIGURATION@
+
+@AUTHN_NAME@, @AUTHZ_NAME@
+    Extension instance name.
+@PROFILE@
+    Profile name, visible to user.
+@PROFILE_CONFIGURATION@
+    Profile configuration file.
+
+PROFILE CONFIGURATION EXAMPLES
+------------------------------
+
+OPENLDAP/IPA/RHDS
+
+Using simple bind transport using startTLS:
+
+    # select one
+    include <openldap.properties>
+    #include <ipa.properties>
+    #include <rhds.properties>
+
+    vars.user = uid=search,cn=users,cn=accounts,dc=company,dc=com
+    vars.password = 123456
+    vars.server = ldap1.company.com
+
+    pool.default.ssl.startTLS = true
+    pool.default.ssl.truststore.file = ${local:_basedir}/${server}.jks
+    pool.default.ssl.truststore.password = changeit
+    pool.default.serverset.single.server = ${global:vars.server}
+    pool.default.auth.simple.bindDN = ${global:vars.user}
+    pool.default.auth.simple.password = ${global:vars.password}
+
+Round robin configuration:
+
+    pool.default.serverset.type = round-robin
+    pool.default.serverset.round-robin.1.server = ${global:vars.server1}
+    pool.default.serverset.round-robin.2.server = ${global:vars.server2}
+
+More supported configuration at README.profile.
+
+OpenLDAP note: memberOf overlay must be enabled.
+
+ACTIVE DIRECTORY
+
+Using simple bind transport using startTLS. Unfortunately, SASL does not provide
+bind failure reasons.
+
+Connect to Domain Controller DNS Server directly, use SRV record to
+resolve hosts.
+
+    include = <ad.properties>
+
+    vars.user = search
+    vars.password = 123456
+    vars.domain = company.com
+    vars.dns = dns://dc1.${global:vars.domain} dns://dc2.${global:vars.domain}
+
+    pool.default.serverset.type = srvrecord
+    pool.default.serverset.srvrecord.domain = ${global:vars.domain}
+    pool.default.serverset.srvrecord.jndi-properties.java.naming.provider.url = ${global:vars.dns}
+    pool.default.socketfactory.resolver.uRL = ${global:vars.dns}
+    pool.default.ssl.startTLS = true
+    pool.default.ssl.truststore.file = ${local:_basedir}/${global:vars.domain}.jks
+    pool.default.ssl.truststore.password = changeit
+    pool.default.auth.simple.bindDN = ${global:vars.user}
+    pool.default.auth.simple.password = ${global:vars.password}
+
+APACHE SSO CONFIGURATION
+------------------------
+
+Authorization extension can be used in an environment in which apache
+preforms the authentication, common example is kerberos. Use the
+ovirt-engine-extension-aaa-misc and configure the http authentication
+extension to acquire principal name out of the request.
+
+APACHE CONFIGURATION
+
+The following example enforces kerberos authentication, and delegate
+principal name via HTTP headers. The actual kerberos configuration is
+out of scope for this document.
+
+<LocationMatch ^(/ovirt-engine/(webadmin|userportal|api)|/api)>
+    RewriteEngine on
+    RewriteCond %{LA-U:REMOTE_USER} ^(.*)$
+    RewriteRule ^(.*)$ - [L,P,E=REMOTE_USER:%1]
+    RequestHeader set X-Remote-User %{REMOTE_USER}s
+
+    AuthType Kerberos
+    AuthName "Kerberos Login"
+    Krb5Keytab /etc/krb5.keytab
+    KrbAuthRealms REALM.COM
+    Require valid-user
+</LocationMatch>
+
+WARNING!!!
+
+In case SSO is enforced on partial URI list (example only api), The
+X-Remote-User must be reseted for the remaining URIs, to avoid security
+bypass.
+
+AUTHN EXTENSION
+
+The following configuration read the X-Remote-User header and sets it as
+principal name.
+
+/etc/ovirt-engine/extensions.d/http-authn.properties
+
+ovirt.engine.extension.name = http-authn
+ovirt.engine.extension.bindings.method = jbossmodule
+ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine-extensions.aaa.misc
+ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engineextensions.aaa.misc.http.AuthnExtension
+ovirt.engine.extension.provides = org.ovirt.engine.api.extensions.aaa.Authn
+ovirt.engine.aaa.authn.profile.name = http
+ovirt.engine.aaa.authn.authz.plugin = ldap-authz
+# optional, see mapping section
+ovirt.engine.aaa.authn.mapping.plugin = http-mapping
+config.artifact.name = HEADER
+config.artifact.arg = X-Remote-User
+
+MAPPING
+
+Optional, if transformation required. For all providers but Active Directory
+removing realm is required.
+
+/etc/ovirt-engine/extensions.d/http-mapping.properties
+
+ovirt.engine.extension.enabled = true
+ovirt.engine.extension.name = http-mapping
+ovirt.engine.extension.bindings.method = jbossmodule
+ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine-extensions.aaa.misc
+ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engineextensions.aaa.misc.mapping.MappingExtension
+ovirt.engine.extension.provides = org.ovirt.engine.api.extensions.aaa.Mapping
+config.mapAuthRecord.pattern = ^(?<name>.*)@.*$
+config.mapAuthRecord.replacement = ${name}
+config.mapAuthRecord.mustMatch = true
+
+AUTHZ EXTENSION
+
+In case of Active Directory, instruct extension to use realm as principal,
+add the following to extension configuration:
+
+config.globals.principalFormat.ad_principalFormat = realm
+
+ADVANCED EXTENSION CONFIGURATION
+--------------------------------
+
+config.profile.searchdir.@SORT@ = DIRECTORY
+    Additional profile configuration search directories.
+    xxx is alphabetic sorted.
+
+config.profile.file.@SORT@ = FILE
+    Profile configurations to read.
+    xxx is alphabetic sorted.
+
+config.globals.@SORT@.@VAR@ = VALUE
+    Sequence variables to set before initialization.
+
+config.authn.credentials-change.message = TEXT
+    A message to display if password is expired.
+
+config.authn.credentials-change.url = URL
+    A URL to display if password is expired.
+
+config.authn.sequence.authn.name = ID [authn]
+    Sequence name of authentication.
+
+    Input:
+        user
+        password
+
+    Output:
+        authTranslatedMessage
+        PrincipalRecord_NAME
+        message
+
+attrmap.map-principal-record.name = ID [map-principal-record]
+    Attribute map to map between principal record and native attributes.
+
+attrmap.map-group-record.name = ID [map-group-record]
+    Attribute map to map between group record and native attributes.
+
+config.authz.query.max_filter_size = INT [50]
+    A default maximum filter size in elements. Usually, should be set by
+    configuration.
+
+config.authz.sequence.credentials-change.name = ID [credentials-change]
+    Sequence name of credentials change.
+
+    Input:
+        user
+        password
+        passwordNew
+
+config.authz.sequence.namespace.attribute.namespace = ID [namespace]
+    Attribute name of namespace within the namespace query.
+
+config.authz.sequence.namespace.name = ID [namespace]
+    Sequence name of namespace query.
+    Used during initialization to determine namespaces.
+
+    Output:
+        query
+
+config.authz.sequence.query-principals.name = ID [query-principals]
+    Sequence name of query principal.
+    Used during administrative tasks.
+
+    Input:
+        namespace
+        filter
+
+    Output:
+        query
+
+config.authz.sequence.resolve-principal.name = ID [resolve-principal]
+    Sequence name of resolve principal.
+    Used during user login to fetch properties of principal name.
+
+    Input:
+        PrincipalRecord_NAME
+
+    Output:
+        PrincipalRecord_xxxx
+
+config.authz.sequence.query-groups.name = ID [query-groups]
+    Sequence name of query groups.
+    Used during administrative tasks.
+
+    Input:
+        namespace
+        filter
+
+    Output:
+        query
+
+config.authz.sequence.resolve-group.name = ID [resolve-group]
+    Sequence name of resolve group.
+    Used during user login to fetch groups recursively.
+    Used during directory sync.
+
+    Input:
+        dn
+
+    Output:
+        GroupRecord_xxxx

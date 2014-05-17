@@ -1,0 +1,69 @@
+%if 0%{?rhel}
+%if 0%{?centos}
+%global slf4j slf4j
+%else
+%global slf4j slf4j-eap6
+%endif
+%else
+%global slf4j slf4j
+%endif
+
+%global make_common_opts \\\
+	PREFIX=%{_prefix} \\\
+	SYSCONF_DIR=%{_sysconfdir} \\\
+	DATA_DIR=%{_datadir} \\\
+	PKG_DATA_DIR=%{_datadir}/%{name} \\\
+	%{nil}
+Name:		@PACKAGE_NAME@
+Version:	@RPM_VERSION@
+Release:	@RPM_RELEASE@%{?release_suffix}%{?dist}
+License:	ASL 2.0
+Summary:	oVirt Script Engine Gateway Extension
+Group:		Virtualization/Management
+URL:		http://www.ovirt.org
+BuildArch:	noarch
+Source:		http://resources.ovirt.org/pub/src/%{name}/%{name}-@PACKAGE_VERSION@.tar.gz
+
+BuildRequires:	%{slf4j} >= 1.7
+BuildRequires:	ant
+BuildRequires:	java-1.7.0-openjdk-devel
+BuildRequires:	jpackage-utils
+BuildRequires:	ovirt-engine-extensions-api
+BuildRequires:	unboundid-ldapsdk
+
+Requires:	ovirt-engine >= 3.5
+Requires:	unboundid-ldapsdk >= 2.3.7
+
+%description
+Generic LDAP implementation for oVirt engine.
+
+%prep
+%setup -c -q
+
+%build
+cat > build.properties << __EOF__
+package.display.name=%{name}-%{version}-%{release}
+jar.slf4j-api=$(build-classpath %{slf4j} slf4j-api)
+jar.ovirt-engine-extensions-api=$(build-classpath ovirt-engine/ovirt-engine-extensions-api)
+jar.unboundid-ldapsdk=$(build-classpath unboundid-ldapsdk)
+__EOF__
+
+make %{make_common_opts} all
+
+%install
+rm -fr "%{buildroot}"
+make %{make_common_opts} install-no-build DESTDIR="%{buildroot}"
+
+rm -f "%{buildroot}/usr/share/ovirt-engine-extension-aaa-ldap/modules/org/ovirt/engine-extensions/aaa/ldap/main/unboundid-ldapsdk.jar"
+ln -s \
+	"$(build-classpath unboundid-ldapsdk)" \
+	"%{buildroot}/usr/share/ovirt-engine-extension-aaa-ldap/modules/org/ovirt/engine-extensions/aaa/ldap/main/unboundid-ldapsdk.jar"
+
+%files
+%doc README*
+%{_datadir}/%{name}/
+%{_sysconfdir}/ovirt-engine/engine.conf.d/50-%{name}.conf
+
+%changelog
+* Sun May 4 2014 Alon Bar-Lev <alonbl@redhat.com> 0.0.0
+- Initial.

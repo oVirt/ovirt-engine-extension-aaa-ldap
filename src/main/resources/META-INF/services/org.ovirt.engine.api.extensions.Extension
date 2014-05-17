@@ -1,0 +1,2 @@
+org.ovirt.engineextensions.aaa.ldap.AuthnExtension
+org.ovirt.engineextensions.aaa.ldap.AuthzExtension

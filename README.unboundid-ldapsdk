@@ -1,0 +1,102 @@
+UnboundID LDAP SDK for Java NOTES
+=================================
+
+Implementation uses UnboundID LDAP SDK for Java. Many of the terms and
+configuration options derived from the SDK terms. More information can
+be found at UnboundID site[1].
+
+Known issues and limitations are outlined in this document.
+
+[1] https://www.unboundid.com/products/ldap-sdk/
+
+LIMITATIONS
+-----------
+
+DYNAMIC DNS RESOLUTION
+
+UnboundID LDAP SDK for Java provides rich feature set for locating the
+LDAP server within dynamic environment. It provides fail over, round robin,
+DNS SRV record handling and more.
+
+The problem is that the SDK is using the Java native DNS resolution, which
+is incapable of managing dynamic environments, so the rich feature set of
+fall back policy is usable only to some extent.
+
+The UnboundID LDAP SDK for Java provides the RoundRobinDNSServerSet to
+provide some remedy, it does that by duplicating functionality of the basic
+ServerSets, it includes support for fail over, random, round robin modes.
+However, it supports only single name resolution. So it is basically unusable
+for the generic case.
+
+To workaround this limitation, a custom socket factory was implemented. Each
+component that is trying to connect to LDAP server will reach at some point
+the socket factory, as a result every component will enjoy dynamic resolution
+once the resolver socket factory is installed. In some cases resolution will
+be performed in addition and after the Java native resolution.
+
+The resolver socket factory is a hack, it is not using any documented feature
+of the SDK, it assumes that the host name will be accepted one way or the
+other by the socket factory.
+
+Suggested implementation: support resolver implementation within the core of
+the SDK, similar to the socket factory support. Until such time the resolver
+socket factory provide a solution.
+
+DYNAMIC DNS RESOLUTION FOR REFERRALS
+
+Once referral is detected, the implementation resolves the referral directly
+without considering the fall back policy (ServerSet). This means that there
+can be no fall back for referrals and even if one uses RoundRobinDNSServerSet
+the Java native resolver will be used to resolve referrals.
+
+A workaround was implemented to workaround the referral issue by duplicating
+the default logic of the referral connector into custom referral connector
+while using custom resolver. The added value of this logic is that unlike the
+default behavior, all addresses of host are considered as connection
+candidate.
+
+Suggested implementation: support resolver implementation within the core of
+the SDK, similar to the socket factory support. Until such time the resolver
+socket factory provide a solution.
+
+DNS SRV RECORD SUPPORT
+
+UnboundID LDAP SDK for Java provides support for DNS SRV record base fall
+back policy. It uses custom resolver in order to query the SRV record,
+however, it does not use a custom resolver to resolve the names returned from
+SRV record query.
+
+It is impossible to use the RoundRobinDNSServerSet together with the
+DNSSRVRecordServerSet as nested level to enable dynamic resolution of the
+2nd level.
+
+The immediate result is that multi-homed servers are not considered within
+proper ordering, for example, if highest priority server has 4 addresses,
+only one of these is considered before falling back into 2nd priority,
+instead of randomly select each until all exhausted, and only then attempt
+accessing the 2nd priority.
+
+The secondary result is that the host is resolved using Java native
+resolver so in practice it is static.
+
+There is no solution for the multi-homed servers, as it requires
+re-implementation of DNSSRVRecordServerSet.
+
+The resolver socket factory provide solution for the second level resolution.
+
+KNOWN ISSUES
+------------
+
+NO UPSTREAM SOURCE TARBALL
+
+Upstream do not provide source tarball, only recently a release tags were
+added into source control repository. There is no way to keep hash of sources
+intact, and in addition, upstream source control repository contains large
+chunk of unneeded binary build utilities.
+
+Current solution is to create source tarball manually based on source control
+snapshot excluding the binaries, and use -Dcheckstyle.enabled=false ant
+parameter to enable build without the binaries.
+
+Patches were sent to opt-out checkstyle if the binaries not available, but
+these were not accepted without good reason.

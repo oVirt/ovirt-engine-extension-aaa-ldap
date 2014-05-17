@@ -1,0 +1,7 @@
+oVirt LDAP authentication and authorization extension
+
+????-??-?? - Version 0.0.0
+
+Alon Bar-Lev <alonbl@redhat.com>
+
+ * Initial implementation.

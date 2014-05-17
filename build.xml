@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="ovirt-engine-extension-aaa-ldap" default="all">
+	<property file="build.properties"/>
+
+	<property name="package.name" value="ovirt-engine-extension-aaa-ldap"/>
+	<property name="package.version" value="0.0.0"/>
+	<property name="package.branch" value="master"/>
+	<property name="rpm.version" value='${package.version}'/>
+	<property name="rpm.release" value='0.0.${package.branch}'/>
+
+	<property name="build.root" location="."/>
+	<property name="build.output" value="${build.root}/output"/>
+	<property name="build.intermediate" value="${build.root}/target"/>
+	<property name="lib" value="${build.root}/lib"/>
+
+	<property name="jar.slf4j-api" value="${lib}/slf4j-api.jar"/>
+	<property name="jar.slf4j-jdk14" value="${lib}/slf4j-jdk14.jar"/>
+	<property name="jar.unboundid-ldapsdk" value="${lib}/unboundid-ldapsdk.jar"/>
+	<property name="jar.ovirt-engine-extensions-api" value="${lib}/ovirt-engine-extensions-api.jar"/>
+
+	<condition property="package.version-suffix" value="_${package.branch}" else="">
+		<length when="gt" length="0" string="${package.branch}" />
+	</condition>
+	<property name="package.display.name" value="${package.name}-${package.version}${package.version-suffix}"/>
+
+	<property name="dir.destdir" value=""/>
+	<property name="dir.prefix" value="/usr/local"/>
+	<property name="dir.sysconf" value="${dir.prefix}/etc"/>
+	<property name="dir.data" value="${dir.prefix}/share"/>
+	<property name="dir.pkgdata" value="${dir.prefix}/share/${package.name}"/>
+	<property name="dir.pkgmodules" value="${dir.pkgdata}/modules"/>
+	<property name="dir.profiles" value="${dir.pkgdata}/profiles"/>
+
+	<path id="classpath.buildtime">
+		<pathelement path="${jar.slf4j-api}"/>
+		<pathelement path="${jar.unboundid-ldapsdk}"/>
+		<pathelement path="${jar.ovirt-engine-extensions-api}"/>
+	</path>
+
+	<path id="classpath.runtime">
+		<path refid="classpath.buildtime"/>
+		<pathelement path="${jar.slf4j-jdk14}"/>
+		<pathelement path="${build.output}/modules/org/ovirt/engine-extensions/aaa/ldap/main/ovirt-engine-extension-aaa-ldap.jar"/>
+	</path>
+
+	<target name="all" depends="conf, main, tests, spec"/>
+
+	<target name="install" depends="all, install-no-build"/>
+
+	<target name="clean">
+		<delete dir="${build.intermediate}"/>
+		<delete dir="${build.output}"/>
+		<delete file="ovirt-engine-extension-aaa-ldap.spec"/>
+	</target>
+
+	<target name="conf">
+		<delete file="${build.output}/engine.conf"/>
+		<copy
+			file="src/resources/engine.conf"
+			tofile="${build.output}/engine.conf"
+		>
+			<filterset>
+				<filter token="MODULEPATH" value="${dir.pkgmodules}"/>
+			</filterset>
+		</copy>
+	</target>
+
+	<target name="main">
+		<mkdir dir="${build.intermediate}/main"/>
+		<mkdir dir="${build.output}"/>
+		<delete dir="${build.output}/modules"/>
+		<delete dir="${build.intermediate}/main-gen-src"/>
+		<mkdir dir="${build.output}/modules/org/ovirt/engine-extensions/aaa/ldap/main"/>
+		<copy
+			todir="${build.intermediate}/main-gen-src"
+			overwrite="true"
+		>
+			<fileset dir="src/main/java-gen"/>
+			<filterset>
+				<filter token="PACKAGE_NAME" value="${package.name}"/>
+				<filter token="PACKAGE_VERSION" value="${package.version}${package.version-suffix}"/>
+				<filter token="PACKAGE_DISPLAY_NAME" value="${package.display.name}"/>
+				<filter token="PROFILES_DIR" value="${dir.profiles}"/>
+			</filterset>
+		</copy>
+		<javac
+			debug="true"
+			debuglevel="lines,vars,source"
+			encoding="utf-8"
+			includeantruntime="no"
+			srcdir="${build.intermediate}/main-gen-src"
+			destdir="${build.intermediate}/main"
+		/>
+		<javac
+			debug="true"
+			debuglevel="lines,vars,source"
+			encoding="utf-8"
+			includeantruntime="no"
+			srcdir="src/main/java"
+			destdir="${build.intermediate}/main"
+		>
+			<compilerarg value="-Xlint"/>
+			<classpath refid="classpath.buildtime"/>
+		</javac>
+		<jar
+			destfile="${build.output}/modules/org/ovirt/engine-extensions/aaa/ldap/main/ovirt-engine-extension-aaa-ldap.jar"
+		>
+			<fileset dir="${build.intermediate}/main"/>
+			<fileset dir="src/main/resources"/>
+		</jar>
+		<copy
+			file="src/resources/module.xml"
+			todir="${build.output}/modules/org/ovirt/engine-extensions/aaa/ldap/main"
+		/>
+		<copy
+			file="${jar.unboundid-ldapsdk}"
+			todir="${build.output}/modules/org/ovirt/engine-extensions/aaa/ldap/main"
+		/>
+	</target>
+
+	<target name="tests" depends="main">
+		<mkdir dir="${build.intermediate}/test"/>
+		<mkdir dir="${build.output}"/>
+		<javac
+			debug="true"
+			debuglevel="lines,vars,source"
+			encoding="utf-8"
+			includeantruntime="no"
+			srcdir="src/test/java"
+			destdir="${build.intermediate}/test"
+		>
+			<compilerarg value="-Xlint"/>
+			<classpath refid="classpath.runtime"/>
+		</javac>
+		<jar
+			destfile="${build.output}/ovirt-engine-extension-aaa-ldap-test.jar"
+		>
+			<fileset dir="${build.intermediate}/test"/>
+			<fileset dir="src/test/resources"/>
+		</jar>
+	</target>
+
+	<target name="spec">
+		<copy
+			file="ovirt-engine-extension-aaa-ldap.spec.in"
+			tofile="ovirt-engine-extension-aaa-ldap.spec"
+			overwrite="true"
+		>
+			<filterset>
+				<filter token="PACKAGE_NAME" value="${package.name}"/>
+				<filter token="PACKAGE_VERSION" value="${package.version}${package.version-suffix}"/>
+				<filter token="RPM_VERSION" value="${rpm.version}"/>
+				<filter token="RPM_RELEASE" value="${rpm.release}"/>
+			</filterset>
+		</copy>
+	</target>
+
+	<target name="dist" depends="spec">
+		<delete file="${package.name}-${package.version}${package.version-suffix}.tar.gz"/>
+		<tar
+			destfile="${package.name}-${package.version}${package.version-suffix}.tar.gz"
+			compression="gzip"
+		>
+			<tarfileset dir=".">
+				<include name=".gitignore"/>
+				<include name="COPYING"/>
+				<include name="ChangeLog"/>
+				<include name="Makefile"/>
+				<include name="README*"/>
+				<include name="build.xml"/>
+				<include name="ovirt-engine-extension-aaa-ldap.spec"/>
+				<include name="ovirt-engine-extension-aaa-ldap.spec.in"/>
+				<include name="profiles/**"/>
+				<include name="src/**"/>
+			</tarfileset>
+		</tar>
+	</target>
+
+	<target name="install-no-build">
+		<copy todir="${dir.destdir}${dir.profiles}">
+			<fileset dir="profiles"/>
+		</copy>
+		<chmod
+			dir="${dir.destdir}${dir.profiles}"
+			perm="u=rwX,go=rX"
+		/>
+		<copy todir="${dir.destdir}${dir.pkgmodules}">
+			<fileset dir="${build.output}/modules"/>
+		</copy>
+		<chmod
+			dir="${dir.destdir}${dir.pkgdata}"
+			perm="u=rwX,go=rX"
+		/>
+		<copy
+			file="${build.output}/engine.conf"
+			tofile="${dir.destdir}${dir.sysconf}/ovirt-engine/engine.conf.d/50-${package.name}.conf"
+		/>
+		<chmod
+			file="${dir.destdir}${dir.sysconf}/ovirt-engine/engine.conf.d/50-${package.name}.conf"
+			perm="u=rw,go=r"
+		/>
+	</target>
+
+	<target name="check.auth" depends="tests">
+		<java
+			classname="org.ovirt.engineextensions.aaa.ldap.AuthTest"
+			fork="yes"
+			failonerror="yes"
+		>
+			<sysproperty key="java.util.logging.config.file" value="src/test/resources/logging.properties"/>
+			<classpath>
+				<path refid="classpath.runtime"/>
+				<pathelement path="${build.output}/ovirt-engine-extension-aaa-ldap-test.jar"/>
+			</classpath>
+			<arg value="src/test/resources/profiles/${profile}"/>
+		</java>
+	</target>
+
+	<target name="check.profile" depends="tests">
+		<java
+			classname="org.ovirt.engineextensions.aaa.ldap.ProfileTest"
+			fork="yes"
+			failonerror="yes"
+		>
+			<sysproperty key="java.util.logging.config.file" value="src/test/resources/logging.properties"/>
+			<classpath>
+				<path refid="classpath.runtime"/>
+				<pathelement path="${build.output}/ovirt-engine-extension-aaa-ldap-test.jar"/>
+			</classpath>
+			<arg value="src/test/resources/profiles"/>
+		</java>
+	</target>
+
+</project>
