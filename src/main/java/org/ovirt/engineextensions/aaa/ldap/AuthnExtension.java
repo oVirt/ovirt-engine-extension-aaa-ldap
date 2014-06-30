@@ -202,6 +202,7 @@ public class AuthnExtension implements Extension {
         vars.put(ExtensionUtil.VARS_PASSWORD, input.<String> get(Authn.InvokeKeys.CREDENTIALS));
         vars.put(ExtensionUtil.VARS_PASSWORD_NEW, input.<String> get(Authn.InvokeKeys.CREDENTIALS_NEW));
         framework.runSequence(sequenceCredentialsChange, vars);
+        output.put(Authn.InvokeKeys.RESULT, Authn.AuthResult.SUCCESS);
 
         log.debug("doCredentialsChange Return");
     }
