@@ -17,7 +17,31 @@ Refer to README.unboundid-ldapsdk for known issues and limitations.
 EXTENSION CONFIGURATION
 -----------------------
 
-/etc/ovirt-enigne/extensions.d/<name>.conf
+AUTHZ
+
+Configure authorization extension.
+
+/etc/ovirt-enigne/extensions.d/@AUTHZ_NAME@.properties
+
+ovirt.engine.extension.name = @AUTHZ_NAME@
+ovirt.engine.extension.bindings.method = jbossmodule
+ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine-extensions.aaa.ldap
+ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engineextensions.aaa.ldap.AuthzExtension
+ovirt.engine.extension.provides = org.ovirt.engine.api.extensions.aaa.Authz
+config.profile.file.1 = @PROFILE_CONFIGURATION@
+
+@AUTHZ_NAME@
+    Extension instance name.
+@PROFILE@
+    Profile name, visible to user.
+@PROFILE_CONFIGURATION@
+    Profile configuration file.
+
+AUTHN
+
+Configure authentication extension.
+
+/etc/ovirt-enigne/extensions.d/@AUTHN_NAME@.properties
 
 ovirt.engine.extension.name = @AUTHN_NAME@
 ovirt.engine.extension.bindings.method = jbossmodule
@@ -28,15 +52,10 @@ ovirt.engine.aaa.authn.profile.name = @PROFILE@
 ovirt.engine.aaa.authn.authz.plugin = @AUTHZ_NAME@
 config.profile.file.1 = @PROFILE_CONFIGURATION@
 
-ovirt.engine.extension.name = @AUTHZ_NAME@
-ovirt.engine.extension.bindings.method = jbossmodule
-ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine-extensions.aaa.ldap
-ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engineextensions.aaa.ldap.AuthzExtension
-ovirt.engine.extension.provides = org.ovirt.engine.api.extensions.aaa.Authz
-config.profile.file.1 = @PROFILE_CONFIGURATION@
-
-@AUTHN_NAME@, @AUTHZ_NAME@
+@AUTHN_NAME@
     Extension instance name.
+@AUTHZ_NAME@
+    Authz extension instance name.
 @PROFILE@
     Profile name, visible to user.
 @PROFILE_CONFIGURATION@
