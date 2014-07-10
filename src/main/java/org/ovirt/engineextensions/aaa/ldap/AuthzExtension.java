@@ -381,7 +381,13 @@ public class AuthzExtension implements Extension {
         sequenceResolvePrincipal = configuration.getProperty(PREFIX_CONFIG_AUTHZ + "sequence.resolve-principal.name", "resolve-principal");
 
         if (Boolean.valueOf(framework.getGlobals().get(ExtensionUtil.VARS_CAPABILITY_RECUSRIVE_GROUP_RESOLUTION).toString())) {
-            // TODO
+            context.put(
+                Authz.ContextKeys.CAPABILITIES,
+                context.<Long>get(
+                    Authz.ContextKeys.CAPABILITIES,
+                    0l
+                ) | Authz.Capabilities.RECURSIVE_GROUP_RESOLUTION
+            );
         }
     }
 
