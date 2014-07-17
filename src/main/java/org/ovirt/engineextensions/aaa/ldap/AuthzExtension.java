@@ -45,7 +45,7 @@ public class AuthzExtension implements Extension {
         Map<ExtKey, String> fromKeys;
     }
 
-    public static final ExtKey RAW_GROUPS_KEY = new ExtKey("AAA_LDAP_UNBOUNDID_RAW_GROUPS", List/*<String>*/.class, "c51860df-9998-48a5-998f-843c2f88998a");
+    public static final ExtKey RAW_GROUPS_KEY = new ExtKey("AAA_LDAP_UNBOUNDID_RAW_GROUPS", Collection/*<String>*/.class, "c51860df-9998-48a5-998f-843c2f88998a");
 
     private static final String PREFIX_CONFIG_AUTHZ = "config.authz.";
 
@@ -58,7 +58,7 @@ public class AuthzExtension implements Extension {
 
     private Framework framework;
     private volatile boolean frameworkInitialized = false;
-    private List<String> namespaces = new ArrayList<>();
+    private Collection<String> namespaces = new ArrayList<>();
 
     private String attrmapGroupRecord;
     private String attrmapPrincipalRecord;
@@ -166,7 +166,7 @@ public class AuthzExtension implements Extension {
         if (key == null) {
             log.trace("no key");
             List<Filter> filters = new ArrayList<>();
-            for (ExtMap subfilter : filter.<List<ExtMap>>get(Authz.QueryFilterRecord.FILTER)) {
+            for (ExtMap subfilter : filter.<Collection<ExtMap>>get(Authz.QueryFilterRecord.FILTER)) {
                 Filter f = transformFilter(subfilter, attrmap, fromKeys, prefix);
                 if (f != null) {
                     filters.add(f);
@@ -251,13 +251,13 @@ public class AuthzExtension implements Extension {
     throws Exception {
         log.debug("_resolveGroups Entry");
 
-        List<String> groups = record.<List<String>>get(RAW_GROUPS_KEY);
+        Collection<String> groups = record.<List<String>>get(RAW_GROUPS_KEY);
         if (groups != null) {
             record.remove(RAW_GROUPS_KEY);
 
             for (String group : groups) {
                 log.debug("Resolving: '{}'", group);
-                List<ExtMap> groupRecords = record.<List<ExtMap>>get(groupsKey, new LinkedList<ExtMap>());
+                Collection<ExtMap> groupRecords = record.<Collection<ExtMap>>get(groupsKey, new LinkedList<ExtMap>());
                 record.put(groupsKey, groupRecords);
                 ExtMap groupRecord = cache.get(group);
                 if (groupRecord == null) {
@@ -304,7 +304,7 @@ public class AuthzExtension implements Extension {
         log.debug("_resolveGroups Return");
     }
 
-    private void resolveGroups(List<ExtMap> records, String sequence, ExtKey groupsKey, boolean recursive)
+    private void resolveGroups(Collection<ExtMap> records, String sequence, ExtKey groupsKey, boolean recursive)
     throws Exception {
         log.debug("resolveGroups Entry");
 
@@ -312,7 +312,7 @@ public class AuthzExtension implements Extension {
         for (ExtMap record : records) {
             _resolveGroups(record, sequence, groupsKey, false, cache);
             if (recursive) {
-                for (ExtMap groupRecord : record.<List<ExtMap>>get(groupsKey, Collections.<ExtMap>emptyList())) {
+                for (ExtMap groupRecord : record.<Collection<ExtMap>>get(groupsKey, Collections.<ExtMap>emptyList())) {
                     _resolveGroups(groupRecord, sequence, Authz.GroupRecord.GROUPS, true, cache);
                 }
             }
