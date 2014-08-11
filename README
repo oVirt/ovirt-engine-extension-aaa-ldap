@@ -64,14 +64,15 @@ config.profile.file.1 = @PROFILE_CONFIGURATION@
 PROFILE CONFIGURATION EXAMPLES
 ------------------------------
 
-OPENLDAP/IPA/RHDS
+OPENLDAP/389DS/RHDS/IPA
 
 Using simple bind transport using startTLS:
 
     # select one
     include <openldap.properties>
-    #include <ipa.properties>
+    #include <389ds.properties>
     #include <rhds.properties>
+    #include <ipa.properties>
 
     vars.user = uid=search,cn=users,cn=accounts,dc=company,dc=com
     vars.password = 123456
