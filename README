@@ -225,7 +225,7 @@ config.authn.sequence.authn.name = ID [authn]
 
     Output:
         authTranslatedMessage
-        PrincipalRecord_NAME
+        PrincipalRecord_PRINCIPAL
         message
 
 attrmap.map-principal-record.name = ID [map-principal-record]
@@ -272,7 +272,7 @@ config.authz.sequence.resolve-principal.name = ID [resolve-principal]
     Used during user login to fetch properties of principal name.
 
     Input:
-        PrincipalRecord_NAME
+        PrincipalRecord_PRINCIPAL
 
     Output:
         PrincipalRecord_xxxx

@@ -153,7 +153,7 @@ public class AuthzExtension implements Extension {
 
     private Filter transformFilter(
         ExtMap filter,
-        Map<String, Framework.AttrMapInfo> attrmap,
+        List<Framework.AttrMapInfo> attrmap,
         Map<ExtKey, String> fromKeys,
         String prefix
     ) {
@@ -192,8 +192,8 @@ public class AuthzExtension implements Extension {
             String field = fromKeys.get(key);
             if (field != null) {
                 Framework.AttrMapInfo attrInfo = null;
-                for (Framework.AttrMapInfo entry : attrmap.values()) {
-                    if (entry.hasAlias(prefix + field)) {
+                for (Framework.AttrMapInfo entry : attrmap) {
+                    if (entry.getName().equals(prefix + field)) {
                         attrInfo = entry;
                     }
                 }
@@ -214,16 +214,16 @@ public class AuthzExtension implements Extension {
                         throw new IllegalArgumentException("Invalid search operator");
                     case Authz.QueryFilterOperator.EQ:
                         if (prefixEquals) {
-                            ret = Filter.createSubstringFilter(attrInfo.getName(), value.stringValue(), null, null);
+                            ret = Filter.createSubstringFilter(attrInfo.getMap(), value.stringValue(), null, null);
                         } else {
-                            ret = Filter.createEqualityFilter(attrInfo.getName(), value.getValue());
+                            ret = Filter.createEqualityFilter(attrInfo.getMap(), value.getValue());
                         }
                         break;
                     case Authz.QueryFilterOperator.LE:
-                        ret = Filter.createLessOrEqualFilter(attrInfo.getName(), value.getValue());
+                        ret = Filter.createLessOrEqualFilter(attrInfo.getMap(), value.getValue());
                         break;
                     case Authz.QueryFilterOperator.GE:
-                        ret = Filter.createGreaterOrEqualFilter(attrInfo.getName(), value.getValue());
+                        ret = Filter.createGreaterOrEqualFilter(attrInfo.getMap(), value.getValue());
                         break;
                     }
                 }
@@ -415,7 +415,7 @@ public class AuthzExtension implements Extension {
 
         Map<String, Object> vars = framework.createSequenceVars();
         vars.put(
-            ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "NAME",
+            ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "PRINCIPAL",
             input.<ExtMap>get(Authn.InvokeKeys.AUTH_RECORD).get(
                 Authn.AuthRecord.PRINCIPAL
             )

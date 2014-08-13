@@ -257,10 +257,12 @@ ATTRIBUTE MAP
     # Specific settings
     attrmap.@POOLID@.*
 
-    # Conversion to use: STRING, BASE64
-    attrmap.default.map.@ATTR@.conversion = STRING
-    # Alias to append.
-    attrmap.default.map.@ATTR@.alias = @STRING@
+    # Conversion to use: STRING, BASE64, DATE
+    attrmap.default.attr.@ALIAS@.conversion = STRING
+    # Map attribute.
+    attrmap.default.attr.@ALIAS@.map = @ATTRIBUTE@
+    # String.format
+    attrmap.default.attr.@ALIAS@.format = %s
 
 SEARCH
 

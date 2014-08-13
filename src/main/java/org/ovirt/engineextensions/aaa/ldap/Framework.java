@@ -42,23 +42,21 @@ public class Framework implements Closeable {
         private final String name;
         private final AttrConversion conversion;
         private final String format;
-        private final Set<String> aliases = new HashSet<>();
-        private AttrMapInfo(String name, String conversion, String format, String alias) {
+        private final String map;
+        private AttrMapInfo(String name, String conversion, String format, String map) {
             this.name = name;
             this.conversion = AttrConversion.valueOf(conversion);
             this.format = format;
-            this.aliases.add(name);
-            if (alias != null) {
-                this.aliases.add(alias);
-            }
+            this.map = map;
         }
         @Override
         public String toString() {
             return String.format(
-                "AttrMapInfo(%s, '%s', %s)",
+                "AttrMapInfo(%s, %s, '%s', %s)",
+                name,
                 conversion,
                 format,
-                aliases
+                map
             );
         }
         public String getName() {
@@ -70,8 +68,8 @@ public class Framework implements Closeable {
         public String getFormat() {
             return format;
         }
-        public boolean hasAlias(String alias) {
-            return aliases.contains(alias);
+        public String getMap() {
+            return map;
         }
         public String encode(ASN1OctetString value) {
             return String.format(format, conversion.encode(value));
@@ -100,7 +98,7 @@ public class Framework implements Closeable {
     public static class SearchInstance {
         private LDAPConnectionPool connectionPool;
         private LDAPConnection connection;
-        private Map<String, AttrMapInfo> attrMap;
+        private List<AttrMapInfo> attrMap;
         private SearchRequest searchRequest;
         private boolean doPaging;
         private ASN1OctetString resumeCookie;
@@ -850,14 +848,14 @@ public class Framework implements Closeable {
         }
     }
 
-    public Map<String, AttrMapInfo> getAttrMap(
+    public List<AttrMapInfo> getAttrMap(
         String name,
         Map<String, Object> vars
     ) throws LDAPException {
 
         log.debug("Entry name='{}'", name);
 
-        Map<String, AttrMapInfo> ret = new HashMap<>();
+        List<AttrMapInfo> ret = new ArrayList<>();
 
         final String PREFIX_ATTRMAP = "attrmap";
         MapProperties attrProps = Util.expandMap(
@@ -868,14 +866,15 @@ public class Framework implements Closeable {
             "seq",
             vars
         );
-        for (Map.Entry<String, MapProperties> entry : attrProps.getOrEmpty("map").getMap().entrySet()) {
-            AttrMapInfo attrInfo = new AttrMapInfo(
-                entry.getKey(),
-                entry.getValue().getString(AttrConversion.STRING.toString(), "conversion"),
-                entry.getValue().getString("%s", "format"),
-                entry.getValue().getString(null, "alias")
+        for (Map.Entry<String, MapProperties> entry : attrProps.getOrEmpty("attr").getMap().entrySet()) {
+            ret.add (
+                new AttrMapInfo(
+                    entry.getKey(),
+                    entry.getValue().getString(AttrConversion.STRING.toString(), "conversion"),
+                    entry.getValue().getString("%s", "format"),
+                    entry.getValue().getString(null, "map")
+                )
             );
-            ret.put(attrInfo.name, attrInfo);
         }
 
         log.debug("AttrMapInfo Return {}", ret);
@@ -885,7 +884,7 @@ public class Framework implements Closeable {
 
     private List<Map<String, List<String>>> searchMapEntries(
         List<SearchResultEntry> entries,
-        Map<String, AttrMapInfo> attrMap
+        List<AttrMapInfo> attrMap
     ) {
         List<Map<String, List<String>>> ret = new LinkedList<>();
 
@@ -894,22 +893,27 @@ public class Framework implements Closeable {
             ret.add(mapped);
             mapped.put("_dn", Arrays.asList(entry.getDN()));
             for (Attribute attribute : entry.getAttributes()) {
-                AttrMapInfo attrInfo = attrMap.get(attribute.getBaseName());
-                List<String> values = new ArrayList<>();
-                for (ASN1OctetString value : attribute.getRawValues()) {
-                    values.add(
-                        attrInfo != null ?
-                        attrInfo.encode(value) :
-                        value.stringValue()
-                    );
-                }
-
-                if (attrInfo == null) {
-                    mapped.put(attribute.getBaseName(), values);
-                } else {
-                    for (String alias : attrInfo.aliases) {
-                        mapped.put(alias, values);
+                boolean found = false;
+                for (AttrMapInfo attrInfo : attrMap) {
+                    if (attribute.getBaseName().equals(attrInfo.getMap())) {
+                        found = true;
+                        List<String> values = new ArrayList<>();
+                        for (ASN1OctetString value : attribute.getRawValues()) {
+                            values.add(
+                                attrInfo != null ?
+                                attrInfo.encode(value) :
+                                value.stringValue()
+                            );
+                        }
+                        mapped.put(attrInfo.getName(), values);
                     }
+                }
+                if (!found) {
+                    List<String> values = new ArrayList<>();
+                    for (ASN1OctetString value : attribute.getRawValues()) {
+                        values.add(value.stringValue());
+                    }
+                    mapped.put(attribute.getBaseName(), values);
                 }
             }
         }

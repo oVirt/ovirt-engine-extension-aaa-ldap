@@ -164,7 +164,7 @@ public class AuthnExtension implements Extension {
             authResult
         ).mput(
             Authn.InvokeKeys.PRINCIPAL,
-            vars.get(ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "NAME")
+            vars.get(ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "PRINCIPAL")
         ).mput(
             Authn.InvokeKeys.USER_MESSAGE,
             vars.get(Framework.VARS_MESSAGE)
@@ -175,7 +175,7 @@ public class AuthnExtension implements Extension {
                 Authn.InvokeKeys.AUTH_RECORD,
                 new ExtMap().mput(
                     Authn.AuthRecord.PRINCIPAL,
-                    vars.get(ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "NAME")
+                    vars.get(ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "PRINCIPAL")
                 )
             );
         }
@@ -195,7 +195,7 @@ public class AuthnExtension implements Extension {
 
         Map<String, Object> vars = framework.createSequenceVars();
         if (input.<String> get(Authn.InvokeKeys.PRINCIPAL) != null) {
-            vars.put(ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "NAME", input.<String> get(Authn.InvokeKeys.PRINCIPAL));
+            vars.put(ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "PRINCIPAL", input.<String> get(Authn.InvokeKeys.PRINCIPAL));
         } else {
             vars.put(ExtensionUtil.VARS_USER, input.<String> get(Authn.InvokeKeys.USER));
         }
