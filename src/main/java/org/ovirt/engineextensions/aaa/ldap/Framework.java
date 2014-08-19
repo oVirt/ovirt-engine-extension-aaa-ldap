@@ -316,7 +316,12 @@ public class Framework implements Closeable {
             log.debug("DIGESTMD5BindRequestProperties: {}", bindprops);
             bindRequest = new DIGESTMD5BindRequest(bindprops);
         } else if ("gssapi".equals(authType)) {
-            GSSAPIBindRequestProperties bindprops = new GSSAPIBindRequestProperties(user, password);
+            String ruser = user;
+            String[] userComps = user.split("@", 2);
+            if (userComps.length == 2) {
+                ruser = userComps[0] + "@" + userComps[1].toUpperCase();
+            }
+            GSSAPIBindRequestProperties bindprops = new GSSAPIBindRequestProperties(ruser, password);
             Util.setObjectByProperties(bindprops, authProps, "set");
             log.debug("GSSAPIBindRequestProperties: {}", bindprops);
             bindRequest = new GSSAPIBindRequest(bindprops);

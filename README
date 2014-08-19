@@ -189,11 +189,22 @@ config.mapAuthRecord.pattern = ^(?<name>.*)@.*$
 config.mapAuthRecord.replacement = ${name}
 config.mapAuthRecord.mustMatch = true
 
-AUTHZ EXTENSION
+AUTHN EXTENSION NOTES
 
-In case of Active Directory, instruct extension to use realm as principal,
-add the following to extension configuration:
+In case sasl mechanism is used, such as gssapi, set the following within
+extension configuration:
 
+# Active Directory
+config.globals.bindFormat.ad_bindFormat = realm
+# Other
+config.globals.bindFormat.simple_bindFormat = realm
+
+AUTHZ EXTENSION NOTES
+
+In case kerberos is used as authn, for example using mod_auth_kerb,
+instruct extension to use realm format for principal:
+
+# Active Directory
 config.globals.principalFormat.ad_principalFormat = realm
 
 ADVANCED EXTENSION CONFIGURATION
