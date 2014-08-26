@@ -148,6 +148,8 @@ Pool of LDAP connections, based on specific policy.
     pool.default.socketfactory.resolver.uRL = dns://
     # jndi properties to use, prefix is truncated.
     pool.default.socketfactory.resolver.jndi-properties.@PROPERTY@ = @STRING@
+    # permit plain address usage
+    pool.default.socketfactory.resolver.enableAddressOnly = false
 
     # SSL
     pool.default.ssl.enable = false

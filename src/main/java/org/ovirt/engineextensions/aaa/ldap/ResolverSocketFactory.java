@@ -26,6 +26,16 @@ public class ResolverSocketFactory extends SocketFactory {
 
     private final SocketFactory socketFactory;
     private final Resolver resolver;
+    private boolean enableAddressOnly = false;
+
+    private boolean checkAddress(InetAddress address) {
+        boolean ret = false;
+        ret = address.toString().charAt(0) == '/' || Resolver.isAddress(address.getHostName());
+        if (ret && !enableAddressOnly) {
+            throw new IllegalArgumentException();
+        }
+        return ret;
+    }
 
     public ResolverSocketFactory(Resolver resolver, SocketFactory socketFactory) {
         if (socketFactory == null) {
@@ -37,6 +47,10 @@ public class ResolverSocketFactory extends SocketFactory {
 
     public ResolverSocketFactory(Resolver resolver) {
         this(resolver, null);
+    }
+
+    public void setEnableAddressOnly(boolean enableAddressOnly) {
+        this.enableAddressOnly = enableAddressOnly;
     }
 
     public Socket createSocket()
@@ -56,18 +70,20 @@ public class ResolverSocketFactory extends SocketFactory {
 
     public Socket createSocket(InetAddress host, int port)
     throws IOException {
-        if (host.toString().charAt(0) == '/' || Resolver.isAddress(host.getHostName())) {
-            throw new IllegalArgumentException();
+        if (checkAddress(host)) {
+            return socketFactory.createSocket(host, port);
+        } else {
+            return createSocket(host.getHostName(), port);
         }
-        return createSocket(host.getHostName(), port);
     }
 
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort)
     throws IOException {
-        if (address.toString().charAt(0) == '/' || Resolver.isAddress(address.getHostName())) {
-            throw new IllegalArgumentException();
+        if (checkAddress(address)) {
+            return socketFactory.createSocket(address, port, localAddress, localPort);
+        } else {
+            return createSocket(address.getHostName(), port, localAddress, localPort);
         }
-        return createSocket(address.getHostName(), port, localAddress, localPort);
     }
 }
 

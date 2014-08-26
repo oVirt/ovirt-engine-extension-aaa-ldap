@@ -487,6 +487,7 @@ public class Framework implements Closeable {
                 resolver,
                 socketFactory
             );
+            Util.setObjectByProperties(socketFactory, socketFactoryProps, "set");
             /* HACK-END */
             /*
              * HACK-BEGIN

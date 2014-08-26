@@ -36,7 +36,10 @@ be performed in addition and after the Java native resolution.
 
 The resolver socket factory is a hack, it is not using any documented feature
 of the SDK, it assumes that the host name will be accepted one way or the
-other by the socket factory.
+other by the socket factory. To detect potential changes within the sdk that
+may break this assumption, the resolver socket factory will reject plain
+address usage, as it cannot detect if address was provided by user or by
+modified logic within the sdk.
 
 Suggested implementation: support resolver implementation within the core of
 the SDK, similar to the socket factory support. Until such time the resolver
