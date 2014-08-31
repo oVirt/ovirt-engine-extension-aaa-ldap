@@ -128,6 +128,7 @@ public class Framework implements Closeable {
     public static final String VARS_RESULT_CODE = "resultCode";
     public static final String VARS_SENSITIVE = "sensitiveKeys";
     public static final String VARS_STOP = "stop";
+    public static final String VARS_DN = "_dn";
 
     private static final Map<ResultCode, String> resultCodeNameMap;
     static {
@@ -897,7 +898,12 @@ public class Framework implements Closeable {
         for (SearchResultEntry entry : entries) {
             Map<String, List<String>> mapped = new HashMap<>();
             ret.add(mapped);
-            mapped.put("_dn", Arrays.asList(entry.getDN()));
+            mapped.put(VARS_DN, Arrays.asList(entry.getDN()));
+            for (AttrMapInfo attrInfo : attrMap) {
+                if (VARS_DN.equals(attrInfo.getMap())) {
+                    mapped.put(attrInfo.getName(), Arrays.asList(entry.getDN()));
+                }
+            }
             for (Attribute attribute : entry.getAttributes()) {
                 boolean found = false;
                 for (AttrMapInfo attrInfo : attrMap) {
@@ -905,11 +911,7 @@ public class Framework implements Closeable {
                         found = true;
                         List<String> values = new ArrayList<>();
                         for (ASN1OctetString value : attribute.getRawValues()) {
-                            values.add(
-                                attrInfo != null ?
-                                attrInfo.encode(value) :
-                                value.stringValue()
-                            );
+                            values.add(attrInfo.encode(value));
                         }
                         mapped.put(attrInfo.getName(), values);
                     }

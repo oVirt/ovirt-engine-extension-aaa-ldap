@@ -286,6 +286,8 @@ config.authz.sequence.resolve-principal.name = ID [resolve-principal]
         PrincipalRecord_PRINCIPAL
 
     Output:
+        PrincipalRecord_DN - dn of object
+        PrincipalRecord_GROUPS_RAW - list of groups dn
         PrincipalRecord_xxxx
 
 config.authz.sequence.query-groups.name = ID [query-groups]
@@ -308,4 +310,6 @@ config.authz.sequence.resolve-group.name = ID [resolve-group]
         dn
 
     Output:
+        GroupRecord_DN - dn of object
+        GroupRecord_GROUPS_RAW - list of groups dn
         GroupRecord_xxxx

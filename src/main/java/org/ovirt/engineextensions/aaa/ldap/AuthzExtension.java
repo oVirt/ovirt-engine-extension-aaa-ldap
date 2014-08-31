@@ -45,6 +45,7 @@ public class AuthzExtension implements Extension {
         Map<ExtKey, String> fromKeys;
     }
 
+    public static final ExtKey DN_KEY = new ExtKey("AAA_LDAP_UNBOUNDID_DN", String.class, "95ca004b-6fe5-4552-988a-f3542171f713");
     public static final ExtKey RAW_GROUPS_KEY = new ExtKey("AAA_LDAP_UNBOUNDID_RAW_GROUPS", Collection/*<String>*/.class, "c51860df-9998-48a5-998f-843c2f88998a");
 
     private static final String PREFIX_CONFIG_AUTHZ = "config.authz.";
@@ -284,6 +285,9 @@ public class AuthzExtension implements Extension {
                             Authz.GroupRecord.NAMESPACE,
                             resolveNamespace(group)
                         ).mput(
+                            DN_KEY,
+                            vars.get(ExtensionUtil.GROUP_RECORD_PREFIX + "DN")
+                        ).mput(
                             RAW_GROUPS_KEY,
                             vars.get(ExtensionUtil.GROUP_RECORD_PREFIX + "GROUPS_RAW")
                         );
@@ -432,7 +436,10 @@ public class AuthzExtension implements Extension {
                     }
                 }
             }
-            principalRecord.put(
+            principalRecord.mput(
+                DN_KEY,
+                vars.get(ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "DN")
+            ).mput(
                 RAW_GROUPS_KEY,
                 vars.get(ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "GROUPS_RAW")
             );
@@ -542,7 +549,6 @@ public class AuthzExtension implements Extension {
 
                 for (Map<String, List<String>> entry : entries) {
                     ExtMap record = new ExtMap();
-                    record.put(opaque.namespaceKey, opaque.namespace);
                     for (Map.Entry<String, List<String>> var : entry.entrySet()) {
                         if (var.getKey().startsWith(opaque.varPrefix)) {
                             ExtKey key = opaque.toKeys.get(var.getKey().substring(opaque.varPrefix.length()));
@@ -554,21 +560,27 @@ public class AuthzExtension implements Extension {
                             }
                         }
                     }
-                    if (opaque.resolveGroups) {
-                        record.put(
-                            RAW_GROUPS_KEY,
-                            entry.get(opaque.varPrefix + "GROUPS_RAW")
-                        );
-                    }
+                    record.mput(
+                        opaque.namespaceKey,
+                        opaque.namespace
+                    ).mput(
+                        DN_KEY,
+                        entry.get(opaque.varPrefix + "DN").get(0)
+                    ).mput(
+                        RAW_GROUPS_KEY,
+                        entry.get(opaque.varPrefix + "GROUPS_RAW")
+                    );
                     records.add(record);
                 }
 
-                resolveGroups(
-                    records,
-                    sequenceResolveGroup,
-                    opaque.groupsKey,
-                    opaque.resolveGroupsRecursive
-                );
+                if (opaque.resolveGroups) {
+                    resolveGroups(
+                        records,
+                        sequenceResolveGroup,
+                        opaque.groupsKey,
+                        opaque.resolveGroupsRecursive
+                    );
+                }
 
                 log.debug("doQueryExecute records#={}", records.size());
                 log.trace("Records: {}", records);
