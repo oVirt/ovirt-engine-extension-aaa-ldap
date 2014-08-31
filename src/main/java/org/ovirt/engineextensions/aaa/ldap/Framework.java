@@ -1243,6 +1243,23 @@ public class Framework implements Closeable {
                             opProps.getString(null, "variable"),
                             opProps.getString(null, "value")
                         );
+                    } else if ("var-list-append".equals(type)) {
+                        ArrayList<Object> l = new ArrayList<>();
+                        for (
+                            Collection<?> c :
+                            Arrays.asList(
+                                (Collection<?>)vars.get(opProps.getString(null, "left-variable")),
+                                (Collection<?>)vars.get(opProps.getString(null, "right-variable"))
+                            )
+                        ) {
+                            if (c != null) {
+                                l.addAll(c);
+                            }
+                        }
+                        vars.put(
+                            opProps.getString(null, "variable"),
+                            l
+                        );
                     } else if ("sysprop-set".equals(type)) {
                         System.setProperty(
                             opProps.getString(null, "name"),

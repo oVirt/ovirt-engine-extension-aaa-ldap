@@ -120,6 +120,12 @@ resolve hosts.
     pool.default.auth.simple.bindDN = ${global:vars.user}
     pool.default.auth.simple.password = ${global:vars.password}
 
+Global catalog lookup can be enabled to support inter-forest group
+resolution. Not enabled by default as it has performance costs. Add the
+following to authz extension configuration:
+
+    config.globals.000.ad_enable_gc = true
+
 APACHE SSO CONFIGURATION
 ------------------------
 
@@ -312,4 +318,24 @@ config.authz.sequence.resolve-group.name = ID [resolve-group]
     Output:
         GroupRecord_DN - dn of object
         GroupRecord_GROUPS_RAW - list of groups dn
+        GroupRecord_xxxx
+
+config.authz.sequence.complete-principal.name = ID [complete-principal]
+    Optional sequence name to complete principal attributes.
+    Used post principal fetch.
+
+    Input:
+        PrincipalRecord_xxxx
+
+    Output:
+        PrincipalRecord_xxxx
+
+config.authz.sequence.complete-group.name = ID [complete-group]
+    Optional sequence name to complete group attributes.
+    Used post group fetch.
+
+    Input:
+        GroupRecord_xxxx
+
+    Output:
         GroupRecord_xxxx

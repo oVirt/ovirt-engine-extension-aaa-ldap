@@ -41,6 +41,7 @@ public class AuthzExtension implements Extension {
         ExtKey groupsKey;
         ExtKey namespaceKey;
         String varPrefix;
+        String completeSequence;
         Map<String, ExtKey> toKeys;
         Map<ExtKey, String> fromKeys;
     }
@@ -69,6 +70,8 @@ public class AuthzExtension implements Extension {
     private String sequenceQueryPrincipals;
     private String sequenceResolveGroup;
     private String sequenceResolvePrincipal;
+    private String sequenceCompletePrincipal;
+    private String sequenceCompleteGroup;
 
     private static Map<ExtKey, String>  getRecordKeys(Class<?> clz) {
         Map<ExtKey, String> ret  = new HashMap<ExtKey, String>();
@@ -235,6 +238,34 @@ public class AuthzExtension implements Extension {
         return ret;
     }
 
+    private ExtMap transformVarsToRecord(
+        Map<String, Object> vars,
+        Map<String, ExtKey> toKeys,
+        String varPrefix,
+        ExtKey namespaceKey,
+        String namespace
+    ) {
+        ExtMap record = new ExtMap();
+        for (Map.Entry<String, Object> var : vars.entrySet()) {
+            if (var.getKey().startsWith(varPrefix)) {
+                ExtKey key = toKeys.get(var.getKey().substring(varPrefix.length()));
+                if (key != null) {
+                    record.put(key, vars.get(var.getKey()).toString());
+                }
+            }
+        }
+        return record.mput(
+            namespaceKey,
+            record.get(namespaceKey, namespace)
+        ).mput(
+            DN_KEY,
+            vars.get(varPrefix + "DN")
+        ).mput(
+            RAW_GROUPS_KEY,
+            vars.get(varPrefix + "GROUPS_RAW")
+        );
+    }
+
     private String resolveNamespace(String dn) {
         String candidate = "";
         for (String namespace : namespaces) {
@@ -248,7 +279,7 @@ public class AuthzExtension implements Extension {
         return candidate;
     }
 
-    private void _resolveGroups(ExtMap record, String sequence, ExtKey groupsKey, boolean recursive, Map<String, ExtMap> cache)
+    private void _resolveGroups(ExtMap record, ExtKey groupsKey, boolean recursive, Map<String, ExtMap> cache)
     throws Exception {
         log.debug("_resolveGroups Entry");
 
@@ -268,28 +299,16 @@ public class AuthzExtension implements Extension {
                         ExtensionUtil.VARS_DN,
                         group
                     );
-                    framework.runSequence(sequence, vars);
+                    framework.runSequence(sequenceResolveGroup, vars);
                     if (vars.get(ExtensionUtil.GROUP_RECORD_PREFIX + "ID") == null) {
                         log.debug("WARNING: Cannot resolve group '{}'", group);
                     } else {
-                        groupRecord = new ExtMap();
-                        for (Map.Entry<String, Object> entry : vars.entrySet()) {
-                            if (entry.getKey().startsWith(ExtensionUtil.GROUP_RECORD_PREFIX)) {
-                                ExtKey key = groupToRecordKeys.get(entry.getKey().substring(ExtensionUtil.GROUP_RECORD_PREFIX.length()));
-                                if (key != null) {
-                                    groupRecord.put(key, vars.get(entry.getKey()).toString());
-                                }
-                            }
-                        }
-                        groupRecord.mput(
+                        framework.runSequence(sequenceCompleteGroup, vars);
+                        groupRecord = transformVarsToRecord(
+                            vars, groupToRecordKeys,
+                            ExtensionUtil.GROUP_RECORD_PREFIX,
                             Authz.GroupRecord.NAMESPACE,
                             resolveNamespace(group)
-                        ).mput(
-                            DN_KEY,
-                            vars.get(ExtensionUtil.GROUP_RECORD_PREFIX + "DN")
-                        ).mput(
-                            RAW_GROUPS_KEY,
-                            vars.get(ExtensionUtil.GROUP_RECORD_PREFIX + "GROUPS_RAW")
                         );
                     }
                 }
@@ -299,7 +318,7 @@ public class AuthzExtension implements Extension {
 
                 if (recursive) {
                     for (ExtMap entry : groupRecords) {
-                        _resolveGroups(entry, sequence, groupsKey, recursive, cache);
+                        _resolveGroups(entry, groupsKey, recursive, cache);
                     }
                 }
             }
@@ -308,16 +327,16 @@ public class AuthzExtension implements Extension {
         log.debug("_resolveGroups Return");
     }
 
-    private void resolveGroups(Collection<ExtMap> records, String sequence, ExtKey groupsKey, boolean recursive)
+    private void resolveGroups(Collection<ExtMap> records, ExtKey groupsKey, boolean recursive)
     throws Exception {
         log.debug("resolveGroups Entry");
 
         Map<String, ExtMap> cache = new HashMap<>();
         for (ExtMap record : records) {
-            _resolveGroups(record, sequence, groupsKey, false, cache);
+            _resolveGroups(record, groupsKey, false, cache);
             if (recursive) {
                 for (ExtMap groupRecord : record.<Collection<ExtMap>>get(groupsKey, Collections.<ExtMap>emptyList())) {
-                    _resolveGroups(groupRecord, sequence, Authz.GroupRecord.GROUPS, true, cache);
+                    _resolveGroups(groupRecord, Authz.GroupRecord.GROUPS, true, cache);
                 }
             }
         }
@@ -383,6 +402,8 @@ public class AuthzExtension implements Extension {
         sequenceQueryPrincipals = configuration.getProperty(PREFIX_CONFIG_AUTHZ + "sequence.query-principals.name", "query-principals");
         sequenceResolveGroup = configuration.getProperty(PREFIX_CONFIG_AUTHZ + "sequence.resolve-group.name", "resolve-group");
         sequenceResolvePrincipal = configuration.getProperty(PREFIX_CONFIG_AUTHZ + "sequence.resolve-principal.name", "resolve-principal");
+        sequenceCompletePrincipal = configuration.getProperty(PREFIX_CONFIG_AUTHZ + "sequence.complete-principal.name", "complete-principal");
+        sequenceCompleteGroup = configuration.getProperty(PREFIX_CONFIG_AUTHZ + "sequence.complete-group.name", "complete-group");
 
         if (Boolean.valueOf(framework.getGlobals().get(ExtensionUtil.VARS_CAPABILITY_RECUSRIVE_GROUP_RESOLUTION).toString())) {
             context.put(
@@ -427,26 +448,19 @@ public class AuthzExtension implements Extension {
         framework.runSequence(sequenceResolvePrincipal, vars);
 
         if (vars.get(ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "ID") != null) {
-            ExtMap principalRecord = new ExtMap();
-            for (Map.Entry<String, Object> entry : vars.entrySet()) {
-                if (entry.getKey().startsWith(ExtensionUtil.PRINCIPAL_RECORD_PREFIX)) {
-                    ExtKey key = principalToRecordKeys.get(entry.getKey().substring(ExtensionUtil.PRINCIPAL_RECORD_PREFIX.length()));
-                    if (key != null) {
-                        principalRecord.put(key, vars.get(entry.getKey()).toString());
-                    }
-                }
-            }
-            principalRecord.mput(
-                DN_KEY,
-                vars.get(ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "DN")
-            ).mput(
-                RAW_GROUPS_KEY,
-                vars.get(ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "GROUPS_RAW")
+
+            framework.runSequence(sequenceCompletePrincipal, vars);
+
+            ExtMap principalRecord = transformVarsToRecord(
+                vars,
+                principalToRecordKeys,
+                ExtensionUtil.PRINCIPAL_RECORD_PREFIX,
+                Authz.PrincipalRecord.NAMESPACE,
+                null
             );
 
             resolveGroups(
                 Arrays.asList(principalRecord),
-                sequenceResolveGroup,
                 Authz.PrincipalRecord.GROUPS,
                 true
             );
@@ -489,6 +503,7 @@ public class AuthzExtension implements Extension {
             opaque.groupsKey = Authz.PrincipalRecord.GROUPS;
             opaque.namespaceKey = Authz.PrincipalRecord.NAMESPACE;
             opaque.varPrefix = ExtensionUtil.PRINCIPAL_RECORD_PREFIX;
+            opaque.completeSequence = sequenceCompletePrincipal;
             opaque.toKeys = principalToRecordKeys;
             opaque.fromKeys = principalFromRecordKeys;
             sequence = sequenceQueryPrincipals;
@@ -497,6 +512,7 @@ public class AuthzExtension implements Extension {
             opaque.groupsKey = Authz.GroupRecord.GROUPS;
             opaque.namespaceKey = Authz.GroupRecord.NAMESPACE;
             opaque.varPrefix = ExtensionUtil.GROUP_RECORD_PREFIX;
+            opaque.completeSequence = sequenceCompleteGroup;
             opaque.toKeys = groupToRecordKeys;
             opaque.fromKeys = groupFromRecordKeys;
             sequence = sequenceQueryGroups;
@@ -548,35 +564,36 @@ public class AuthzExtension implements Extension {
                 List<ExtMap> records = new LinkedList<>();
 
                 for (Map<String, List<String>> entry : entries) {
-                    ExtMap record = new ExtMap();
+
+                    Map<String, Object> vars = framework.createSequenceVars();
                     for (Map.Entry<String, List<String>> var : entry.entrySet()) {
-                        if (var.getKey().startsWith(opaque.varPrefix)) {
+                        Object value = var.getValue();
+                        if (var.getKey().equals(opaque.varPrefix + "DN")) {
+                            value = var.getValue().get(0);
+                        } else if (var.getKey().startsWith(opaque.varPrefix)) {
                             ExtKey key = opaque.toKeys.get(var.getKey().substring(opaque.varPrefix.length()));
                             if (key != null) {
-                                record.put(
-                                    key,
-                                    var.getValue().get(0).toString()
-                                );
+                                value = var.getValue().get(0);
                             }
                         }
+                        vars.put(var.getKey(), value);
                     }
-                    record.mput(
-                        opaque.namespaceKey,
-                        opaque.namespace
-                    ).mput(
-                        DN_KEY,
-                        entry.get(opaque.varPrefix + "DN").get(0)
-                    ).mput(
-                        RAW_GROUPS_KEY,
-                        entry.get(opaque.varPrefix + "GROUPS_RAW")
+                    framework.runSequence(opaque.completeSequence, vars);
+
+                    records.add(
+                        transformVarsToRecord(
+                            vars,
+                            opaque.toKeys,
+                            opaque.varPrefix,
+                            opaque.namespaceKey,
+                            opaque.namespace
+                        )
                     );
-                    records.add(record);
                 }
 
                 if (opaque.resolveGroups) {
                     resolveGroups(
                         records,
-                        sequenceResolveGroup,
                         opaque.groupsKey,
                         opaque.resolveGroupsRecursive
                     );
