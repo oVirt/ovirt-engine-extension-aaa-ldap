@@ -441,11 +441,12 @@ public class AuthzExtension implements Extension {
         Map<String, Object> vars = framework.createSequenceVars();
         vars.put(
             ExtensionUtil.PRINCIPAL_RECORD_PREFIX + "PRINCIPAL",
-            input.<String>get(
-                Authn.InvokeKeys.PRINCIPAL,
+            (
+                input.containsKey(Authn.InvokeKeys.AUTH_RECORD) ?
                 input.<ExtMap>get(Authn.InvokeKeys.AUTH_RECORD).<String>get(
                     Authn.AuthRecord.PRINCIPAL
-                )
+                ) :
+                input.<String>get(Authz.InvokeKeys.PRINCIPAL)
             )
         );
         framework.runSequence(sequenceResolvePrincipal, vars);
