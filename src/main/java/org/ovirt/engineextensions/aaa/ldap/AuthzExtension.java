@@ -463,11 +463,13 @@ public class AuthzExtension implements Extension {
                 null
             );
 
-            resolveGroups(
-                Arrays.asList(principalRecord),
-                Authz.PrincipalRecord.GROUPS,
-                true
-            );
+            if ((input.<Integer>get(Authz.InvokeKeys.QUERY_FLAGS) & Authz.QueryFlags.RESOLVE_GROUPS) != 0) {
+                resolveGroups(
+                    Arrays.asList(principalRecord),
+                    Authz.PrincipalRecord.GROUPS,
+                    (input.<Integer>get(Authz.InvokeKeys.QUERY_FLAGS) & Authz.QueryFlags.RESOLVE_GROUPS_RECURSIVE) != 0
+                );
+            }
 
             output.mput(
                 Authz.InvokeKeys.PRINCIPAL_RECORD,
