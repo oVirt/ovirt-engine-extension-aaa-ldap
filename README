@@ -120,12 +120,6 @@ resolve hosts.
     pool.default.auth.simple.bindDN = ${global:vars.user}
     pool.default.auth.simple.password = ${global:vars.password}
 
-Global catalog lookup can be enabled to support inter-forest group
-resolution. Not enabled by default as it has performance costs. Add the
-following to authz extension configuration:
-
-    config.globals.000.ad_enable_gc = true
-
 APACHE SSO CONFIGURATION
 ------------------------
 
@@ -173,15 +167,11 @@ ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engineextensions.aa
 ovirt.engine.extension.provides = org.ovirt.engine.api.extensions.aaa.Authn
 ovirt.engine.aaa.authn.profile.name = http
 ovirt.engine.aaa.authn.authz.plugin = ldap-authz
-# optional, see mapping section
 ovirt.engine.aaa.authn.mapping.plugin = http-mapping
 config.artifact.name = HEADER
 config.artifact.arg = X-Remote-User
 
 MAPPING
-
-Optional, if transformation required. For all providers but Active Directory
-removing realm is required.
 
 /etc/ovirt-engine/extensions.d/http-mapping.properties
 
@@ -192,27 +182,23 @@ ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine-extensions.
 ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engineextensions.aaa.misc.mapping.MappingExtension
 ovirt.engine.extension.provides = org.ovirt.engine.api.extensions.aaa.Mapping
 config.mapAuthRecord.type = regex
-config.mapAuthRecord.regex.pattern = ^(?<name>.*)@.*$
-config.mapAuthRecord.regex.replacement = ${name}
 config.mapAuthRecord.regex.mustMatch = true
+config.mapAuthRecord.regex.pattern = ^(?<user>.*?)((\\\\(?<at>@)(?<suffix>.*?)@.*)|(?<realm>@.*))$
+
+# START-TECHDEP
+# Active directory:
+config.mapAuthRecord.regex.replacement = ${user}${at}${suffix}${realm}
+# Other
+config.mapAuthRecord.regex.replacement = ${user}${at}${suffix}
+# END-TECHDEP
 
 AUTHN EXTENSION NOTES
 
 In case sasl mechanism is used, such as gssapi, set the following within
 extension configuration:
 
-# Active Directory
-config.globals.bindFormat.ad_bindFormat = realm
-# Other
+# Except of active directory
 config.globals.bindFormat.simple_bindFormat = realm
-
-AUTHZ EXTENSION NOTES
-
-In case kerberos is used as authn, for example using mod_auth_kerb,
-instruct extension to use realm format for principal:
-
-# Active Directory
-config.globals.principalFormat.ad_principalFormat = realm
 
 ADVANCED EXTENSION CONFIGURATION
 --------------------------------
