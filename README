@@ -21,7 +21,7 @@ AUTHZ
 
 Configure authorization extension.
 
-/etc/ovirt-enigne/extensions.d/@AUTHZ_NAME@.properties
+/etc/ovirt-engine/extensions.d/@AUTHZ_NAME@.properties
 
 ovirt.engine.extension.name = @AUTHZ_NAME@
 ovirt.engine.extension.bindings.method = jbossmodule
@@ -41,7 +41,7 @@ AUTHN
 
 Configure authentication extension.
 
-/etc/ovirt-enigne/extensions.d/@AUTHN_NAME@.properties
+/etc/ovirt-engine/extensions.d/@AUTHN_NAME@.properties
 
 ovirt.engine.extension.name = @AUTHN_NAME@
 ovirt.engine.extension.bindings.method = jbossmodule
@@ -93,9 +93,9 @@ Round robin configuration:
 
 More supported configuration at README.profile.
 
-OpenLDAP note: memberOf overlay must be enabled.
-
 ACTIVE DIRECTORY
+
+Active Directory 2003 R2 and above is supported.
 
 Using simple bind transport using startTLS. Unfortunately, SASL does not provide
 bind failure reasons.
@@ -260,6 +260,27 @@ config.authz.sequence.namespace.name = ID [namespace]
     Output:
         query
 
+config.authz.sequence.resolve-principal.name = ID [resolve-principal]
+    Sequence name of resolve principal.
+    Used during user login to fetch properties of principal name.
+
+    Input:
+        PrincipalRecord_PRINCIPAL
+
+    Output:
+        query
+
+config.authz.sequence.resolve-groups.name = ID [resolve-groups]
+    Sequence name of resolve groups out of DN.
+    Used during user login to fetch groups recursively.
+    Used during directory sync.
+
+    Input:
+        dn
+
+    Output:
+        query*
+
 config.authz.sequence.query-principals.name = ID [query-principals]
     Sequence name of query principal.
     Used during administrative tasks.
@@ -271,18 +292,6 @@ config.authz.sequence.query-principals.name = ID [query-principals]
     Output:
         query
 
-config.authz.sequence.resolve-principal.name = ID [resolve-principal]
-    Sequence name of resolve principal.
-    Used during user login to fetch properties of principal name.
-
-    Input:
-        PrincipalRecord_PRINCIPAL
-
-    Output:
-        PrincipalRecord_DN - dn of object
-        PrincipalRecord_GROUPS_RAW - list of groups dn
-        PrincipalRecord_xxxx
-
 config.authz.sequence.query-groups.name = ID [query-groups]
     Sequence name of query groups.
     Used during administrative tasks.
@@ -293,36 +302,3 @@ config.authz.sequence.query-groups.name = ID [query-groups]
 
     Output:
         query
-
-config.authz.sequence.resolve-group.name = ID [resolve-group]
-    Sequence name of resolve group.
-    Used during user login to fetch groups recursively.
-    Used during directory sync.
-
-    Input:
-        dn
-
-    Output:
-        GroupRecord_DN - dn of object
-        GroupRecord_GROUPS_RAW - list of groups dn
-        GroupRecord_xxxx
-
-config.authz.sequence.complete-principal.name = ID [complete-principal]
-    Optional sequence name to complete principal attributes.
-    Used post principal fetch.
-
-    Input:
-        PrincipalRecord_xxxx
-
-    Output:
-        PrincipalRecord_xxxx
-
-config.authz.sequence.complete-group.name = ID [complete-group]
-    Optional sequence name to complete group attributes.
-    Used post group fetch.
-
-    Input:
-        GroupRecord_xxxx
-
-    Output:
-        GroupRecord_xxxx
