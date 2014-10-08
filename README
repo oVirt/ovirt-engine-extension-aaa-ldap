@@ -73,6 +73,7 @@ Using simple bind transport using startTLS:
     #include = <389ds.properties>
     #include = <rhds.properties>
     #include = <ipa.properties>
+    #include = <rfc2307.properties>
 
     vars.user = uid=search,cn=users,cn=accounts,dc=company,dc=com
     vars.password = 123456
