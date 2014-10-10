@@ -1197,6 +1197,22 @@ public class Framework implements Closeable {
                             opProps.getString(null, "name"),
                             vars
                         );
+                    } else if ("for-each".equals(type)) {
+                        Object values = vars.get(opProps.getString(null, "variable"));
+                        if (values != null) {
+                            if (!(values instanceof Collection)) {
+                                values = Arrays.asList(values);
+                            }
+                            int vi = 0;
+                            for (Object v : (Collection)values) {
+                                vars.put(opProps.getString("forEachIndex", "var-index"), vi);
+                                vars.put(opProps.getString("forEachValue", "var-value"), v);
+                                runSequence(
+                                    opProps.getString(null, "sequence"),
+                                    vars
+                                );
+                            }
+                        }
                     } else if ("auth-check".equals(type)) {
                         authCheck(
                             opProps.getString(null, "name"),
