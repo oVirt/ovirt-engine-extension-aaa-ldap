@@ -71,6 +71,25 @@ public class MapProperties {
         return builder.toString();
     }
 
+    private <T> T validateMandatory(T o, String... keys) {
+        if (o == null) {
+            StringBuffer sb = new StringBuffer();
+            for (String k : keys) {
+                if (sb.length() > 0) {
+                    sb.append(".");
+                }
+                sb.append(k);
+            }
+            throw new IllegalStateException(
+                String.format(
+                    "%s must be specified",
+                    sb
+                )
+            );
+        }
+        return o;
+    }
+
     public MapProperties() {
     }
 
@@ -236,6 +255,23 @@ public class MapProperties {
             return Long.valueOf(props.value);
         }
     }
+
+    public String getMandatoryString(String... keys) {
+        return validateMandatory(getString(null, keys), keys);
+    }
+
+    public Boolean getMandatoryBoolean(String... keys) {
+        return validateMandatory(getBoolean(null, keys), keys);
+    }
+
+    public Integer getMandatoryInt(String... keys) {
+        return validateMandatory(getInt(null, keys), keys);
+    }
+
+    public Long getMandatoryLong(String... keys) {
+        return validateMandatory(getLong(null, keys), keys);
+    }
+
 }
 
 // vim: expandtab tabstop=4 shiftwidth=4

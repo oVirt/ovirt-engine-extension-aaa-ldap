@@ -211,8 +211,8 @@ public class Framework implements Closeable {
             return null;
         } else {
             return s.replaceFirst(
-                props.getString(null, "pattern"),
-                props.getString(null, "replace")
+                props.getMandatoryString("pattern"),
+                props.getMandatoryString("replace")
             );
         }
     }
@@ -253,10 +253,7 @@ public class Framework implements Closeable {
 
         String ret = diagProps.getString(
             diagProps.getString(
-                props.getString(
-                    null,
-                    "default"
-                ),
+                diagProps.getMandatoryString("default"),
                 prefix
             ),
             prefix,
@@ -277,7 +274,7 @@ public class Framework implements Closeable {
         BindRequest bindRequest = null;
 
         final String POOL_PREFIX_AUTH = "auth";
-        String authType = poolProps.getString(null, POOL_PREFIX_AUTH, "type");
+        String authType = poolProps.getString("none", POOL_PREFIX_AUTH, "type");
         MapProperties authProps = poolProps.getOrEmpty(POOL_PREFIX_AUTH, authType);
 
         log.debug("createBindRequest Entry type='{}', user='{}'", authType, user);
@@ -343,7 +340,7 @@ public class Framework implements Closeable {
         this.props = applyDefault(props);
         dumpProperties(this.props);
 
-        statsTTL = this.props.getInt(null, "stats", "interval");
+        statsTTL = this.props.getMandatoryInt("stats", "interval");
 
         MapProperties debugProps = this.props.getOrEmpty("sdk", "debug");
         Boolean debug = debugProps.getBoolean(null, "enable");
@@ -446,7 +443,7 @@ public class Framework implements Closeable {
                         "algorithm"
                     )
                 );
-                kmf.init(keyStore, keystoreProps.getString(null, "password").toCharArray());
+                kmf.init(keyStore, keystoreProps.getMandatoryString("password").toCharArray());
                 keyManagers = kmf.getKeyManagers();
             }
 
@@ -476,7 +473,7 @@ public class Framework implements Closeable {
 
         log.debug("Creating SocketFactory");
         final String POOL_PREFIX_SOCKET_FACTORY = "socketfactory";
-        String socketFactoryType = poolProps.getString(null, POOL_PREFIX_SOCKET_FACTORY, "type");
+        String socketFactoryType = poolProps.getString("java", POOL_PREFIX_SOCKET_FACTORY, "type");
         MapProperties socketFactoryProps = poolProps.get(POOL_PREFIX_SOCKET_FACTORY, socketFactoryType);
         if ("java".equals(socketFactoryType)) {
         } else if ("resolver".equals(socketFactoryType)) {
@@ -511,9 +508,9 @@ public class Framework implements Closeable {
         final String POOL_PREFIX_SERVERSET = "serverset";
         final String SERVERSET_SERVER = "server";
         final String SERVERSET_PORT = "port";
-        String serversetType = poolProps.getString(null, POOL_PREFIX_SERVERSET, "type");
+        String serversetType = poolProps.getString("single", POOL_PREFIX_SERVERSET, "type");
         MapProperties serverSetProps = poolProps.get(POOL_PREFIX_SERVERSET, serversetType);
-        String defaultPort = serverSetProps.getString(null, SERVERSET_PORT);
+        String defaultPort = serverSetProps.getString("389", SERVERSET_PORT);
         ServerSet serverset;
         if ("single".equals(serversetType)) {
             serverset = new SingleServerSet(
@@ -572,9 +569,9 @@ public class Framework implements Closeable {
             serverset = new DNSSRVRecordServerSet(
                 String.format(
                     "_%s._%s.%s",
-                    serverSetProps.getString(null, "service"),
-                    serverSetProps.getString(null, "protocol"),
-                    serverSetProps.getString(null, "domain")
+                    serverSetProps.getMandatoryString("service"),
+                    serverSetProps.getMandatoryString("protocol"),
+                    serverSetProps.getMandatoryString("domain")
                 ),
                 null,
                 serverSetProps.getOrEmpty("jndi-properties").toProperties(),
@@ -728,8 +725,8 @@ public class Framework implements Closeable {
             "seq",
             vars
         );
-        String pool = authCheckProps.getString(null, "pool");
-        String user = authCheckProps.getString(null, "user");
+        String pool = authCheckProps.getMandatoryString("pool");
+        String user = authCheckProps.getMandatoryString("user");
 
         if (user == null || user.isEmpty()) {
             throw new IllegalArgumentException("User required for authentication check");
@@ -881,7 +878,7 @@ public class Framework implements Closeable {
                     entry.getKey(),
                     entry.getValue().getString(AttrConversion.STRING.toString(), "conversion"),
                     entry.getValue().getString("%s", "format"),
-                    entry.getValue().getString(null, "map")
+                    entry.getValue().getMandatoryString("map")
                 )
             );
         }
@@ -993,7 +990,7 @@ public class Framework implements Closeable {
         log.debug("SearchRequest: {}", searchRequest);
 
         SearchInstance instance = new SearchInstance();
-        instance.connectionPool = getConnectionPool(searchProps.getString(null, "pool"));
+        instance.connectionPool = getConnectionPool(searchProps.getMandatoryString("pool"));
         instance.connection = instance.connectionPool.getConnection();
         instance.searchRequest = searchRequest;
         instance.doPaging = searchProps.getBoolean(Boolean.TRUE, "paging");;
@@ -1150,12 +1147,12 @@ public class Framework implements Closeable {
                         run = true;
                     } else if ("var-set".equals(conditionType)) {
                         run = vars.get(
-                            conditionProps.getString(null, "variable")
+                            conditionProps.getMandatoryString("variable")
                         ) != null;
                     } else if ("compare".equals(conditionType)) {
                         String convertType = conditionProps.getString("string", "conversion");
-                        Object left = conditionProps.getString(null, "left");
-                        Object right = conditionProps.getString(null, "right");
+                        Object left = conditionProps.getMandatoryString("left");
+                        Object right = conditionProps.getMandatoryString("right");
                         if ("string".equals(convertType)) {
                         } else if ("numeric".equals(convertType)) {
                             left = Long.valueOf(left.toString());
@@ -1201,11 +1198,11 @@ public class Framework implements Closeable {
                             );
                         } else if ("call".equals(type)) {
                             runSequence(
-                                opProps.getString(null, "name"),
+                                opProps.getMandatoryString("name"),
                                 vars
                             );
                         } else if ("for-each".equals(type)) {
-                            Object values = vars.get(opProps.getString(null, "variable"));
+                            Object values = vars.get(opProps.getMandatoryString("variable"));
                             if (values != null) {
                                 if (!(values instanceof Collection)) {
                                     values = Arrays.asList(values);
@@ -1215,14 +1212,14 @@ public class Framework implements Closeable {
                                     vars.put(opProps.getString("forEachIndex", "var-index"), vi);
                                     vars.put(opProps.getString("forEachValue", "var-value"), v);
                                     runSequence(
-                                        opProps.getString(null, "sequence"),
+                                        opProps.getMandatoryString("sequence"),
                                         vars
                                     );
                                 }
                             }
                         } else if ("auth-check".equals(type)) {
                             authCheck(
-                                opProps.getString(null, "name"),
+                                opProps.getMandatoryString("name"),
                                 vars
                             );
                         } else if ("fetch-record".equals(type)) {
@@ -1235,7 +1232,7 @@ public class Framework implements Closeable {
                                 }
                             }
                             List<Map<String, List<String>>> searchEntries = search(
-                                opProps.getString(null, "search"),
+                                opProps.getMandatoryString("search"),
                                 0,
                                 5,
                                 vars
@@ -1249,7 +1246,7 @@ public class Framework implements Closeable {
                                     if (info == null) {
                                         vars.put(ATTRVARS_PREFIX + e.getKey(), e.getValue().get(0));
                                     } else {
-                                        String varname = info.getString(null, "name");
+                                        String varname = info.getMandatoryString("name");
                                         int select = info.getInt(0, "select");
                                         if (select == -1) {
                                             vars.put(varname, e.getValue());
@@ -1263,16 +1260,16 @@ public class Framework implements Closeable {
                             }
                         } else if ("var-set".equals(type)) {
                             vars.put(
-                                opProps.getString(null, "variable"),
-                                opProps.getString(null, "value")
+                                opProps.getMandatoryString("variable"),
+                                opProps.getMandatoryString("value")
                             );
                         } else if ("var-list-append".equals(type)) {
                             ArrayList<Object> l = new ArrayList<>();
                             for (
                                 Collection<?> c :
                                 Arrays.asList(
-                                    (Collection<?>)vars.get(opProps.getString(null, "left-variable")),
-                                    (Collection<?>)vars.get(opProps.getString(null, "right-variable"))
+                                    (Collection<?>)vars.get(opProps.getMandatoryString("left-variable")),
+                                    (Collection<?>)vars.get(opProps.getMandatoryString("right-variable"))
                                 )
                             ) {
                                 if (c != null) {
@@ -1280,19 +1277,19 @@ public class Framework implements Closeable {
                                 }
                             }
                             vars.put(
-                                opProps.getString(null, "variable"),
+                                opProps.getMandatoryString("variable"),
                                 l
                             );
                         } else if ("sysprop-set".equals(type)) {
                             System.setProperty(
-                                opProps.getString(null, "name"),
-                                opProps.getString(null, "value")
+                                opProps.getMandatoryString("name"),
+                                opProps.getMandatoryString("value")
                             );
                         } else if ("regex".equals(type)) {
-                            String pattern = opProps.getString(null, "pattern");
+                            String pattern = opProps.getMandatoryString("pattern");
                             log.debug("Pattern: {}", pattern);
                             Matcher matcher = Pattern.compile(pattern).matcher(
-                                opProps.getString(null, "value")
+                                opProps.getMandatoryString("value")
                             );
                             if (matcher.matches()) {
                                 for (Map.Entry<String, MapProperties> e : opProps.get("replacement").getMap().entrySet()) {
@@ -1306,21 +1303,21 @@ public class Framework implements Closeable {
                             }
                         } else if ("credentials-change".equals(type)) {
                             modifyCredentials(
-                                opProps.getString(null, "pool"),
-                                opProps.getString(null, "user"),
-                                opProps.getString(null, "password", "current"),
-                                opProps.getString(null, "password", "new")
+                                opProps.getMandatoryString("pool"),
+                                opProps.getMandatoryString("user"),
+                                opProps.getMandatoryString("password", "current"),
+                                opProps.getMandatoryString("password", "new")
                             );
                         } else if ("pool-create".equals(type)) {
                             createPool(
-                                opProps.getString(null, "name"),
+                                opProps.getMandatoryString("name"),
                                 vars
                             );
                         } else if ("search-open".equals(type)) {
                             vars.put(
-                                opProps.getString(null, "variable"),
+                                opProps.getMandatoryString("variable"),
                                 searchOpen(
-                                    opProps.getString(null, "search"),
+                                    opProps.getMandatoryString("search"),
                                     0,
                                     0,
                                     vars
@@ -1328,7 +1325,7 @@ public class Framework implements Closeable {
                             );
                         } else if ("time-get".equals(type)) {
                             vars.put(
-                                opProps.getString(null, "variable"),
+                                opProps.getMandatoryString("variable"),
                                 Long.toString(new Date().getTime())
                             );
                         } else {
