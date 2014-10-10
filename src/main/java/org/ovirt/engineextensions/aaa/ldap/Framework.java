@@ -1135,203 +1135,208 @@ public class Framework implements Closeable {
                 log.debug("Running sequence {}/{}/{} {}", name, _entry.getKey(), type, entry.getString("", "description"));
                 dumpVariables(vars);
 
-                boolean run = false;
-                MapProperties condProps = entry.getOrEmpty("condition");
-                String conditionType = condProps.getString("true", "type");
-                MapProperties conditionProps = condProps.get(conditionType);
-                if ("true".equals(conditionType)) {
-                    run = true;
-                } else if ("var-set".equals(conditionType)) {
-                    run = vars.get(
-                        conditionProps.getString(null, "variable")
-                    ) != null;
-                } else if ("compare".equals(conditionType)) {
-                    String convertType = conditionProps.getString("string", "conversion");
-                    Object left = conditionProps.getString(null, "left");
-                    Object right = conditionProps.getString(null, "right");
-                    if ("string".equals(convertType)) {
-                    } else if ("numeric".equals(convertType)) {
-                        left = Long.valueOf(left.toString());
-                        right = Long.valueOf(right.toString());
+                try {
+                    boolean run = false;
+                    MapProperties condProps = entry.getOrEmpty("condition");
+                    String conditionType = condProps.getString("true", "type");
+                    MapProperties conditionProps = condProps.get(conditionType);
+                    if ("true".equals(conditionType)) {
+                        run = true;
+                    } else if ("var-set".equals(conditionType)) {
+                        run = vars.get(
+                            conditionProps.getString(null, "variable")
+                        ) != null;
+                    } else if ("compare".equals(conditionType)) {
+                        String convertType = conditionProps.getString("string", "conversion");
+                        Object left = conditionProps.getString(null, "left");
+                        Object right = conditionProps.getString(null, "right");
+                        if ("string".equals(convertType)) {
+                        } else if ("numeric".equals(convertType)) {
+                            left = Long.valueOf(left.toString());
+                            right = Long.valueOf(right.toString());
+                        } else {
+                            throw new IllegalArgumentException(
+                                String.format("Invalid compare conversion '%s'", convertType)
+                            );
+                        }
+                        @SuppressWarnings("unchecked")
+                        int result = ((Comparable)left).compareTo(right);
+                        if (result < 0) {
+                            result = -1;
+                        } else if (result > 0) {
+                            result = 1;
+                        }
+                        run = result == conditionProps.getInt(0, "result");
                     } else {
                         throw new IllegalArgumentException(
-                            String.format("Invalid compare conversion '%s'", convertType)
+                            String.format("Invalid sequence condition type '%s'", conditionType)
                         );
                     }
-                    @SuppressWarnings("unchecked")
-                    int result = ((Comparable)left).compareTo(right);
-                    if (result < 0) {
-                        result = -1;
-                    } else if (result > 0) {
-                        result = 1;
+                    if (condProps.getBoolean(Boolean.FALSE, "not")) {
+                        run = !run;
                     }
-                    run = result == conditionProps.getInt(0, "result");
-                } else {
-                    throw new IllegalArgumentException(
-                        String.format("Invalid sequence condition type '%s'", conditionType)
-                    );
-                }
-                if (condProps.getBoolean(Boolean.FALSE, "not")) {
-                    run = !run;
-                }
 
-                if (!run) {
-                    log.debug("Skip");
-                } else {
-                    MapProperties opProps = entry.getOrEmpty(type);
-                    if ("noop".equals(type)) {
-                    } else if ("return".equals(type)) {
-                        do_return = true;
-                    } else if ("stop".equals(type)) {
-                        vars.put(VARS_STOP, "true");
-                    } else if ("log".equals(type)) {
-                        log.getClass().getMethod(
-                            opProps.getString("info", "level"),
-                            String.class
-                        ).invoke(
-                            log,
-                            opProps.getString("", "message")
-                        );
-                    } else if ("call".equals(type)) {
-                        runSequence(
-                            opProps.getString(null, "name"),
-                            vars
-                        );
-                    } else if ("for-each".equals(type)) {
-                        Object values = vars.get(opProps.getString(null, "variable"));
-                        if (values != null) {
-                            if (!(values instanceof Collection)) {
-                                values = Arrays.asList(values);
+                    if (!run) {
+                        log.debug("Skip");
+                    } else {
+                        MapProperties opProps = entry.getOrEmpty(type);
+                        if ("noop".equals(type)) {
+                        } else if ("return".equals(type)) {
+                            do_return = true;
+                        } else if ("stop".equals(type)) {
+                            vars.put(VARS_STOP, "true");
+                        } else if ("log".equals(type)) {
+                            log.getClass().getMethod(
+                                opProps.getString("info", "level"),
+                                String.class
+                            ).invoke(
+                                log,
+                                opProps.getString("", "message")
+                            );
+                        } else if ("call".equals(type)) {
+                            runSequence(
+                                opProps.getString(null, "name"),
+                                vars
+                            );
+                        } else if ("for-each".equals(type)) {
+                            Object values = vars.get(opProps.getString(null, "variable"));
+                            if (values != null) {
+                                if (!(values instanceof Collection)) {
+                                    values = Arrays.asList(values);
+                                }
+                                int vi = 0;
+                                for (Object v : (Collection)values) {
+                                    vars.put(opProps.getString("forEachIndex", "var-index"), vi);
+                                    vars.put(opProps.getString("forEachValue", "var-value"), v);
+                                    runSequence(
+                                        opProps.getString(null, "sequence"),
+                                        vars
+                                    );
+                                }
                             }
-                            int vi = 0;
-                            for (Object v : (Collection)values) {
-                                vars.put(opProps.getString("forEachIndex", "var-index"), vi);
-                                vars.put(opProps.getString("forEachValue", "var-value"), v);
-                                runSequence(
-                                    opProps.getString(null, "sequence"),
-                                    vars
-                                );
+                        } else if ("auth-check".equals(type)) {
+                            authCheck(
+                                opProps.getString(null, "name"),
+                                vars
+                            );
+                        } else if ("fetch-record".equals(type)) {
+                            final String ATTRVARS_PREFIX = "search_attr_";
+                            Iterator<Map.Entry<String, Object>> iter = vars.entrySet().iterator();
+                            while(iter.hasNext()) {
+                                Map.Entry<String, Object> e = iter.next();
+                                if (e.getKey().startsWith(ATTRVARS_PREFIX)) {
+                                    iter.remove();
+                                }
                             }
-                        }
-                    } else if ("auth-check".equals(type)) {
-                        authCheck(
-                            opProps.getString(null, "name"),
-                            vars
-                        );
-                    } else if ("fetch-record".equals(type)) {
-                        final String ATTRVARS_PREFIX = "search_attr_";
-                        Iterator<Map.Entry<String, Object>> iter = vars.entrySet().iterator();
-                        while(iter.hasNext()) {
-                            Map.Entry<String, Object> e = iter.next();
-                            if (e.getKey().startsWith(ATTRVARS_PREFIX)) {
-                                iter.remove();
-                            }
-                        }
-                        List<Map<String, List<String>>> searchEntries = search(
-                            opProps.getString(null, "search"),
-                            0,
-                            5,
-                            vars
-                        );
-                        if (searchEntries.size() > 1) {
-                            log.debug("ERROR: Unexpected number of records n={}", searchEntries.size());
-                        } else if (searchEntries.size() == 1) {
-                            MapProperties mapProps = opProps.getOrEmpty("map");
-                            for (Map.Entry<String, List<String>> e : searchEntries.get(0).entrySet()) {
-                                MapProperties info = mapProps.get(e.getKey());
-                                if (info == null) {
-                                    vars.put(ATTRVARS_PREFIX + e.getKey(), e.getValue().get(0));
-                                } else {
-                                    String varname = info.getString(null, "name");
-                                    int select = info.getInt(0, "select");
-                                    if (select == -1) {
-                                        vars.put(varname, e.getValue());
+                            List<Map<String, List<String>>> searchEntries = search(
+                                opProps.getString(null, "search"),
+                                0,
+                                5,
+                                vars
+                            );
+                            if (searchEntries.size() > 1) {
+                                log.debug("ERROR: Unexpected number of records n={}", searchEntries.size());
+                            } else if (searchEntries.size() == 1) {
+                                MapProperties mapProps = opProps.getOrEmpty("map");
+                                for (Map.Entry<String, List<String>> e : searchEntries.get(0).entrySet()) {
+                                    MapProperties info = mapProps.get(e.getKey());
+                                    if (info == null) {
+                                        vars.put(ATTRVARS_PREFIX + e.getKey(), e.getValue().get(0));
                                     } else {
-                                        if (select < e.getValue().size()) {
-                                            vars.put(varname, e.getValue().get(select));
+                                        String varname = info.getString(null, "name");
+                                        int select = info.getInt(0, "select");
+                                        if (select == -1) {
+                                            vars.put(varname, e.getValue());
+                                        } else {
+                                            if (select < e.getValue().size()) {
+                                                vars.put(varname, e.getValue().get(select));
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                    } else if ("var-set".equals(type)) {
-                        vars.put(
-                            opProps.getString(null, "variable"),
-                            opProps.getString(null, "value")
-                        );
-                    } else if ("var-list-append".equals(type)) {
-                        ArrayList<Object> l = new ArrayList<>();
-                        for (
-                            Collection<?> c :
-                            Arrays.asList(
-                                (Collection<?>)vars.get(opProps.getString(null, "left-variable")),
-                                (Collection<?>)vars.get(opProps.getString(null, "right-variable"))
-                            )
-                        ) {
-                            if (c != null) {
-                                l.addAll(c);
+                        } else if ("var-set".equals(type)) {
+                            vars.put(
+                                opProps.getString(null, "variable"),
+                                opProps.getString(null, "value")
+                            );
+                        } else if ("var-list-append".equals(type)) {
+                            ArrayList<Object> l = new ArrayList<>();
+                            for (
+                                Collection<?> c :
+                                Arrays.asList(
+                                    (Collection<?>)vars.get(opProps.getString(null, "left-variable")),
+                                    (Collection<?>)vars.get(opProps.getString(null, "right-variable"))
+                                )
+                            ) {
+                                if (c != null) {
+                                    l.addAll(c);
+                                }
                             }
-                        }
-                        vars.put(
-                            opProps.getString(null, "variable"),
-                            l
-                        );
-                    } else if ("sysprop-set".equals(type)) {
-                        System.setProperty(
-                            opProps.getString(null, "name"),
-                            opProps.getString(null, "value")
-                        );
-                    } else if ("regex".equals(type)) {
-                        String pattern = opProps.getString(null, "pattern");
-                        log.debug("Pattern: {}", pattern);
-                        Matcher matcher = Pattern.compile(pattern).matcher(
-                            opProps.getString(null, "value")
-                        );
-                        if (matcher.matches()) {
-                            for (Map.Entry<String, MapProperties> e : opProps.get("replacement").getMap().entrySet()) {
-                                vars.put(
-                                    e.getKey(),
-                                    matcher.replaceFirst(
-                                        e.getValue().getValue()
-                                    )
-                                );
+                            vars.put(
+                                opProps.getString(null, "variable"),
+                                l
+                            );
+                        } else if ("sysprop-set".equals(type)) {
+                            System.setProperty(
+                                opProps.getString(null, "name"),
+                                opProps.getString(null, "value")
+                            );
+                        } else if ("regex".equals(type)) {
+                            String pattern = opProps.getString(null, "pattern");
+                            log.debug("Pattern: {}", pattern);
+                            Matcher matcher = Pattern.compile(pattern).matcher(
+                                opProps.getString(null, "value")
+                            );
+                            if (matcher.matches()) {
+                                for (Map.Entry<String, MapProperties> e : opProps.get("replacement").getMap().entrySet()) {
+                                    vars.put(
+                                        e.getKey(),
+                                        matcher.replaceFirst(
+                                            e.getValue().getValue()
+                                        )
+                                    );
+                                }
                             }
-                        }
-                    } else if ("credentials-change".equals(type)) {
-                        modifyCredentials(
-                            opProps.getString(null, "pool"),
-                            opProps.getString(null, "user"),
-                            opProps.getString(null, "password", "current"),
-                            opProps.getString(null, "password", "new")
-                        );
-                    } else if ("pool-create".equals(type)) {
-                        createPool(
-                            opProps.getString(null, "name"),
-                            vars
-                        );
-                    } else if ("search-open".equals(type)) {
-                        vars.put(
-                            opProps.getString(null, "variable"),
-                            searchOpen(
-                                opProps.getString(null, "search"),
-                                0,
-                                0,
+                        } else if ("credentials-change".equals(type)) {
+                            modifyCredentials(
+                                opProps.getString(null, "pool"),
+                                opProps.getString(null, "user"),
+                                opProps.getString(null, "password", "current"),
+                                opProps.getString(null, "password", "new")
+                            );
+                        } else if ("pool-create".equals(type)) {
+                            createPool(
+                                opProps.getString(null, "name"),
                                 vars
-                            )
-                        );
-                    } else if ("time-get".equals(type)) {
-                        vars.put(
-                            opProps.getString(null, "variable"),
-                            Long.toString(new Date().getTime())
-                        );
-                    } else {
-                        throw new IllegalArgumentException(
-                            String.format("Invalid sequence type '%s'", type)
-                        );
-                    }
+                            );
+                        } else if ("search-open".equals(type)) {
+                            vars.put(
+                                opProps.getString(null, "variable"),
+                                searchOpen(
+                                    opProps.getString(null, "search"),
+                                    0,
+                                    0,
+                                    vars
+                                )
+                            );
+                        } else if ("time-get".equals(type)) {
+                            vars.put(
+                                opProps.getString(null, "variable"),
+                                Long.toString(new Date().getTime())
+                            );
+                        } else {
+                            throw new IllegalArgumentException(
+                                String.format("Invalid sequence type '%s'", type)
+                            );
+                        }
 
-                    log.debug("End sequence {} {}", name, entry.getString("", "description"));
-                    dumpVariables(vars);
+                        log.debug("End sequence {} {}", name, entry.getString("", "description"));
+                        dumpVariables(vars);
+                    }
+                } catch (Exception e) {
+                    log.debug("Sequence {} {} failed due to exception: {}", name, entry.getString("", "description"), e.getMessage());
+                    throw e;
                 }
             }
         } catch (LDAPException e) {
