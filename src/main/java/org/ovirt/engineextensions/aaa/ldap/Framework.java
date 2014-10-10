@@ -1187,7 +1187,7 @@ public class Framework implements Closeable {
                     } else if ("log".equals(type)) {
                         log.getClass().getMethod(
                             opProps.getString("info", "level"),
-                            Object.class
+                            String.class
                         ).invoke(
                             log,
                             opProps.getString("", "message")
