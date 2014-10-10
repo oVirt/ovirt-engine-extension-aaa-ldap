@@ -1178,7 +1178,7 @@ public class Framework implements Closeable {
                 if (!run) {
                     log.debug("Skip");
                 } else {
-                    MapProperties opProps = entry.get(type);
+                    MapProperties opProps = entry.getOrEmpty(type);
                     if ("noop".equals(type)) {
                     } else if ("return".equals(type)) {
                         do_return = true;
