@@ -225,7 +225,7 @@ public class Framework implements Closeable {
         String diagnosticMessage = Util.toString(vars.get(VARS_DIAGNOSTIC_MESSAGE));
 
         log.debug(
-            "Entry resultCode='{}', diagnosticMessage='{}'",
+            "translateDiagnosticMessage Entry resultCode='{}', diagnosticMessage='{}'",
             resultCode,
             diagnosticMessage
         );
@@ -264,7 +264,7 @@ public class Framework implements Closeable {
         );
 
         log.debug(
-            "Return '{}'",
+            "translateDiagnosticMessage Return '{}'",
             ret
         );
 
@@ -280,7 +280,7 @@ public class Framework implements Closeable {
         String authType = poolProps.getString(null, POOL_PREFIX_AUTH, "type");
         MapProperties authProps = poolProps.getOrEmpty(POOL_PREFIX_AUTH, authType);
 
-        log.debug("Entry type='{}', user='{}'", authType, user);
+        log.debug("createBindRequest Entry type='{}', user='{}'", authType, user);
 
         if ("none".equals(authType)) {
             bindRequest = new SimpleBindRequest();
@@ -332,6 +332,8 @@ public class Framework implements Closeable {
             );
         }
 
+        log.debug("createBindRequest Return {}", bindRequest);
+
         return bindRequest;
     }
 
@@ -379,7 +381,7 @@ public class Framework implements Closeable {
     }
 
     private LDAPConnectionPool createConnectionPool(MapProperties poolProps) throws Exception {
-        log.debug("Entry");
+        log.debug("createConnectionPool Entry");
 
         SSLSocketVerifier sslSocketVerifier = null;
         PostConnectProcessor postConnectProcessor = null;
@@ -603,7 +605,7 @@ public class Framework implements Closeable {
             true
         );
         Util.setObjectByProperties(connectionPool, cpoolProps, "set");
-        log.debug("LDAPConnectionPool: {}", connectionPool);
+        log.debug("createConnectionPool Return: {}", connectionPool);
 
         if (log.isDebugEnabled()) {
             log.debug("Return RootDSE: {}", connectionPool.getRootDSE().getAttributes());
@@ -616,7 +618,7 @@ public class Framework implements Closeable {
     throws Exception {
 
         log.info("Creating LDAP pool '{}' for '{}'", name, instanceName);
-        log.debug("Entry name='{}'", name);
+        log.debug("createPool Entry name='{}'", name);
 
         ConnectionPoolEntry entry = new ConnectionPoolEntry();
         entry.name = name;
@@ -642,11 +644,11 @@ public class Framework implements Closeable {
             previous.close();
         }
 
-        log.debug("Return");
+        log.debug("createPool Return");
     }
 
     public void init() throws Exception {
-        log.debug("Entry");
+        log.debug("init Entry");
 
         globals.put(VARS_STOP, "false");
         for (MapProperties init : props.get("sequence-init").getOrEmpty().getOrEmpty("init").getMap().values()) {
@@ -654,11 +656,11 @@ public class Framework implements Closeable {
         }
         globals.put(VARS_STOP, "false");
 
-        log.debug("Return globals={}", globals);
+        log.debug("init Return globals={}", globals);
     }
 
     public void open() throws Exception {
-        log.debug("Entry");
+        log.debug("open Entry");
 
         Map<String, Object> tempGlobals = new HashMap<>(globals);
 
@@ -672,12 +674,12 @@ public class Framework implements Closeable {
         initglobals.putAll(globals);
         globals.putAll(tempGlobals);
 
-        log.debug("Return globals={}", globals);
+        log.debug("open Return globals={}", globals);
     }
 
     @Override
     public void close() throws IOException {
-        log.debug("Entry");
+        log.debug("close Entry");
         for (ConnectionPoolEntry entry : connectionPools.values()) {
             entry.close();
         }
@@ -686,11 +688,11 @@ public class Framework implements Closeable {
             globals.clear();
             globals.putAll(initglobals);
         }
-        log.debug("Return");
+        log.debug("close Return");
     }
 
     public LDAPConnectionPool getConnectionPool(String name) {
-        log.debug("Entry name='{}'", name);
+        log.debug("getConnectionPool Entry name='{}'", name);
         ConnectionPoolEntry entry = connectionPools.get(name);
         if (entry == null) {
             throw new IllegalArgumentException(
@@ -715,7 +717,7 @@ public class Framework implements Closeable {
         Map<String, Object> vars
     ) throws LDAPException {
 
-        log.debug("Entry name='{}'", name);
+        log.debug("authCheck Entry name='{}'", name);
 
         final String PREFIX_AUTH_CHECK = "auth-check";
         MapProperties authCheckProps = Util.expandMap(
@@ -843,7 +845,7 @@ public class Framework implements Closeable {
             )
         );
 
-        log.debug("Return");
+        log.debug("authCheck Return");
     }
 
     public void modifyCredentials(String pool, String user, String currentPassword, String newPassword) throws LDAPException {
@@ -860,7 +862,7 @@ public class Framework implements Closeable {
         Map<String, Object> vars
     ) throws LDAPException {
 
-        log.debug("Entry name='{}'", name);
+        log.debug("getAttrMap Entry name='{}'", name);
 
         List<AttrMapInfo> ret = new ArrayList<>();
 
@@ -884,7 +886,7 @@ public class Framework implements Closeable {
             );
         }
 
-        log.debug("AttrMapInfo Return {}", ret);
+        log.debug("getAttrMap Return {}", ret);
 
         return ret;
     }
@@ -1005,6 +1007,8 @@ public class Framework implements Closeable {
     }
 
     public void searchClose(SearchInstance instance) {
+        log.debug("searchClose Entry");
+
         try {
             if (instance.resumeCookie != null) {
                 log.debug("Closing unfinished search");
@@ -1021,6 +1025,8 @@ public class Framework implements Closeable {
         } finally {
             instance.connectionPool.releaseConnection(instance.connection);
         }
+
+        log.debug("searchClose Return");
     }
 
     public List<Map<String, List<String>>> searchExecute(
@@ -1028,7 +1034,7 @@ public class Framework implements Closeable {
         int pageSize
     ) throws LDAPException {
 
-        log.trace("Enter");
+        log.trace("searchExecute Entry");
 
         List<Map<String, List<String>>> ret = null;
 
@@ -1095,7 +1101,7 @@ public class Framework implements Closeable {
             }
         }
 
-        log.trace("Return: {}", ret);
+        log.trace("searchExecute Return: {}", ret);
         return ret;
     }
 
@@ -1113,7 +1119,7 @@ public class Framework implements Closeable {
 
         stats();
 
-        log.debug("runSequence entry name='{}'", name);
+        log.debug("runSequence Entry name='{}'", name);
 
         try {
             boolean do_return = false;
