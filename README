@@ -278,6 +278,7 @@ config.authz.sequence.resolve-groups.name = ID [resolve-groups]
 
     Input:
         dn
+        dnType - principal|group
 
     Output:
         query*

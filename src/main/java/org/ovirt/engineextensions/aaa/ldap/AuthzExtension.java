@@ -287,6 +287,10 @@ public class AuthzExtension implements Extension {
                 ExtensionUtil.VARS_DN,
                 record.get(DN_KEY)
             );
+            vars.put(
+                ExtensionUtil.VARS_DN_TYPE,
+                groupsKey.equals(Authz.PrincipalRecord.GROUPS) ? "principal" : "group"
+            );
             framework.runSequence(sequenceResolveGroups, vars);
             for (Map.Entry<String, Object> var : vars.entrySet()) {
                 if (var.getKey().startsWith(ExtensionUtil.VARS_QUERY)) {

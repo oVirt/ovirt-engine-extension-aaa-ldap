@@ -29,6 +29,7 @@ public class ExtensionUtil {
     public static final String VARS_AUTHN_ENABLE = "authn_enable";
     public static final String VARS_AUTHZ_ENABLE = "authz_enable";
     public static final String VARS_DN = "dn";
+    public static final String VARS_DN_TYPE = "dnType";
     public static final String VARS_FILTER = "filter";
     public static final String VARS_MAX_FILTER_SIZE = "maxFilterSize";
     public static final String VARS_NAMESPACE = "namespace";
