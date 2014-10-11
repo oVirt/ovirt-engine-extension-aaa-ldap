@@ -292,6 +292,8 @@ public class AuthzExtension implements Extension {
                 groupsKey.equals(Authz.PrincipalRecord.GROUPS) ? "principal" : "group"
             );
             framework.runSequence(sequenceResolveGroups, vars);
+
+            Set<String> addedGroups = new HashSet<>();
             for (Map.Entry<String, Object> var : vars.entrySet()) {
                 if (var.getKey().startsWith(ExtensionUtil.VARS_QUERY)) {
                     log.debug("Resolving query var '{}'", var.getKey());
@@ -306,14 +308,18 @@ public class AuthzExtension implements Extension {
                                 )) != null
                             ) {
                                 for (Map<String, List<String>> entry : entries) {
-                                    groupRecords.add(
-                                        transformSearchToRecord(
-                                            entry,
-                                            groupToRecordKeys,
-                                            ExtensionUtil.GROUP_RECORD_PREFIX,
-                                            Authz.GroupRecord.NAMESPACE
-                                        )
-                                    );
+                                    String dn = entry.get(ExtensionUtil.GROUP_RECORD_PREFIX + "DN").get(0);
+                                    if (!addedGroups.contains(dn)) {
+                                        addedGroups.add(dn);
+                                        groupRecords.add(
+                                            transformSearchToRecord(
+                                                entry,
+                                                groupToRecordKeys,
+                                                ExtensionUtil.GROUP_RECORD_PREFIX,
+                                                Authz.GroupRecord.NAMESPACE
+                                            )
+                                        );
+                                    }
                                 }
                             }
                         } finally {
