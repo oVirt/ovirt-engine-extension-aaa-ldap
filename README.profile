@@ -339,8 +339,8 @@ SEQUENCE
     # Iterate collection by calling sequence
     sequence.@ID@.@SORT@.for-each.sequence = @ID@
     sequence.@ID@.@SORT@.for-each.variable = @VAR@
-    sequence.@ID@.@SORT@.for-each.var-index = @VAR@  # will hold index
-    sequence.@ID@.@SORT@.for-each.var-value = @VAR@  # will hold value
+    sequence.@ID@.@SORT@.for-each.var-index = @VAR@  # will hold index default: forEachIndex
+    sequence.@ID@.@SORT@.for-each.var-value = @VAR@  # will hold value default: forEachValue
     # Log
     # Log message at level (trace, debug, info, warn, error, fatal)
     sequence.@ID@.@SORT@.log.level = info
