@@ -1209,7 +1209,7 @@ public class Framework implements Closeable {
                                 }
                                 int vi = 0;
                                 for (Object v : (Collection)values) {
-                                    vars.put(opProps.getString("forEachIndex", "var-index"), vi);
+                                    vars.put(opProps.getString("forEachIndex", "var-index"), vi++);
                                     vars.put(opProps.getString("forEachValue", "var-value"), v);
                                     runSequence(
                                         opProps.getMandatoryString("sequence"),
