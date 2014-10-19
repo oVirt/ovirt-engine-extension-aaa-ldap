@@ -991,7 +991,6 @@ public class Framework implements Closeable {
 
         SearchInstance instance = new SearchInstance();
         instance.connectionPool = getConnectionPool(searchProps.getMandatoryString("pool"));
-        instance.connection = instance.connectionPool.getConnection();
         instance.searchRequest = searchRequest;
         instance.doPaging = searchProps.getBoolean(Boolean.TRUE, "paging");;
         instance.pageSize = pageSize != 0 ? pageSize : searchProps.getInt(100, "pageSize");
@@ -1006,21 +1005,25 @@ public class Framework implements Closeable {
     public void searchClose(SearchInstance instance) {
         log.debug("searchClose Entry");
 
-        try {
-            if (instance.resumeCookie != null) {
-                log.debug("Closing unfinished search");
-                instance.searchRequest.setControls(
-                    new SimplePagedResultsControl(
-                        0,
-                        instance.resumeCookie
-                    )
-                );
-                instance.connection.search(instance.searchRequest);
+        if (instance.connection != null) {
+            try {
+                log.debug("We have connection");
+                if (instance.resumeCookie != null) {
+                    log.debug("Closing unfinished search");
+                    instance.searchRequest.setControls(
+                        new SimplePagedResultsControl(
+                            0,
+                            instance.resumeCookie
+                        )
+                    );
+                    instance.connection.search(instance.searchRequest);
+                }
+            } catch(LDAPException e) {
+                log.debug("Ignoring exception", e);
+            } finally {
+                log.debug("Releasing connection");
+                instance.connectionPool.releaseConnection(instance.connection);
             }
-        } catch(LDAPException e) {
-            log.debug("Ignoring exception", e);
-        } finally {
-            instance.connectionPool.releaseConnection(instance.connection);
         }
 
         log.debug("searchClose Return");
@@ -1036,6 +1039,11 @@ public class Framework implements Closeable {
         List<Map<String, List<String>>> ret = null;
 
         if (!instance.done) {
+            if (instance.connection == null) {
+                log.debug("Getting connection");
+                instance.connection = instance.connectionPool.getConnection();
+            }
+
             if (instance.doPaging) {
                 instance.searchRequest.setControls(
                     new SimplePagedResultsControl(
