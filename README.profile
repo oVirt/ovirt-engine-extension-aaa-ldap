@@ -185,7 +185,7 @@ Pool of LDAP connections, based on specific policy.
     pool.default.serverset.{round-robin|failover|fastest-connect|fewest-connections}.@SORT@.server = @STRING@
     pool.default.serverset.{round-robin|failover|fastest-connect|fewest-connections}.@SORT@.port = 389
     pool.default.serverset.dns-round-robin.server = @STRING@
-    pool.default.serverset.dns-round-robin.server = 389
+    pool.default.serverset.dns-round-robin.port = 389
     pool.default.serverset.dns-round-robin.selectionMode = RANDOM
     pool.default.serverset.dns-round-robin.dnsRecordTypes = A
     pool.default.serverset.dns-round-robin.cacheTimeoutMillis = @INT@
