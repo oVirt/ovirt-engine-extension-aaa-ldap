@@ -704,7 +704,7 @@ public class Framework implements Closeable {
         if (now > nextStats) {
             nextStats = now + statsTTL;
             for (ConnectionPoolEntry entry : connectionPools.values()) {
-                log.debug("Stats: {}", entry.connectionPool.getConnectionPoolStatistics());
+                log.debug("Stats: {} {}", entry.name, entry.connectionPool.getConnectionPoolStatistics());
             }
         }
     }
