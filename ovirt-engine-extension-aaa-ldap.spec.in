@@ -24,9 +24,14 @@ URL:		http://www.ovirt.org
 BuildArch:	noarch
 Source:		http://resources.ovirt.org/pub/src/%{name}/%{name}-@PACKAGE_VERSION@.tar.gz
 
+%if 0%{?rhel}
+BuildRequires:	java7-devel
+%endif
+%if 0%{?fedora}
+BuildRequires:	java-devel >= 1.7.0
+%endif
 BuildRequires:	%{slf4j} >= 1.7
 BuildRequires:	ant
-BuildRequires:	java-1.7.0-openjdk-devel
 BuildRequires:	jpackage-utils
 BuildRequires:	ovirt-engine-extensions-api
 BuildRequires:	unboundid-ldapsdk
