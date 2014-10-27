@@ -64,7 +64,7 @@ config.profile.file.1 = @PROFILE_CONFIGURATION@
 PROFILE CONFIGURATION EXAMPLES
 ------------------------------
 
-OPENLDAP/389DS/RHDS/IPA
+OPENLDAP/389DS/IPA/...
 
 Using simple bind transport using startTLS:
 
