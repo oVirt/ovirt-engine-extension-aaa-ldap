@@ -81,7 +81,7 @@ Using simple bind transport using startTLS:
     vars.server = ldap1.company.com
 
     pool.default.ssl.startTLS = true
-    pool.default.ssl.truststore.file = ${local:_basedir}/${server}.jks
+    pool.default.ssl.truststore.file = ${local:_basedir}/${global:vars.server}.jks
     pool.default.ssl.truststore.password = changeit
     pool.default.serverset.single.server = ${global:vars.server}
     pool.default.auth.simple.bindDN = ${global:vars.user}
