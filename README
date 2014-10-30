@@ -202,6 +202,23 @@ extension configuration:
 # Except of active directory
 config.globals.bindFormat.simple_bindFormat = realm
 
+PROBLEM DETERMINATION
+---------------------
+
+A logger by the name of org.ovirt.engineextensions.aaa.ldap can be set to
+DEBUG, FINE, FINER or ALL to receive verbose output.
+
+Per the time this text is written, setting the log level of a logger within
+ovirt-engine is performed by updating:
+
+  /usr/share/ovirt-engine/services/ovirt-engine/ovirt-engine.xml.in
+
+And adding the following before the <root-logger> line:
+
+      <logger category="org.ovirt.engineextensions.aaa.ldap">
+        <level name="ALL"/>
+      </logger>
+
 ADVANCED EXTENSION CONFIGURATION
 --------------------------------
 
