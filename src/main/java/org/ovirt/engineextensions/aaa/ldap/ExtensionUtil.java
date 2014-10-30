@@ -64,18 +64,37 @@ public class ExtensionUtil {
         Base.INTERFACE_VERSION_CURRENT
     );
 
+    private static File getRelativeFile(String baseDir, String fileName) {
+        File f = new File(fileName);
+        if (!f.isAbsolute()) {
+            f = new File(baseDir, fileName);
+        }
+        return f;
+    }
+
     public static Framework frameworkCreate(ExtMap context, String extensionType) throws Exception {
+
+        /*
+         * TODO: remove reflection when ovirt-engine-3.5.1 out.
+         */
+        String baseDir = "/";
+        try {
+            baseDir = new File(context.<String>get((ExtKey)Base.ContextKeys.class.getField("CONFIGURATION_FILE").get(null)/*Base.ContextKeys.CONFIGURATION_FILE*/, "/dummy")).getParent();
+        } catch(NoSuchFieldException e) {
+            // Ignore
+        }
+
         Properties configuration = context.<Properties>get(Base.ContextKeys.CONFIGURATION);
 
         List<File> searchdir = new ArrayList<>();
         searchdir.add(new File(Config.PROFILES_DIR));
         for (String prefix : Util.stringPropertyNames(configuration, "config.profile.searchdir")) {
-            searchdir.add(new File(configuration.getProperty(prefix)));
+            searchdir.add(getRelativeFile(baseDir, configuration.getProperty(prefix)));
         }
 
         List<File> includes = new ArrayList<>();
         for (String prefix : Util.stringPropertyNames(configuration, "config.profile.file")) {
-            includes.add(new File(configuration.getProperty(prefix)));
+            includes.add(getRelativeFile(baseDir, configuration.getProperty(prefix)));
         }
 
         Framework framework = new Framework(
