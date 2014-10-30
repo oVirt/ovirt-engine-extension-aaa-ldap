@@ -30,6 +30,7 @@
 	<property name="dir.pkgdata" value="${dir.prefix}/share/${package.name}"/>
 	<property name="dir.pkgmodules" value="${dir.pkgdata}/modules"/>
 	<property name="dir.profiles" value="${dir.pkgdata}/profiles"/>
+	<property name="dir.examples" value="${dir.pkgdata}/examples"/>
 
 	<path id="classpath.buildtime">
 		<pathelement path="${jar.slf4j-api}"/>
@@ -177,6 +178,7 @@
 				<include name="ovirt-engine-extension-aaa-ldap.spec"/>
 				<include name="ovirt-engine-extension-aaa-ldap.spec.in"/>
 				<include name="profiles/**"/>
+				<include name="examples/**"/>
 				<include name="src/**"/>
 			</tarfileset>
 		</tar>
@@ -188,6 +190,13 @@
 		</copy>
 		<chmod
 			dir="${dir.destdir}${dir.profiles}"
+			perm="u=rwX,go=rX"
+		/>
+		<copy todir="${dir.destdir}${dir.examples}">
+			<fileset dir="examples"/>
+		</copy>
+		<chmod
+			dir="${dir.destdir}${dir.examples}"
 			perm="u=rwX,go=rX"
 		/>
 		<copy todir="${dir.destdir}${dir.pkgmodules}">

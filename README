@@ -80,12 +80,12 @@ Using simple bind transport using startTLS:
     vars.password = 123456
     vars.server = ldap1.company.com
 
-    pool.default.ssl.startTLS = true
-    pool.default.ssl.truststore.file = ${local:_basedir}/${global:vars.server}.jks
-    pool.default.ssl.truststore.password = changeit
     pool.default.serverset.single.server = ${global:vars.server}
     pool.default.auth.simple.bindDN = ${global:vars.user}
     pool.default.auth.simple.password = ${global:vars.password}
+    pool.default.ssl.startTLS = true
+    pool.default.ssl.truststore.file = ${local:_basedir}/${global:vars.server}.jks
+    pool.default.ssl.truststore.password = changeit
 
 Round robin configuration:
 
@@ -114,13 +114,13 @@ resolve hosts.
 
     pool.default.serverset.type = srvrecord
     pool.default.serverset.srvrecord.domain = ${global:vars.domain}
+    pool.default.auth.simple.bindDN = ${global:vars.user}
+    pool.default.auth.simple.password = ${global:vars.password}
     pool.default.serverset.srvrecord.jndi-properties.java.naming.provider.url = ${global:vars.dns}
     pool.default.socketfactory.resolver.uRL = ${global:vars.dns}
     pool.default.ssl.startTLS = true
     pool.default.ssl.truststore.file = ${local:_basedir}/${global:vars.domain}.jks
     pool.default.ssl.truststore.password = changeit
-    pool.default.auth.simple.bindDN = ${global:vars.user}
-    pool.default.auth.simple.password = ${global:vars.password}
 
 APACHE SSO CONFIGURATION
 ------------------------
