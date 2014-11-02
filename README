@@ -35,7 +35,7 @@ config.profile.file.1 = @PROFILE_CONFIGURATION@
 @PROFILE@
     Profile name, visible to user.
 @PROFILE_CONFIGURATION@
-    Profile configuration file.
+    Profile configuration file, may be relative to extension configuration.
 
 AUTHN
 
@@ -59,10 +59,18 @@ config.profile.file.1 = @PROFILE_CONFIGURATION@
 @PROFILE@
     Profile name, visible to user.
 @PROFILE_CONFIGURATION@
-    Profile configuration file.
+    Profile configuration file, may be relative to extension configuration.
 
 PROFILE CONFIGURATION EXAMPLES
 ------------------------------
+
+EXAMPLES
+
+Examples are available at the following directory:
+
+  /usr/share/ovirt-engine-extension-aaa-ldap/example
+
+Examples are relative to /etc/ovirt-engine directory.
 
 OPENLDAP/389DS/IPA/...
 
@@ -76,9 +84,9 @@ Using simple bind transport using startTLS:
     #include = <iplanet.properties>
     #include = <rfc2307.properties>
 
+    vars.server = ldap1.company.com
     vars.user = uid=search,cn=users,cn=accounts,dc=company,dc=com
     vars.password = 123456
-    vars.server = ldap1.company.com
 
     pool.default.serverset.single.server = ${global:vars.server}
     pool.default.auth.simple.bindDN = ${global:vars.user}
@@ -107,9 +115,9 @@ resolve hosts.
 
     include = <ad.properties>
 
-    vars.user = search
-    vars.password = 123456
     vars.domain = company.com
+    vars.user = search@${global:vars.domain}
+    vars.password = 123456
     vars.dns = dns://dc1.${global:vars.domain} dns://dc2.${global:vars.domain}
 
     pool.default.serverset.type = srvrecord
