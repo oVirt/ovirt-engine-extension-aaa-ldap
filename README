@@ -101,6 +101,12 @@ Round robin configuration:
     pool.default.serverset.round-robin.1.server = ${global:vars.server1}
     pool.default.serverset.round-robin.2.server = ${global:vars.server2}
 
+In case sasl mechanism is used, such as gssapi, set the following within
+extension configuration:
+
+# Except of active directory
+config.globals.bindFormat.simple_bindFormat = realm
+
 More supported configuration at README.profile.
 
 ACTIVE DIRECTORY
@@ -129,6 +135,8 @@ resolve hosts.
     pool.default.ssl.startTLS = true
     pool.default.ssl.truststore.file = ${local:_basedir}/${global:vars.domain}.jks
     pool.default.ssl.truststore.password = changeit
+
+More supported configuration at README.profile.
 
 APACHE SSO CONFIGURATION
 ------------------------
@@ -195,20 +203,12 @@ config.mapAuthRecord.type = regex
 config.mapAuthRecord.regex.mustMatch = true
 config.mapAuthRecord.regex.pattern = ^(?<user>.*?)((\\\\(?<at>@)(?<suffix>.*?)@.*)|(?<realm>@.*))$
 
-# START-TECHDEP
+# START-PLATFORM-DEPENDED
 # Active directory:
 config.mapAuthRecord.regex.replacement = ${user}${at}${suffix}${realm}
 # Other
 config.mapAuthRecord.regex.replacement = ${user}${at}${suffix}
-# END-TECHDEP
-
-AUTHN EXTENSION NOTES
-
-In case sasl mechanism is used, such as gssapi, set the following within
-extension configuration:
-
-# Except of active directory
-config.globals.bindFormat.simple_bindFormat = realm
+# END-PLATFORM-DEPENDED
 
 PROBLEM DETERMINATION
 ---------------------
