@@ -138,6 +138,23 @@ resolve hosts.
 
 More supported configuration at README.profile.
 
+X.509 CERTIFICATE TRUST STORE
+-----------------------------
+
+When using TLS/SSL to communicate with LDAP server an X.509 certificate
+trust store should be provided if the certificate of the LDAP server is
+not signed by well known certification authority.
+
+The trust store can be anything Java supports, by default it is
+JKS (Java Key Store) format.
+
+Use the following command to create a JKS myrootca.jks trust store using
+password 'changeit' and import the certificate myrootca.pem into
+alias myrootca:
+
+ $ keytool -importcert -noprompt -trustcacerts -alias myrootca \
+       -file myrootca.pem -keystore myrootca.jks -storepass changeit
+
 APACHE SSO CONFIGURATION
 ------------------------
 
