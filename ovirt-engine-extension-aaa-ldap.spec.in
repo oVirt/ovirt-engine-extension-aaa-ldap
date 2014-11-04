@@ -1,10 +1,19 @@
 %if 0%{?rhel}
+%if 0%{?rhel} < 7
+%global java_devel java7-devel
 %if 0%{?centos}
 %global slf4j slf4j
 %else
 %global slf4j slf4j-eap6
 %endif
 %else
+%global java_devel java-devel >= 1.7.0
+%global slf4j slf4j
+%endif
+%endif
+
+%if 0%{?fedora}
+%global java_devel java-devel >= 1.7.0
 %global slf4j slf4j
 %endif
 
@@ -24,12 +33,7 @@ URL:		http://www.ovirt.org
 BuildArch:	noarch
 Source:		http://resources.ovirt.org/pub/src/%{name}/%{name}-@PACKAGE_VERSION@.tar.gz
 
-%if 0%{?rhel}
-BuildRequires:	java7-devel
-%endif
-%if 0%{?fedora}
-BuildRequires:	java-devel >= 1.7.0
-%endif
+BuildRequires:	%{java_devel}
 BuildRequires:	%{slf4j} >= 1.7
 BuildRequires:	ant
 BuildRequires:	jpackage-utils
@@ -48,7 +52,7 @@ Generic LDAP implementation for oVirt engine.
 %build
 cat > build.properties << __EOF__
 package.display.name=%{name}-%{version}-%{release}
-jar.slf4j-api=$(build-classpath %{slf4j} slf4j-api)
+jar.slf4j-api=$(build-classpath %{slf4j}/slf4j-api)
 jar.ovirt-engine-extensions-api=$(build-classpath ovirt-engine/ovirt-engine-extensions-api)
 jar.unboundid-ldapsdk=$(build-classpath unboundid-ldapsdk)
 __EOF__
