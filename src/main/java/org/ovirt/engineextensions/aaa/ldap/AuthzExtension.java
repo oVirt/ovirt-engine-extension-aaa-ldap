@@ -283,6 +283,7 @@ public class AuthzExtension implements Extension {
     ) throws Exception {
         loopPrevention.push(record.<String>get(DN_KEY));
         log.debug("_resolveGroups Entry loopPrevention={}", loopPrevention);
+        log.trace("_resolveGroups {}", record);
 
         Collection<ExtMap> groupRecords = cache.get(record.get(DN_KEY));
         if (groupRecords == null) {
@@ -359,7 +360,7 @@ public class AuthzExtension implements Extension {
 
     private void resolveGroups(Collection<ExtMap> records, ExtKey groupsKey, boolean recursive)
     throws Exception {
-        log.debug("resolveGroups Entry");
+        log.debug("resolveGroups Entry records={}, recursive={}", records, recursive);
 
         Deque<String> loopPrevention = new ArrayDeque<>();
         Map<String, Collection<ExtMap>> cache = new HashMap<>();
