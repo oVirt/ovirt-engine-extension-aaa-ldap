@@ -274,9 +274,15 @@ public class AuthzExtension implements Extension {
         return candidate;
     }
 
-    private void _resolveGroups(ExtMap record, ExtKey groupsKey, boolean recursive, Map<String, Collection<ExtMap>> cache)
-    throws Exception {
-        log.debug("_resolveGroups Entry");
+    private void _resolveGroups(
+        ExtMap record,
+        ExtKey groupsKey,
+        boolean recursive,
+        Map<String, Collection<ExtMap>> cache,
+        Deque<String> loopPrevention
+    ) throws Exception {
+        loopPrevention.push(record.<String>get(DN_KEY));
+        log.debug("_resolveGroups Entry loopPrevention={}", loopPrevention);
 
         Collection<ExtMap> groupRecords = cache.get(record.get(DN_KEY));
         if (groupRecords == null) {
@@ -335,10 +341,19 @@ public class AuthzExtension implements Extension {
 
         if (recursive) {
             for (ExtMap entry : groupRecords) {
-                _resolveGroups(entry, groupsKey, recursive, cache);
+                if (loopPrevention.contains(entry.get(DN_KEY))) {
+                    log.error(
+                        "Group recursion detected for group '{}' stack is {}",
+                        entry.get(DN_KEY),
+                        loopPrevention
+                    );
+                } else {
+                    _resolveGroups(entry, groupsKey, recursive, cache, loopPrevention);
+                }
             }
         }
 
+        loopPrevention.pop();
         log.debug("_resolveGroups Return");
     }
 
@@ -346,12 +361,13 @@ public class AuthzExtension implements Extension {
     throws Exception {
         log.debug("resolveGroups Entry");
 
+        Deque<String> loopPrevention = new ArrayDeque<>();
         Map<String, Collection<ExtMap>> cache = new HashMap<>();
         for (ExtMap record : records) {
-            _resolveGroups(record, groupsKey, false, cache);
+            _resolveGroups(record, groupsKey, false, cache, loopPrevention);
             if (recursive) {
                 for (ExtMap groupRecord : record.<Collection<ExtMap>>get(groupsKey, Collections.<ExtMap>emptyList())) {
-                    _resolveGroups(groupRecord, Authz.GroupRecord.GROUPS, true, cache);
+                    _resolveGroups(groupRecord, Authz.GroupRecord.GROUPS, true, cache, loopPrevention);
                 }
             }
         }
