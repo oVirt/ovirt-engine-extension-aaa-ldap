@@ -149,7 +149,7 @@ public class Framework implements Closeable {
         }
     }
 
-    private final String instanceName;
+    private final String logPrefix;
     private final MapProperties props;
     private final int statsTTL;
 
@@ -334,9 +334,9 @@ public class Framework implements Closeable {
         return bindRequest;
     }
 
-    public Framework(String instanceName, MapProperties props) throws IOException {
+    public Framework(String logPrefix, MapProperties props) throws IOException {
 
-        this.instanceName = instanceName;
+        this.logPrefix = logPrefix;
         this.props = applyDefault(props);
         dumpProperties(this.props);
 
@@ -400,7 +400,7 @@ public class Framework implements Closeable {
             }
 
             if (sslProps.getBoolean(Boolean.FALSE, "insecure")) {
-                log.warn("TLS/SSL insecure mode");
+                log.warn("{} TLS/SSL insecure mode", logPrefix);
                 trustManagers = new TrustManager[] {new TrustAllTrustManager()};
             } else {
                 log.debug("Creating trust store");
@@ -614,7 +614,7 @@ public class Framework implements Closeable {
     private void createPool(String name, Map<String, Object> vars)
     throws Exception {
 
-        log.info("Creating LDAP pool '{}' for '{}'", name, instanceName);
+        log.info("{} Creating LDAP pool '{}'", logPrefix, name);
         log.debug("createPool Entry name='{}'", name);
 
         ConnectionPoolEntry entry = new ConnectionPoolEntry();
@@ -1080,7 +1080,7 @@ public class Framework implements Closeable {
                     instance.connection = connection;
                     ret = new ArrayList<Map<String, List<String>>>();
                 } catch (LDAPException e) {
-                    log.warn("Cannot connect referral '{}': {}", host, e);
+                    log.warn("{} Cannot connect referral '{}': {}", logPrefix, host, e.getMessage());
                     log.debug("Exception", e);
                 }
             } else {

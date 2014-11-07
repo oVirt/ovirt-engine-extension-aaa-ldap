@@ -34,6 +34,7 @@ public class AuthnExtension implements Extension {
     private Framework framework;
     private volatile boolean frameworkInitialized = false;
 
+    private String logPrefix;
     private String sequenceAuthn;
     private String sequenceCredentialsChange;
     private String credentialsChangeMessage;
@@ -89,7 +90,7 @@ public class AuthnExtension implements Extension {
             ExtensionUtil.EXTENSION_INFO
         ).mput(
             Base.ContextKeys.EXTENSION_NAME,
-            "aaa.ldap.authn"
+            ExtensionUtil.EXTENSION_NAME_PREFIX + "authn"
         ).mput(
             Authn.ContextKeys.CAPABILITIES,
             (
@@ -99,12 +100,14 @@ public class AuthnExtension implements Extension {
             )
         );
 
+        logPrefix = ExtensionUtil.getLogPrefix(context);
+
         sequenceAuthn = configuration.getProperty(PREFIX_CONFIG_AUTHN + "sequence.authn.name", "authn");
         sequenceCredentialsChange = configuration.getProperty(PREFIX_CONFIG_AUTHN + "sequence.credentials-change.name", "credentials-change");
         credentialsChangeMessage = configuration.getProperty(PREFIX_CONFIG_AUTHN + "credentials-change.message");
         credentialsChangeUrl = configuration.getProperty(PREFIX_CONFIG_AUTHN + "credentials-change.url");
 
-        framework = ExtensionUtil.frameworkCreate(context, "authn_enable");
+        framework = ExtensionUtil.frameworkCreate(context, logPrefix, "authn_enable");
 
         if (Boolean.valueOf(framework.getGlobals().get(ExtensionUtil.VARS_CAPABILITY_CREDENTIALS_CHANGE).toString())) {
             output.put(
@@ -121,7 +124,7 @@ public class AuthnExtension implements Extension {
         try {
             ensureFramework(input);
         } catch(Exception e) {
-            log.error("Cannot initialize LDAP framework, deferring initialization. Error: {}", e.getMessage());
+            log.error("{} Cannot initialize LDAP framework, deferring initialization. Error: {}", logPrefix, e.getMessage());
             log.debug("Exception", e);
         }
     }

@@ -128,7 +128,7 @@ class Resolver implements Closeable {
                 ctx.close();
                 ctx = null;
             } catch (NamingException e) {
-                log.warn("Ignoring exception", e);
+                log.debug("Ignoring exception", e);
             }
         }
     }

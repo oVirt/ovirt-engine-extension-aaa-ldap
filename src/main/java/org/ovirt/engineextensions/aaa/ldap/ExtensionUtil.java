@@ -41,6 +41,7 @@ public class ExtensionUtil {
     public static final String VARS_CAPABILITY_CREDENTIALS_CHANGE = "capability_credentialsChange";
     public static final String VARS_USER = "user";
 
+    public static final String EXTENSION_NAME_PREFIX = "ovirt-engine-extension-aaa-ldap.";
     public static final ExtMap EXTENSION_INFO = new ExtMap().mput(
         Base.ContextKeys.AUTHOR,
         "The oVirt Project"
@@ -72,7 +73,15 @@ public class ExtensionUtil {
         return f;
     }
 
-    public static Framework frameworkCreate(ExtMap context, String extensionType) throws Exception {
+    public static String getLogPrefix(ExtMap context) {
+        return String.format(
+            "[%s::%s]",
+            context.get(Base.ContextKeys.EXTENSION_NAME),
+            context.get(Base.ContextKeys.INSTANCE_NAME)
+        );
+    }
+
+    public static Framework frameworkCreate(ExtMap context, String logPrefix, String extensionType) throws Exception {
 
         /*
          * TODO: remove reflection when ovirt-engine-3.5.1 out.
@@ -98,7 +107,7 @@ public class ExtensionUtil {
         }
 
         Framework framework = new Framework(
-            context.<String>get(Base.ContextKeys.INSTANCE_NAME),
+            logPrefix,
             new MapProperties(
                 Util.loadProperties(
                     searchdir,

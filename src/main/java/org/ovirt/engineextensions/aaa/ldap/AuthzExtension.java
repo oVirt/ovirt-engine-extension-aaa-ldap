@@ -61,6 +61,7 @@ public class AuthzExtension implements Extension {
     private volatile boolean frameworkInitialized = false;
     private Collection<String> namespaces = new ArrayList<>();
 
+    private String logPrefix;
     private String attrmapGroupRecord;
     private String attrmapPrincipalRecord;
     private String attrNamespace;
@@ -344,7 +345,8 @@ public class AuthzExtension implements Extension {
             for (ExtMap entry : groupRecords) {
                 if (loopPrevention.contains(entry.get(DN_KEY))) {
                     log.error(
-                        "Group recursion detected for group '{}' stack is {}",
+                        "{} Group recursion detected for group '{}' stack is {}",
+                        logPrefix,
                         entry.get(DN_KEY),
                         loopPrevention
                     );
@@ -418,13 +420,15 @@ public class AuthzExtension implements Extension {
             ExtensionUtil.EXTENSION_INFO
         ).mput(
             Base.ContextKeys.EXTENSION_NAME,
-            "aaa.ldap.authz"
+            ExtensionUtil.EXTENSION_NAME_PREFIX + "authz"
         ).mput(
             Authz.ContextKeys.QUERY_MAX_FILTER_SIZE,
             Integer.valueOf(configuration.getProperty(PREFIX_CONFIG_AUTHZ + "query.max_filter_size", "50"))
         );
 
-        framework = ExtensionUtil.frameworkCreate(context, "authz_enable");
+        logPrefix = ExtensionUtil.getLogPrefix(context);
+
+        framework = ExtensionUtil.frameworkCreate(context, logPrefix, "authz_enable");
 
         attrmapGroupRecord = configuration.getProperty(PREFIX_CONFIG_AUTHZ + "attrmap.map-group-record.name", "map-group-record");
         attrmapPrincipalRecord = configuration.getProperty(PREFIX_CONFIG_AUTHZ + "attrmap.map-principal-record.name", "map-principal-record");
@@ -452,7 +456,7 @@ public class AuthzExtension implements Extension {
         try {
             ensureFramework(input);
         } catch(Exception e) {
-            log.error("Cannot initialize LDAP framework, deferring initialization. Error: {}", e.getMessage());
+            log.error("{} Cannot initialize LDAP framework, deferring initialization. Error: {}", logPrefix, e.getMessage());
             log.debug("Exception", e);
         }
     }
