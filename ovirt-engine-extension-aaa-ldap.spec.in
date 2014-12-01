@@ -74,5 +74,5 @@ ln -s \
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-%{name}.conf
 
 %changelog
-* Sun May 4 2014 Alon Bar-Lev <alonbl@redhat.com> 0.0.0
+* Mon Dec 1 2014 Alon Bar-Lev <alonbl@redhat.com> 1.0.0-1
 - Initial.
