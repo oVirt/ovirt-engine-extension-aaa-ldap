@@ -631,11 +631,12 @@ public class Framework implements Closeable {
         );
         entry.connectionPool = createConnectionPool(entry.props);
 
-        List<String> supportedExtendedOperations = Arrays.asList(
-            entry.connectionPool.getRootDSE().getSupportedExtendedOperationOIDs()
-        );
-        entry.supportPasswordModify = supportedExtendedOperations.contains(PasswordModifyExtendedRequest.PASSWORD_MODIFY_REQUEST_OID);
-        entry.supportWhoAmI = supportedExtendedOperations.contains(WhoAmIExtendedRequest.WHO_AM_I_REQUEST_OID);
+        String supportedExtendedOperations[] = entry.connectionPool.getRootDSE().getSupportedExtendedOperationOIDs();
+        if (supportedExtendedOperations != null) {
+            List<String> supportedExtendedOperationsList = Arrays.asList(supportedExtendedOperations);
+            entry.supportPasswordModify = supportedExtendedOperationsList.contains(PasswordModifyExtendedRequest.PASSWORD_MODIFY_REQUEST_OID);
+            entry.supportWhoAmI = supportedExtendedOperationsList.contains(WhoAmIExtendedRequest.WHO_AM_I_REQUEST_OID);
+        }
         ConnectionPoolEntry previous = connectionPools.put(entry.name, entry);
         if (previous != null) {
             previous.close();
