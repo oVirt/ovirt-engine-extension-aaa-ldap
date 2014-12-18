@@ -123,7 +123,7 @@ Pool of LDAP connections, based on specific policy.
     # CONNECTION OPTIONS
     # Class: LDAPConnectionOptions.
     # Documentation and options at:
-    # https://www.unboundid.com/products/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/LDAPConnectionOptions.html
+    # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/LDAPConnectionOptions.html
     pool.default.connection-options.@ATTRIBUTE@ = value
 
     # POOL OPTIONS
@@ -132,7 +132,7 @@ Pool of LDAP connections, based on specific policy.
     pool.default.connection-pool.initialConnectThreads = 1
     # Class: LDAPConnectionPool.
     # Documentation and options at:
-    # https://www.unboundid.com/products/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/LDAPConnectionPool.html
+    # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/LDAPConnectionPool.html
     pool.default.connection-pool.@ATTRIBUTE@ = value
 
     # SOCKET FACTORY
@@ -172,13 +172,13 @@ Pool of LDAP connections, based on specific policy.
 
     # SERVERSET
     # Documentation at:
-    # https://www.unboundid.com/products/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/SingleServerSet.html
-    # https://www.unboundid.com/products/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/RoundRobinServerSet.html
-    # https://www.unboundid.com/products/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/FailoverServerSet.html
-    # https://www.unboundid.com/products/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/FastestConnectServerSet.html
-    # https://www.unboundid.com/products/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/FewestConnectionsServerSet.html
-    # https://www.unboundid.com/products/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/RoundRobinDNSServerSet.html
-    # https://www.unboundid.com/products/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/DNSSRVRecordServerSet.html
+    # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/SingleServerSet.html
+    # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/RoundRobinServerSet.html
+    # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/FailoverServerSet.html
+    # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/FastestConnectServerSet.html
+    # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/FewestConnectionsServerSet.html
+    # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/RoundRobinDNSServerSet.html
+    # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/DNSSRVRecordServerSet.html
     pool.default.serverset.type = single
     pool.default.serverset.single.server = @STRING@
     pool.default.serverset.single.port = 389
@@ -211,13 +211,13 @@ Pool of LDAP connections, based on specific policy.
     pool.default.auth.cram-md5.password = @STRING@
     # Class: DIGESTMD5BindRequestProperties
     # Documentation and options at:
-    # https://www.unboundid.com/products/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/DIGESTMD5BindRequest.html
+    # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/DIGESTMD5BindRequest.html
     pool.default.auth.digest-md5.@ATTRIBUTE@ = value
         authenticationID = @STRING@
         password = @STRING@
     # Class: GSSAPIBindRequestProperties
     # Documentation and options at:
-    # https://www.unboundid.com/products/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/GSSAPIBindRequestProperties.html
+    # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/GSSAPIBindRequestProperties.html
     pool.default.auth.gssapi.@ATTRIBUTE@ = value
         authenticationID = @STRING@
         password = @STRING@
@@ -285,7 +285,7 @@ SEARCH
     # SEARCH OPTIONS
     # Class: SearchRequest.
     # Documentation and options at:
-    # https://www.unboundid.com/products/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/SearchRequest.html
+    # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/SearchRequest.html
     #
     # NOTE:
     # all variables are also available as @NAME@_encoded to be safely put within
