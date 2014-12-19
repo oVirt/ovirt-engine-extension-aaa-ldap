@@ -3,6 +3,26 @@ oVirt LDAP authentication and authorization extension
 
 Generic LDAP implementation for oVirt engine.
 
+QUICK START
+-----------
+
+Examples are available at the following directory:
+
+  /usr/share/ovirt-engine-extension-aaa-ldap*/examples
+
+Content is relative to /etc/ovirt-engine directory.
+
+1. Per your setup, copy recursive examples/ad (Active Directory) or
+   examples/simple to /etc/ovirt-engine, optionally modify the profile1
+   within the file names and profile1 within the content to a value
+   that suites your environment.
+2. Customize the vars.* variables within files to meet your setup.
+3. Restart ovirt-engine, verify no startup errors.
+4. Within ovirt-engine try to search for users, add a user and assign
+   SuperUser system roles.
+5. Try to login using the newly added user.
+6. Complete customization of profile, such as enabling startTLS.
+
 IMPLEMENTATION NOTES
 --------------------
 
@@ -63,14 +83,6 @@ config.profile.file.1 = @PROFILE_CONFIGURATION@
 
 PROFILE CONFIGURATION EXAMPLES
 ------------------------------
-
-EXAMPLES
-
-Examples are available at the following directory:
-
-  /usr/share/ovirt-engine-extension-aaa-ldap/example
-
-Examples are relative to /etc/ovirt-engine directory.
 
 OPENLDAP/389DS/IPA/...
 
