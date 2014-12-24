@@ -1,7 +1,8 @@
 oVirt LDAP authentication and authorization extension
 
-????-??-?? - Version 1.0.1
+2014-12-24 - Version 1.0.1
 
+ * doc: improve documentations.
  * core: support ldaps that returns no supported extended operations.
    rhbz#1172173.
 

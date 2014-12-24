@@ -4,9 +4,9 @@
 
 	<property name="package.name" value="ovirt-engine-extension-aaa-ldap"/>
 	<property name="package.version" value="1.0.1"/>
-	<property name="package.branch" value="master"/>
+	<property name="package.branch" value=""/>
 	<property name="rpm.version" value='${package.version}'/>
-	<property name="rpm.release" value='0.0.${package.branch}'/>
+	<property name="rpm.release" value='1'/>
 
 	<property name="build.root" location="."/>
 	<property name="build.output" value="${build.root}/output"/>
