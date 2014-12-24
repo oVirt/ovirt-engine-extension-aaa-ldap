@@ -242,6 +242,32 @@ config.mapAuthRecord.regex.replacement = ${user}${at}${suffix}
 PROBLEM DETERMINATION
 ---------------------
 
+USEFUL LDAP COMMANDS
+
+Notations:
+ * @HOST@ - LDAP HOST
+ * @USERDN@ - Bind user DN, empty for anonymous.
+ * @USERPW@ - Bind user password.
+ * @BASEDN@ - Base DN
+
+Find base DN
+
+$ ldapsearch -H ldap://@HOST@ -D '@USERDN@' -w '@USERPW@' -b '' -s BASE defaultNamingContext namingContexts
+
+Dump entire directory
+
+$ ldapsearch -E pr=1024/noprompt -o ldif-wrap=no -H ldap://@HOST@ -D '@USERDN@' -w '@USERPW@' -b '@BASEDN@' '*' +
+
+Test startTLS (preferred)
+
+$ LDAPTLS_REQCERT=never ldapsearch -ZZ -H ldap://@HOST@ -D '@USERDN@' -w '@USERPW@' -b '@BASEDN@'
+
+Test LDAP over SSL/TLS
+
+$ LDAPTLS_REQCERT=never ldapsearch -H ldaps://@HOST@ -D '@USERDN@' -w '@USERPW@' -b '@BASEDN@'
+
+ENGINE LOG
+
 A logger by the name of org.ovirt.engineextensions.aaa.ldap can be set to
 DEBUG, FINE, FINER or ALL to receive verbose output.
 
