@@ -73,10 +73,10 @@
 		<delete dir="${build.intermediate}/main-gen-src"/>
 		<mkdir dir="${build.output}/modules/org/ovirt/engine-extensions/aaa/ldap/main"/>
 		<copy
-			todir="${build.intermediate}/main-gen-src"
+			todir="${build.intermediate}/main"
 			overwrite="true"
 		>
-			<fileset dir="src/main/java-gen"/>
+			<fileset dir="src/main/resources"/>
 			<filterset>
 				<filter token="PACKAGE_NAME" value="${package.name}"/>
 				<filter token="PACKAGE_VERSION" value="${package.version}${package.version-suffix}"/>
@@ -84,16 +84,6 @@
 				<filter token="PROFILES_DIR" value="${dir.profiles}"/>
 			</filterset>
 		</copy>
-		<javac
-			debug="true"
-			debuglevel="lines,vars,source"
-			encoding="utf-8"
-			includeantruntime="no"
-			srcdir="${build.intermediate}/main-gen-src"
-			destdir="${build.intermediate}/main"
-			source="1.7"
-			target="1.7"
-		/>
 		<javac
 			debug="true"
 			debuglevel="lines,vars,source"
@@ -111,7 +101,6 @@
 			destfile="${build.output}/modules/org/ovirt/engine-extensions/aaa/ldap/main/ovirt-engine-extension-aaa-ldap.jar"
 		>
 			<fileset dir="${build.intermediate}/main"/>
-			<fileset dir="src/main/resources"/>
 		</jar>
 		<copy
 			file="src/resources/module.xml"
