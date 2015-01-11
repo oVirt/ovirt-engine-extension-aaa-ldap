@@ -4,6 +4,7 @@ oVirt LDAP authentication and authorization extension
 
  * profiles: add rfc2307-openldap profile to make openldap users' lives
    easier.
+ * profiles: simple: add simple_baseDN variable to override namespace.
  * core: framework: add var-list-get and var-list-set sequence commands.
  * core: authz: support non queried namespaces
 
