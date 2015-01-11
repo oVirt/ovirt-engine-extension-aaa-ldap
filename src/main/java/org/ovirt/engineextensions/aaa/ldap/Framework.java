@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Red Hat Inc.
+ * Copyright 2012-2015 Red Hat Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1151,7 +1151,7 @@ public class Framework implements Closeable {
                     boolean run = false;
                     MapProperties condProps = entry.getOrEmpty("condition");
                     String conditionType = condProps.getString("true", "type");
-                    MapProperties conditionProps = condProps.get(conditionType);
+                    MapProperties conditionProps = condProps.getOrEmpty(conditionType);
                     if ("true".equals(conditionType)) {
                         run = true;
                     } else if ("var-set".equals(conditionType)) {
@@ -1301,7 +1301,7 @@ public class Framework implements Closeable {
                                 opProps.getMandatoryString("value")
                             );
                             if (matcher.matches()) {
-                                for (Map.Entry<String, MapProperties> e : opProps.get("replacement").getMap().entrySet()) {
+                                for (Map.Entry<String, MapProperties> e : opProps.getOrEmpty("replacement").getMap().entrySet()) {
                                     vars.put(
                                         e.getKey(),
                                         matcher.replaceFirst(
