@@ -70,6 +70,9 @@ maxFilterSize
 namespace
     namespace of input/output.
 
+namespaces
+    a list of namespaces to use.
+
 password
     password to use.
 

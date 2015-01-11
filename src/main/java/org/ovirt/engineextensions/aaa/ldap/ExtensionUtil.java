@@ -33,6 +33,7 @@ public class ExtensionUtil {
     public static final String VARS_FILTER = "filter";
     public static final String VARS_MAX_FILTER_SIZE = "maxFilterSize";
     public static final String VARS_NAMESPACE = "namespace";
+    public static final String VARS_NAMESPACES = "namespaces";
     public static final String VARS_PASSWORD = "password";
     public static final String VARS_PASSWORD_NEW = "passwordNew";
     public static final String VARS_QUERY = "query";

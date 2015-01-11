@@ -342,6 +342,7 @@ config.authz.sequence.namespace.name = ID [namespace]
 
     Output:
         query
+        namespaces (list)
 
 config.authz.sequence.resolve-principal.name = ID [resolve-principal]
     Sequence name of resolve principal.
