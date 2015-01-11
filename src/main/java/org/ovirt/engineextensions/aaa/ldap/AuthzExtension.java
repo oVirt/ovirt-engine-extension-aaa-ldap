@@ -174,7 +174,10 @@ public class AuthzExtension implements Extension {
                         }
                     }
 
-                    log.debug("Namespaces: '{}'", namespaces);
+                    log.info("{} Available Namespaces: {}",
+                        logPrefix,
+                        namespaces
+                    );
                     context.put(
                         Authz.ContextKeys.AVAILABLE_NAMESPACES,
                         namespaces
