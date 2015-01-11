@@ -351,7 +351,7 @@ config.authz.sequence.resolve-principal.name = ID [resolve-principal]
         PrincipalRecord_PRINCIPAL
 
     Output:
-        query
+        query*
 
 config.authz.sequence.resolve-groups.name = ID [resolve-groups]
     Sequence name of resolve groups out of DN.

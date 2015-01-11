@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Red Hat Inc.
+ * Copyright 2012-2015 Red Hat Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,6 +98,51 @@ public class AuthzExtension implements Extension {
         return ret;
     }
 
+    private List<Map<String, List<String>>> executeVarQuery(Map<String, Object> vars, String varName) throws LDAPException {
+        List<Map<String, List<String>>> ret = new ArrayList<>();
+
+        List<String> queryVars = new ArrayList<>();
+        for (String var : vars.keySet()) {
+            if (var.startsWith(varName)) {
+                queryVars.add(var);
+            }
+        }
+
+        try {
+            for (String var : queryVars) {
+                log.debug("Resolving query var '{}'", var);
+                Framework.SearchInstance instance = (Framework.SearchInstance)vars.get(var);
+                if (instance != null) {
+                    List<Map<String, List<String>>> entries;
+                    while (
+                        (entries = framework.searchExecute(
+                            instance,
+                            0
+                        )) != null
+                    ) {
+                        ret.addAll(entries);
+                    }
+                }
+            }
+        } finally {
+            for (String var : queryVars) {
+                Framework.SearchInstance instance = (Framework.SearchInstance)vars.get(var);
+                if (instance != null) {
+                    vars.remove(var);
+                    try {
+                        framework.searchClose(instance);
+                    } catch(Exception e) {
+                        log.error("Cannot close search of var '{}'", var);
+                        log.debug("Cannot close search of var '{}', search: {}", var, instance);
+                        log.debug("Exception", e);
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
+
     private void ensureFramework(ExtMap input) throws Exception {
         if (!frameworkInitialized) {
             synchronized(this) {
@@ -114,32 +159,17 @@ public class AuthzExtension implements Extension {
                         );
                     }
 
+                    namespaces = new ArrayList<>();
                     Object availableNamespace = framework.getGlobals().get(ExtensionUtil.VARS_AVAILABLE_NAMESPACE);
                     if (availableNamespace != null) {
                         namespaces.add(availableNamespace.toString());
                     } else {
-                        namespaces = new ArrayList<>();
                         Map<String, Object> vars = framework.createSequenceVars();
                         framework.runSequence(sequenceNamespace, vars);
-                        Framework.SearchInstance instance = (Framework.SearchInstance)vars.get(ExtensionUtil.VARS_QUERY);
-                        if (instance == null) {
-                            namespaces.add("*");
-                        } else {
-                            try {
-                                while (true) {
-                                    List<Map<String, List<String>>> result = framework.searchExecute(instance, 0);
-                                    if (result == null) {
-                                        break;
-                                    }
-                                    for (Map<String, List<String>> entry : result) {
-                                        List<String> namespace = entry.get(attrNamespace);
-                                        if (namespace != null) {
-                                            namespaces.addAll(namespace);
-                                        }
-                                    }
-                                }
-                            } finally {
-                                framework.searchClose(instance);
+                        for (Map<String, List<String>> entry : executeVarQuery(vars, ExtensionUtil.VARS_QUERY)) {
+                            List<String> namespace = entry.get(attrNamespace);
+                            if (namespace != null) {
+                                namespaces.addAll(namespace);
                             }
                         }
                     }
@@ -302,38 +332,18 @@ public class AuthzExtension implements Extension {
             framework.runSequence(sequenceResolveGroups, vars);
 
             Set<String> addedGroups = new HashSet<>();
-            for (Map.Entry<String, Object> var : vars.entrySet()) {
-                if (var.getKey().startsWith(ExtensionUtil.VARS_QUERY)) {
-                    log.debug("Resolving query var '{}'", var.getKey());
-                    Framework.SearchInstance instance = (Framework.SearchInstance)var.getValue();
-                    if (instance != null) {
-                        try {
-                            List<Map<String, List<String>>> entries;
-                            while (
-                                (entries = framework.searchExecute(
-                                    instance,
-                                    0
-                                )) != null
-                            ) {
-                                for (Map<String, List<String>> entry : entries) {
-                                    String dn = entry.get(ExtensionUtil.GROUP_RECORD_PREFIX + "DN").get(0);
-                                    if (!addedGroups.contains(dn)) {
-                                        addedGroups.add(dn);
-                                        groupRecords.add(
-                                            transformSearchToRecord(
-                                                entry,
-                                                groupToRecordKeys,
-                                                ExtensionUtil.GROUP_RECORD_PREFIX,
-                                                Authz.GroupRecord.NAMESPACE
-                                            )
-                                        );
-                                    }
-                                }
-                            }
-                        } finally {
-                            framework.searchClose(instance);
-                        }
-                    }
+            for (Map<String, List<String>> entry : executeVarQuery(vars, ExtensionUtil.VARS_QUERY)) {
+                String dn = entry.get(ExtensionUtil.GROUP_RECORD_PREFIX + "DN").get(0);
+                if (!addedGroups.contains(dn)) {
+                    addedGroups.add(dn);
+                    groupRecords.add(
+                        transformSearchToRecord(
+                            entry,
+                            groupToRecordKeys,
+                            ExtensionUtil.GROUP_RECORD_PREFIX,
+                            Authz.GroupRecord.NAMESPACE
+                        )
+                    );
                 }
             }
             cache.put(record.get(DN_KEY).toString(), groupRecords);
