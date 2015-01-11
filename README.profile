@@ -107,6 +107,83 @@ Examples:
 
     pool.default.auth.digest-md5.allowedQoP = AUTH, AUTH_CONF, AUTH_INT
 
+SEQUENCES
+---------
+
+NOTE: Sequence names can be altered by extension configuration.
+
+namespace
+    Sequence name of namespace query.
+    Used during initialization to determine namespaces.
+
+    Output:
+        query
+        namespaces (list)
+
+authn
+    Sequence name of authentication.
+
+    Input:
+        user
+        password
+
+    Output:
+        authTranslatedMessage
+        PrincipalRecord_PRINCIPAL
+        message
+
+credentials-change
+    Sequence name of credentials change.
+
+    Input:
+        user
+        password
+        passwordNew
+
+resolve-principal
+    Sequence name of resolve principal.
+    Used during user login to fetch properties of principal name.
+
+    Input:
+        PrincipalRecord_PRINCIPAL
+
+    Output:
+        query*
+
+resolve-groups
+    Sequence name of resolve groups out of DN.
+    Used during user login to fetch groups recursively.
+    Used during directory sync.
+
+    Input:
+        dn
+        dnType - principal|group
+
+    Output:
+        query*
+
+query-principals
+    Sequence name of query principal.
+    Used during administrative tasks.
+
+    Input:
+        namespace
+        filter
+
+    Output:
+        query
+
+query-groups
+    Sequence name of query groups.
+    Used during administrative tasks.
+
+    Input:
+        namespace
+        filter
+
+    Output:
+        query
+
 MODEL
 -----
 

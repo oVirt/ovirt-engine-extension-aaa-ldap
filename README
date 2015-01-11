@@ -303,18 +303,6 @@ config.authn.credentials-change.message = TEXT
 config.authn.credentials-change.url = URL
     A URL to display if password is expired.
 
-config.authn.sequence.authn.name = ID [authn]
-    Sequence name of authentication.
-
-    Input:
-        user
-        password
-
-    Output:
-        authTranslatedMessage
-        PrincipalRecord_PRINCIPAL
-        message
-
 attrmap.map-principal-record.name = ID [map-principal-record]
     Attribute map to map between principal record and native attributes.
 
@@ -325,65 +313,13 @@ config.authz.query.max_filter_size = INT [50]
     A default maximum filter size in elements. Usually, should be set by
     configuration.
 
-config.authz.sequence.credentials-change.name = ID [credentials-change]
-    Sequence name of credentials change.
-
-    Input:
-        user
-        password
-        passwordNew
-
 config.authz.sequence.namespace.attribute.namespace = ID [namespace]
     Attribute name of namespace within the namespace query.
 
+config.authn.sequence.authn.name = ID [authn]
+config.authz.sequence.credentials-change.name = ID [credentials-change]
 config.authz.sequence.namespace.name = ID [namespace]
-    Sequence name of namespace query.
-    Used during initialization to determine namespaces.
-
-    Output:
-        query
-        namespaces (list)
-
-config.authz.sequence.resolve-principal.name = ID [resolve-principal]
-    Sequence name of resolve principal.
-    Used during user login to fetch properties of principal name.
-
-    Input:
-        PrincipalRecord_PRINCIPAL
-
-    Output:
-        query*
-
-config.authz.sequence.resolve-groups.name = ID [resolve-groups]
-    Sequence name of resolve groups out of DN.
-    Used during user login to fetch groups recursively.
-    Used during directory sync.
-
-    Input:
-        dn
-        dnType - principal|group
-
-    Output:
-        query*
-
-config.authz.sequence.query-principals.name = ID [query-principals]
-    Sequence name of query principal.
-    Used during administrative tasks.
-
-    Input:
-        namespace
-        filter
-
-    Output:
-        query
-
 config.authz.sequence.query-groups.name = ID [query-groups]
-    Sequence name of query groups.
-    Used during administrative tasks.
-
-    Input:
-        namespace
-        filter
-
-    Output:
-        query
+config.authz.sequence.query-principals.name = ID [query-principals]
+config.authz.sequence.resolve-groups.name = ID [resolve-groups]
+config.authz.sequence.resolve-principal.name = ID [resolve-principal]
