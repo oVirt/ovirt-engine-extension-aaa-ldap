@@ -46,9 +46,6 @@ namespace is:
 
 SEQ VARIABLES
 
-availableNamespace
-    namespace to use (override query).
-
 authn_enable
     set if authn is initialized.
 

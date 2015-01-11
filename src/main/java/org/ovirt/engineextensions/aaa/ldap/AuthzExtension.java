@@ -160,17 +160,12 @@ public class AuthzExtension implements Extension {
                     }
 
                     namespaces = new ArrayList<>();
-                    Object availableNamespace = framework.getGlobals().get(ExtensionUtil.VARS_AVAILABLE_NAMESPACE);
-                    if (availableNamespace != null) {
-                        namespaces.add(availableNamespace.toString());
-                    } else {
-                        Map<String, Object> vars = framework.createSequenceVars();
-                        framework.runSequence(sequenceNamespace, vars);
-                        for (Map<String, List<String>> entry : executeVarQuery(vars, ExtensionUtil.VARS_QUERY)) {
-                            List<String> namespace = entry.get(attrNamespace);
-                            if (namespace != null) {
-                                namespaces.addAll(namespace);
-                            }
+                    Map<String, Object> vars = framework.createSequenceVars();
+                    framework.runSequence(sequenceNamespace, vars);
+                    for (Map<String, List<String>> entry : executeVarQuery(vars, ExtensionUtil.VARS_QUERY)) {
+                        List<String> namespace = entry.get(attrNamespace);
+                        if (namespace != null) {
+                            namespaces.addAll(namespace);
                         }
                     }
 

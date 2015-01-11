@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Red Hat Inc.
+ * Copyright 2012-2015 Red Hat Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ public class ExtensionUtil {
     public static final String VARS_FILTER = "filter";
     public static final String VARS_MAX_FILTER_SIZE = "maxFilterSize";
     public static final String VARS_NAMESPACE = "namespace";
-    public static final String VARS_AVAILABLE_NAMESPACE = "availableNamespace";
     public static final String VARS_PASSWORD = "password";
     public static final String VARS_PASSWORD_NEW = "passwordNew";
     public static final String VARS_QUERY = "query";
