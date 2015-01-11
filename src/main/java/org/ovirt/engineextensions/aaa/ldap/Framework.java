@@ -1272,17 +1272,58 @@ public class Framework implements Closeable {
                                 opProps.getMandatoryString("variable"),
                                 opProps.getMandatoryString("value")
                             );
-                        } else if ("var-list-append".equals(type)) {
-                            ArrayList<Object> l = new ArrayList<>();
-                            for (
-                                Collection<?> c :
-                                Arrays.asList(
-                                    (Collection<?>)vars.get(opProps.getMandatoryString("left-variable")),
-                                    (Collection<?>)vars.get(opProps.getMandatoryString("right-variable"))
-                                )
-                            ) {
-                                if (c != null) {
-                                    l.addAll(c);
+                        } else if ("var-list-get".equals(type)) {
+                            vars.remove(opProps.getMandatoryString("variable"));
+                            String varName = opProps.getMandatoryString("var-list");
+                            Object varValue = vars.get(varName);
+                            if (varValue != null) {
+                                if (!(varValue instanceof Collection)) {
+                                    throw new IllegalArgumentException(
+                                        String.format(
+                                            "Variable '%s' expected to contain Collection while it contains '%s'",
+                                            varName,
+                                            varValue.getClass().getName()
+                                        )
+                                    );
+                                }
+                                Collection<? extends Object> c = (Collection<? extends Object>)varValue;
+                                int index = opProps.getInt(0, "index");
+                                if (index < c.size()) {
+                                    vars.put(
+                                        opProps.getMandatoryString("variable"),
+                                        new ArrayList<Object>(c).get(index)
+                                    );
+                                }
+                            }
+                        } else if ("var-list-set".equals(type)) {
+                            List<Object> l = new ArrayList<>();
+                            for (MapProperties e : opProps.getOrEmpty("values").getMap().values()) {
+                                String v = e.getString(null, "value");
+                                if (v != null) {
+                                    l.add(v);
+                                }
+                                String var = e.getString(null, "var");
+                                if (var != null) {
+                                    Object varValue = vars.get(var);
+                                    if (varValue != null) {
+                                        l.add(varValue);
+                                    }
+                                }
+                                var = e.getString(null, "var-list");
+                                if (var != null) {
+                                    Object varValue = vars.get(var);
+                                    if (varValue != null) {
+                                        if (!(varValue instanceof Collection)) {
+                                            throw new IllegalArgumentException(
+                                                String.format(
+                                                    "Variable '%s' expected to contain Collection while it contains '%s'",
+                                                    var,
+                                                    varValue.getClass().getName()
+                                                )
+                                            );
+                                        }
+                                        l.addAll((Collection<? extends Object>)varValue);
+                                    }
                                 }
                             }
                             vars.put(

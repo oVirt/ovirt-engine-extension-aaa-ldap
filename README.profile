@@ -356,6 +356,15 @@ SEQUENCE
     # Set variable.
     sequence.@ID@.@SORT@.var-set.variable = @VAR@
     sequence.@ID@.@SORT@.var-set.value = @STRING@
+    # Get entry from list.
+    sequence.@ID@.@SORT@.var-list-get.variable = @VAR@
+    sequence.@ID@.@SORT@.var-list-get.var-list = @VAR@  # list content
+    sequence.@ID@.@SORT@.var-list-get.index = @VAR@
+    # Set list.
+    sequence.@ID@.@SORT@.var-list-set.variable = @VAR@
+    sequence.@ID@.@SORT@.var-list-set.values.@SEQ@.value = @STRING@
+    sequence.@ID@.@SORT@.var-list-set.values.@SEQ@.var = @VAR@
+    sequence.@ID@.@SORT@.var-list-set.values.@SEQ@.var-list = @VAR@  # append list content
     # Set system property.
     sequence.@ID@.@SORT@.sysprop-set.name = @STRING@
     sequence.@ID@.@SORT@.sysprop-set.value = @STRING@

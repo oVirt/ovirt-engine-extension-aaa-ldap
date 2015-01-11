@@ -4,6 +4,7 @@ oVirt LDAP authentication and authorization extension
 
  * profiles: add rfc2307-openldap profile to make openldap users' lives
    easier.
+ * core: framework: add var-list-get and var-list-set sequence commands.
 
 2014-12-24 - Version 1.0.1
 
