@@ -287,13 +287,19 @@ public class AuthzExtension implements Extension {
                 }
             }
         }
-        return record.mput(
-            namespaceKey,
-            record.get(namespaceKey, resolveNamespace(attrs.get(varPrefix + "DN").get(0).toString()))
-        ).mput(
-            DN_KEY,
-            attrs.get(varPrefix + "DN").get(0)
-        );
+        String namespace = resolveNamespace(attrs.get(varPrefix + "DN").get(0).toString());
+        if (namespace == null) {
+            record = null;
+        } else {
+            record.mput(
+                namespaceKey,
+                record.get(namespaceKey, resolveNamespace(attrs.get(varPrefix + "DN").get(0).toString()))
+            ).mput(
+                DN_KEY,
+                attrs.get(varPrefix + "DN").get(0)
+            );
+        }
+        return record;
     }
 
     private String resolveNamespace(String dn) {
@@ -340,14 +346,15 @@ public class AuthzExtension implements Extension {
                 String dn = entry.get(ExtensionUtil.GROUP_RECORD_PREFIX + "DN").get(0);
                 if (!addedGroups.contains(dn)) {
                     addedGroups.add(dn);
-                    groupRecords.add(
-                        transformSearchToRecord(
-                            entry,
-                            groupToRecordKeys,
-                            ExtensionUtil.GROUP_RECORD_PREFIX,
-                            Authz.GroupRecord.NAMESPACE
-                        )
+                    ExtMap groupRecord = transformSearchToRecord(
+                        entry,
+                        groupToRecordKeys,
+                        ExtensionUtil.GROUP_RECORD_PREFIX,
+                        Authz.GroupRecord.NAMESPACE
                     );
+                    if (groupRecord != null) {
+                        groupRecords.add(groupRecord);
+                    }
                 }
             }
             cache.put(record.get(DN_KEY).toString(), groupRecords);
@@ -528,6 +535,9 @@ public class AuthzExtension implements Extension {
                 ExtensionUtil.PRINCIPAL_RECORD_PREFIX,
                 Authz.PrincipalRecord.NAMESPACE
             );
+            if (principalRecord == null) {
+                throw new RuntimeException(String.format("Cannot locate principal '%s'", principal));
+            }
         } finally {
             framework.searchClose(instance);
         }
@@ -640,14 +650,15 @@ public class AuthzExtension implements Extension {
                 List<ExtMap> records = new LinkedList<>();
 
                 for (Map<String, List<String>> entry : entries) {
-                    records.add(
-                        transformSearchToRecord(
-                            entry,
-                            opaque.toKeys,
-                            opaque.varPrefix,
-                            opaque.namespaceKey
-                        )
+                    ExtMap record = transformSearchToRecord(
+                        entry,
+                        opaque.toKeys,
+                        opaque.varPrefix,
+                        opaque.namespaceKey
                     );
+                    if (record != null) {
+                        records.add(record);
+                    }
                 }
 
                 if (opaque.resolveGroups) {
