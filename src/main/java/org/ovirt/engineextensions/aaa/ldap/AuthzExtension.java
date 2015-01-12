@@ -290,10 +290,15 @@ public class AuthzExtension implements Extension {
         String namespace = resolveNamespace(attrs.get(varPrefix + "DN").get(0).toString());
         if (namespace == null) {
             record = null;
+            log.warn(
+                "{} Cannot determine namespace for '{}', ignoring entry.",
+                logPrefix,
+                attrs.get(varPrefix + "DN").get(0)
+            );
         } else {
             record.mput(
                 namespaceKey,
-                record.get(namespaceKey, resolveNamespace(attrs.get(varPrefix + "DN").get(0).toString()))
+                record.get(namespaceKey, namespace)
             ).mput(
                 DN_KEY,
                 attrs.get(varPrefix + "DN").get(0)
