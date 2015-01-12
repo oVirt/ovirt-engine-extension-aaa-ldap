@@ -73,6 +73,10 @@ namespace
 namespaces
     a list of namespaces to use.
 
+namespaceDefault
+    a default namespace to use if cannot be found within available
+    namespaces.
+
 password
     password to use.
 
@@ -119,6 +123,7 @@ namespace
     Output:
         query
         namespaces (list)
+        namespaceDefault
 
 authn
     Sequence name of authentication.

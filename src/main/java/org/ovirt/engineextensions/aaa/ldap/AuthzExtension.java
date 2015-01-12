@@ -65,6 +65,7 @@ public class AuthzExtension implements Extension {
     private String attrmapGroupRecord;
     private String attrmapPrincipalRecord;
     private String attrNamespace;
+    private String defaultNamespace;
     private String sequenceNamespace;
     private String sequenceQueryGroups;
     private String sequenceQueryPrincipals;
@@ -160,6 +161,7 @@ public class AuthzExtension implements Extension {
                     }
 
                     namespaces = new ArrayList<>();
+                    defaultNamespace = null;
                     Map<String, Object> vars = framework.createSequenceVars();
                     framework.runSequence(sequenceNamespace, vars);
                     Collection<? extends Object> c = (Collection<? extends Object>)vars.get(ExtensionUtil.VARS_NAMESPACES);
@@ -183,6 +185,15 @@ public class AuthzExtension implements Extension {
                         Authz.ContextKeys.AVAILABLE_NAMESPACES,
                         namespaces
                     );
+
+                    if (vars.containsKey(ExtensionUtil.VARS_NAMESPACE_DEFAULT)) {
+                        defaultNamespace = vars.get(ExtensionUtil.VARS_NAMESPACE_DEFAULT).toString();
+                    }
+
+                    if (defaultNamespace == null && namespaces.size() > 0) {
+                        defaultNamespace = namespaces.iterator().next();
+                    }
+
                     frameworkInitialized = true;
                 }
             }
@@ -315,7 +326,11 @@ public class AuthzExtension implements Extension {
             }
         }
         if (candidate.isEmpty()) {
-            candidate = null;
+            if (defaultNamespace == null) {
+                candidate = null;
+            } else {
+                candidate = defaultNamespace;
+            }
         }
         return candidate;
     }
