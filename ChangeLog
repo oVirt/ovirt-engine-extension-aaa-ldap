@@ -9,6 +9,7 @@ oVirt LDAP authentication and authorization extension
  * core: authz: support non queried namespaces
  * core: authz: support default namespaces for cases namespace cannot be
    resolved.
+ * core: fix java-8 issues.
 
 2014-12-24 - Version 1.0.1
 

@@ -159,11 +159,17 @@ public class MapProperties {
     }
 
     @Override
+    public int hashCode() {
+        return map.hashCode() + value.hashCode();
+    }
+
+    @Override
     public boolean equals(Object o) {
         return (
             o != null &&
             getClass() == o.getClass() &&
-            map.equals(((MapProperties)o).map)
+            map.equals(((MapProperties)o).map) &&
+            (value == null ? ((MapProperties)o).value == null : value.equals(((MapProperties)o).value))
         );
     }
 

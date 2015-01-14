@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.regex.*;
 
 import com.unboundid.asn1.*;
-import com.unboundid.util.*;
+import com.unboundid.util.Base64;
 
 public enum AttrConversion {
 
