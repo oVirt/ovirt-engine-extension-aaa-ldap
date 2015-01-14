@@ -148,53 +148,58 @@ public class AuthzExtension implements Extension {
         if (!frameworkInitialized) {
             synchronized(this) {
                 if (!frameworkInitialized) {
-                    framework.open();
+                    try {
+                        framework.open();
 
-                    ExtMap context = input.<ExtMap>get(Base.InvokeKeys.CONTEXT);
+                        ExtMap context = input.<ExtMap>get(Base.InvokeKeys.CONTEXT);
 
-                    String maxFilterSize = (String)framework.getGlobals().get(ExtensionUtil.VARS_MAX_FILTER_SIZE);
-                    if (maxFilterSize != null) {
-                        context.put(
-                            Authz.ContextKeys.QUERY_MAX_FILTER_SIZE,
-                            Integer.valueOf(maxFilterSize)
+                        String maxFilterSize = (String)framework.getGlobals().get(ExtensionUtil.VARS_MAX_FILTER_SIZE);
+                        if (maxFilterSize != null) {
+                            context.put(
+                                Authz.ContextKeys.QUERY_MAX_FILTER_SIZE,
+                                Integer.valueOf(maxFilterSize)
+                            );
+                        }
+
+                        namespaces = new ArrayList<>();
+                        defaultNamespace = null;
+                        Map<String, Object> vars = framework.createSequenceVars();
+                        framework.runSequence(sequenceNamespace, vars);
+                        Collection<? extends Object> c = (Collection<? extends Object>)vars.get(ExtensionUtil.VARS_NAMESPACES);
+                        if (c != null) {
+                            for (Object o : c) {
+                                namespaces.add(o.toString());
+                            }
+                        }
+                        for (Map<String, List<String>> entry : executeVarQuery(vars, ExtensionUtil.VARS_QUERY)) {
+                            List<String> namespace = entry.get(attrNamespace);
+                            if (namespace != null) {
+                                namespaces.addAll(namespace);
+                            }
+                        }
+
+                        log.info("{} Available Namespaces: {}",
+                            logPrefix,
+                            namespaces
                         );
-                    }
+                        context.put(
+                            Authz.ContextKeys.AVAILABLE_NAMESPACES,
+                            namespaces
+                        );
 
-                    namespaces = new ArrayList<>();
-                    defaultNamespace = null;
-                    Map<String, Object> vars = framework.createSequenceVars();
-                    framework.runSequence(sequenceNamespace, vars);
-                    Collection<? extends Object> c = (Collection<? extends Object>)vars.get(ExtensionUtil.VARS_NAMESPACES);
-                    if (c != null) {
-                        for (Object o : c) {
-                            namespaces.add(o.toString());
+                        if (vars.containsKey(ExtensionUtil.VARS_NAMESPACE_DEFAULT)) {
+                            defaultNamespace = vars.get(ExtensionUtil.VARS_NAMESPACE_DEFAULT).toString();
                         }
-                    }
-                    for (Map<String, List<String>> entry : executeVarQuery(vars, ExtensionUtil.VARS_QUERY)) {
-                        List<String> namespace = entry.get(attrNamespace);
-                        if (namespace != null) {
-                            namespaces.addAll(namespace);
+
+                        if (defaultNamespace == null && namespaces.size() > 0) {
+                            defaultNamespace = namespaces.iterator().next();
                         }
+
+                        frameworkInitialized = true;
+                    } catch (Exception e) {
+                        log.warn("{} Cannot initialize LDAP framework, deferring initialization. Error: {}", logPrefix, e.getMessage());
+                        throw e;
                     }
-
-                    log.info("{} Available Namespaces: {}",
-                        logPrefix,
-                        namespaces
-                    );
-                    context.put(
-                        Authz.ContextKeys.AVAILABLE_NAMESPACES,
-                        namespaces
-                    );
-
-                    if (vars.containsKey(ExtensionUtil.VARS_NAMESPACE_DEFAULT)) {
-                        defaultNamespace = vars.get(ExtensionUtil.VARS_NAMESPACE_DEFAULT).toString();
-                    }
-
-                    if (defaultNamespace == null && namespaces.size() > 0) {
-                        defaultNamespace = namespaces.iterator().next();
-                    }
-
-                    frameworkInitialized = true;
                 }
             }
         }
@@ -497,8 +502,7 @@ public class AuthzExtension implements Extension {
         try {
             ensureFramework(input);
         } catch(Exception e) {
-            log.error("{} Cannot initialize LDAP framework, deferring initialization. Error: {}", logPrefix, e.getMessage());
-            log.debug("Exception", e);
+            log.debug("Ignoring Exception", e);
         }
     }
 

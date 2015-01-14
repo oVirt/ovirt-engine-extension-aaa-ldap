@@ -44,9 +44,14 @@ public class AuthnExtension implements Extension {
         if (!frameworkInitialized) {
             synchronized(this) {
                 if (!frameworkInitialized) {
-                    framework.getGlobals().put(ExtensionUtil.VARS_AUTHN_ENABLE, "1");
-                    framework.open();
-                    frameworkInitialized = true;
+                    try {
+                        framework.getGlobals().put(ExtensionUtil.VARS_AUTHN_ENABLE, "1");
+                        framework.open();
+                        frameworkInitialized = true;
+                    } catch (Exception e) {
+                        log.warn("{} Cannot initialize LDAP framework, deferring initialization. Error: {}", logPrefix, e.getMessage());
+                        throw e;
+                    }
                 }
             }
         }
@@ -124,8 +129,7 @@ public class AuthnExtension implements Extension {
         try {
             ensureFramework(input);
         } catch(Exception e) {
-            log.error("{} Cannot initialize LDAP framework, deferring initialization. Error: {}", logPrefix, e.getMessage());
-            log.debug("Exception", e);
+            log.debug("Ignoring Exception", e);
         }
     }
 
