@@ -1,6 +1,6 @@
 oVirt LDAP authentication and authorization extension
 
-????-??-?? - Version 1.0.2
+2015-01-15 - Version 1.0.2
 
  * profiles: add rfc2307-openldap profile to make openldap users' lives
    easier.
