@@ -115,10 +115,10 @@ public class AuthnExtension implements Extension {
         framework = ExtensionUtil.frameworkCreate(context, logPrefix, "authn_enable");
 
         if (Boolean.valueOf(framework.getGlobals().get(ExtensionUtil.VARS_CAPABILITY_CREDENTIALS_CHANGE).toString())) {
-            output.put(
+            context.put(
                 Authn.ContextKeys.CAPABILITIES,
                 (
-                    output.<Long>get(Authn.ContextKeys.CAPABILITIES) |
+                    context.<Long>get(Authn.ContextKeys.CAPABILITIES) |
                     Authn.Capabilities.CREDENTIALS_CHANGE
                 )
             );

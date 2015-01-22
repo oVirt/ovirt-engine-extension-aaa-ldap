@@ -2,6 +2,7 @@ oVirt LDAP authentication and authorization extension
 
 ????-??-?? - Version 1.0.3
 
+ * authn: fix setting password change capability.
 
 2015-01-15 - Version 1.0.2
 
