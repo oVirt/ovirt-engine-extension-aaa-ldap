@@ -108,7 +108,7 @@
 		/>
 		<copy
 			file="${jar.unboundid-ldapsdk}"
-			todir="${build.output}/modules/org/ovirt/engine-extensions/aaa/ldap/main"
+			tofile="${build.output}/modules/org/ovirt/engine-extensions/aaa/ldap/main/unboundid-ldapsdk.jar"
 		/>
 	</target>
 
