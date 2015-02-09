@@ -94,6 +94,16 @@ public class Framework implements Closeable {
             }
         }
 
+        public String toString() {
+            return String.format(
+                "ConnectionPoolEntry(name='%s', connectionPool=%s, supportPaging=%s, supportPasswordModify=%s, supportWhoAmI=%s)",
+                name,
+                connectionPool,
+                supportPaging,
+                supportPasswordModify,
+                supportWhoAmI
+            );
+        }
     }
 
     public static class SearchInstance {
@@ -653,7 +663,7 @@ public class Framework implements Closeable {
             previous.close();
         }
 
-        log.debug("createPool Return");
+        log.debug("createPool Return {}", entry);
     }
 
     public void init() throws Exception {
