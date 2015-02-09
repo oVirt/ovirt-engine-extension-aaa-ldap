@@ -83,6 +83,7 @@ public class Framework implements Closeable {
         public String name;
         public MapProperties props;
         public LDAPConnectionPool connectionPool;
+        public boolean supportPaging;
         public boolean supportPasswordModify;
         public boolean supportWhoAmI;
 
@@ -96,7 +97,7 @@ public class Framework implements Closeable {
     }
 
     public static class SearchInstance {
-        private LDAPConnectionPool connectionPool;
+        private ConnectionPoolEntry connectionPoolEntry;
         private LDAPConnection connection;
         private List<AttrMapInfo> attrMap;
         private SearchRequest searchRequest;
@@ -631,12 +632,22 @@ public class Framework implements Closeable {
         );
         entry.connectionPool = createConnectionPool(entry.props);
 
-        String supportedExtendedOperations[] = entry.connectionPool.getRootDSE().getSupportedExtendedOperationOIDs();
-        if (supportedExtendedOperations != null) {
-            List<String> supportedExtendedOperationsList = Arrays.asList(supportedExtendedOperations);
-            entry.supportPasswordModify = supportedExtendedOperationsList.contains(PasswordModifyExtendedRequest.PASSWORD_MODIFY_REQUEST_OID);
-            entry.supportWhoAmI = supportedExtendedOperationsList.contains(WhoAmIExtendedRequest.WHO_AM_I_REQUEST_OID);
+        RootDSE rootDSE = entry.connectionPool.getRootDSE();
+        if (rootDSE != null) {
+            String supportedControls[] = rootDSE.getSupportedControlOIDs();
+            if (supportedControls != null) {
+                List<String> supportedControlsList = Arrays.asList(supportedControls);
+                entry.supportPaging = supportedControlsList.contains(SimplePagedResultsControl.PAGED_RESULTS_OID);
+            }
+
+            String supportedExtendedOperations[] = rootDSE.getSupportedExtendedOperationOIDs();
+            if (supportedExtendedOperations != null) {
+                List<String> supportedExtendedOperationsList = Arrays.asList(supportedExtendedOperations);
+                entry.supportPasswordModify = supportedExtendedOperationsList.contains(PasswordModifyExtendedRequest.PASSWORD_MODIFY_REQUEST_OID);
+                entry.supportWhoAmI = supportedExtendedOperationsList.contains(WhoAmIExtendedRequest.WHO_AM_I_REQUEST_OID);
+            }
         }
+
         ConnectionPoolEntry previous = connectionPools.put(entry.name, entry);
         if (previous != null) {
             previous.close();
@@ -991,11 +1002,11 @@ public class Framework implements Closeable {
         log.debug("SearchRequest: {}", searchRequest);
 
         SearchInstance instance = new SearchInstance();
-        instance.connectionPool = getConnectionPool(searchProps.getMandatoryString("pool"));
+        instance.connectionPoolEntry = connectionPools.get(searchProps.getMandatoryString("pool"));
         instance.searchRequest = searchRequest;
-        instance.doPaging = searchProps.getBoolean(Boolean.TRUE, "paging");;
+        instance.doPaging = instance.connectionPoolEntry.supportPaging && searchProps.getBoolean(Boolean.TRUE, "paging");
         instance.pageSize = pageSize != 0 ? pageSize : searchProps.getInt(100, "pageSize");
-        instance.limitLeft = limit != 0 ? limit : searchProps.getInt(Integer.MAX_VALUE, "limit");;
+        instance.limitLeft = limit != 0 ? limit : searchProps.getInt(Integer.MAX_VALUE, "limit");
         instance.attrMap = getAttrMap(searchProps.getString("", "attrmap"), vars);
 
         log.debug("SearchOpen Return {}", instance);
@@ -1023,7 +1034,7 @@ public class Framework implements Closeable {
                 log.debug("Ignoring exception", e);
             } finally {
                 log.debug("Releasing connection");
-                instance.connectionPool.releaseConnection(instance.connection);
+                instance.connectionPoolEntry.connectionPool.releaseConnection(instance.connection);
             }
         }
 
@@ -1042,7 +1053,7 @@ public class Framework implements Closeable {
         if (!instance.done) {
             if (instance.connection == null) {
                 log.debug("Getting connection");
-                instance.connection = instance.connectionPool.getConnection();
+                instance.connection = instance.connectionPoolEntry.connectionPool.getConnection();
             }
 
             if (instance.doPaging) {
