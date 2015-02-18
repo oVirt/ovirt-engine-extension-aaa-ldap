@@ -253,19 +253,23 @@ Notations:
 
 Find base DN
 
-$ ldapsearch -H ldap://@HOST@ -D '@USERDN@' -w '@USERPW@' -b '' -s BASE defaultNamingContext namingContexts
+$ ldapsearch -H ldap://@HOST@ -x -D '@USERDN@' -w '@USERPW@' -b '' -s BASE defaultNamingContext namingContexts
 
 Dump entire directory
 
-$ ldapsearch -E pr=1024/noprompt -o ldif-wrap=no -H ldap://@HOST@ -D '@USERDN@' -w '@USERPW@' -b '@BASEDN@' '*' +
+$ ldapsearch -E pr=1024/noprompt -o ldif-wrap=no -H ldap://@HOST@ -x -D '@USERDN@' -w '@USERPW@' -b '@BASEDN@' '*' +
 
 Test startTLS (preferred)
 
-$ LDAPTLS_REQCERT=never ldapsearch -ZZ -H ldap://@HOST@ -D '@USERDN@' -w '@USERPW@' -b '@BASEDN@'
+$ LDAPTLS_REQCERT=never ldapsearch -ZZ -H ldap://@HOST@ -x -D '@USERDN@' -w '@USERPW@' -b '@BASEDN@'
 
 Test LDAP over SSL/TLS
 
-$ LDAPTLS_REQCERT=never ldapsearch -H ldaps://@HOST@ -D '@USERDN@' -w '@USERPW@' -b '@BASEDN@'
+LDAPTLS_REQCERT=never ldapsearch -H ldaps://@HOST@ -x -D '@USERDN@' -w '@USERPW@' -b '@BASEDN@'
+
+Test LDAP over SSL/TLS using GSSAPI
+
+$ LDAPTLS_REQCERT=never ldapsearch -H ldaps://@HOST@ -Y GSSAPI -b '@BASEDN@'
 
 USEFUL DNS COMMANDS
 
