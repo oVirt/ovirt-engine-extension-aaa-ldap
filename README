@@ -267,6 +267,12 @@ Test LDAP over SSL/TLS
 
 $ LDAPTLS_REQCERT=never ldapsearch -H ldaps://@HOST@ -D '@USERDN@' -w '@USERPW@' -b '@BASEDN@'
 
+USEFUL DNS COMMANDS
+
+Resolve domain LDAP SRV record
+
+$ dig _ldap._tcp.@DOMAIN@ SRV
+
 ENGINE LOG
 
 A logger by the name of org.ovirt.engineextensions.aaa.ldap can be set to
