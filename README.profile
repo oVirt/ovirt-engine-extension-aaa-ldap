@@ -7,7 +7,7 @@ OUTLINE
 FORMAT
 
 The format of profile is properties file. Every rule[1] of Java property file
-apples.
+applies.
 
 [1] http://docs.oracle.com/javase/7/docs/api/java/util/Properties.html#load%28java.io.Reader%29
 
@@ -52,7 +52,7 @@ authn_enable
 authz_enable
     set if authz is initialized.
 
-capability_resucrsiveGroupResolution
+capability_recursiveGroupResolution
     true if directory resolves groups recursively.
 
 capability_credentialsChange

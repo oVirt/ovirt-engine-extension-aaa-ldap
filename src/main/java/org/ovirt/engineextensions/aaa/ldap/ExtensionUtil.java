@@ -38,7 +38,7 @@ public class ExtensionUtil {
     public static final String VARS_PASSWORD = "password";
     public static final String VARS_PASSWORD_NEW = "passwordNew";
     public static final String VARS_QUERY = "query";
-    public static final String VARS_CAPABILITY_RECUSRIVE_GROUP_RESOLUTION = "capability_resucrsiveGroupResolution";
+    public static final String VARS_CAPABILITY_RECUSRIVE_GROUP_RESOLUTION = "capability_recursiveGroupResolution";
     public static final String VARS_CAPABILITY_CREDENTIALS_CHANGE = "capability_credentialsChange";
     public static final String VARS_USER = "user";
 
