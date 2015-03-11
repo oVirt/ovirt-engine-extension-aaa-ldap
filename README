@@ -12,8 +12,8 @@ Examples are available at the following directory:
 
 Content is relative to /etc/ovirt-engine directory.
 
-1. Per your setup, copy recursive examples/ad (Active Directory) or
-   examples/simple to /etc/ovirt-engine, optionally modify the profile1
+1. Per your setup, copy recursive examples/ad/. (Active Directory) or
+   examples/simple/. to /etc/ovirt-engine, optionally modify the profile1
    within the file names and profile1 within the content to a value
    that suites your environment.
 2. Customize the vars.* variables within files to meet your setup.
