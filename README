@@ -168,6 +168,34 @@ alias myrootca:
  $ keytool -importcert -noprompt -trustcacerts -alias myrootca \
        -file myrootca.pem -keystore myrootca.jks -storepass changeit
 
+The root certificate should be obtained from the LDAP server, exact
+method is vendor specific.
+
+OpenLDAP
+
+    Open /etc/openldap/slapd.conf
+    Seek TLSCACertificateFile or TLSCACertificatePath.
+    Locate certificate file.
+
+FreeIPA
+
+    /etc/ipa/ca.crt
+
+Active Directory
+
+    > certutil -ca.cert myrootca.pem
+
+Most LDAP servers will provide root certificate within TLS/SSL negotiation.
+Use the following sequence to extract:
+
+    $ openssl s_client -connect @HOST@:636 -showcerts < /dev/null
+
+    Extract the last certificate into myroot.pem
+
+    Check if it is a root certificate:
+
+    $ openssl verify -CAfile myroot.pem myroot.pem
+
 APACHE SSO CONFIGURATION
 ------------------------
 
