@@ -139,7 +139,7 @@ class Resolver implements Closeable {
 
     private Attributes query(String name, String[] attrs) throws NamingException {
         if (log.isDebugEnabled()) {
-            log.debug("Entry: name='{}', attrs=%s", name, Arrays.asList(attrs));
+            log.debug("Entry: name='{}', attrs={}", name, Arrays.asList(attrs));
         }
 
         Attributes ret = ctx.getAttributes(name, attrs);
