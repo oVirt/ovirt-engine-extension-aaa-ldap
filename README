@@ -299,6 +299,9 @@ Test LDAP over SSL/TLS using GSSAPI
 
 $ LDAPTLS_REQCERT=never ldapsearch -H ldaps://@HOST@ -Y GSSAPI -b '@BASEDN@'
 
+To test using a specific CA certificate, replace LDAPTLS_REQCERT=never
+with LDAPTLS_CACERT=ca.cer.
+
 USEFUL DNS COMMANDS
 
 Resolve domain LDAP SRV record
