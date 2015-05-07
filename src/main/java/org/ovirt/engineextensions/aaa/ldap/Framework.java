@@ -615,10 +615,6 @@ public class Framework implements Closeable {
         Util.setObjectByProperties(connectionPool, cpoolProps, "set");
         log.debug("createConnectionPool Return: {}", connectionPool);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Return RootDSE: {}", connectionPool.getRootDSE().getAttributes());
-        }
-
         return connectionPool;
     }
 
@@ -644,6 +640,17 @@ public class Framework implements Closeable {
 
         RootDSE rootDSE = entry.connectionPool.getRootDSE();
         if (rootDSE != null) {
+            log.info(
+                "{} LDAP pool '{}' information: vendor='{}' version='{}'",
+                logPrefix,
+                name,
+                rootDSE.getVendorName(),
+                rootDSE.getVendorVersion()
+            );
+            if (log.isDebugEnabled()) {
+                log.debug("RootDSE: {}", rootDSE.getAttributes());
+            }
+
             String supportedControls[] = rootDSE.getSupportedControlOIDs();
             if (supportedControls != null) {
                 List<String> supportedControlsList = Arrays.asList(supportedControls);
