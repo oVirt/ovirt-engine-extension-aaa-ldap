@@ -284,6 +284,10 @@ Find base DN
 
 $ ldapsearch -H ldap://@HOST@ -x -D '@USERDN@' -w '@USERPW@' -b '' -s BASE defaultNamingContext namingContexts
 
+Fetch entire rootDSE
+
+$ ldapsearch -H ldap://@HOST@ -x -D '@USERDN@' -w '@USERPW@' -b '' -s BASE '*' +
+
 Dump entire directory
 
 $ ldapsearch -E pr=1024/noprompt -o ldif-wrap=no -H ldap://@HOST@ -x -D '@USERDN@' -w '@USERPW@' -b '@BASEDN@' '*' +
