@@ -96,6 +96,7 @@ Using simple bind transport using startTLS:
     #include = <iplanet.properties>
     #include = <rfc2307.properties>
     #include = <rfc2307-openldap.properties>
+    #include = <rfc2307-edir.properties>
 
     vars.server = ldap1.company.com
     vars.user = uid=search,cn=users,cn=accounts,dc=company,dc=com
