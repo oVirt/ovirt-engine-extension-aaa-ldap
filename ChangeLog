@@ -5,6 +5,7 @@ oVirt LDAP authentication and authorization extension
  * authn: fix setting password change capability.
  * core: auto disable paging if not supported.
  * profiles: rfc2307-edir: initial add, rhbz#1224722.
+ * profiles: rfc2307: minor cleanups.
 
 2015-01-15 - Version 1.0.2
 
