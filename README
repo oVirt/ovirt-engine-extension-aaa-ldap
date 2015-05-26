@@ -184,18 +184,20 @@ FreeIPA
 
 Active Directory
 
-    > certutil -ca.cert myrootca.pem
+    Windows: > certutil -ca.cert myrootca.der
+    Linux:   $ openssl -in myrootca.der -inform DER -out myrootca.pem
 
 Most LDAP servers will provide root certificate within TLS/SSL negotiation.
 Use the following sequence to extract:
 
     $ openssl s_client -connect @HOST@:636 -showcerts < /dev/null
 
-    Extract the last certificate into myroot.pem
+    Copy/paste the last certificate into myrootca.pem
+    Copy/paste the first certificate into end.pem
 
-    Check if it is a root certificate:
+Check if it is a root certificate:
 
-    $ openssl verify -CAfile myroot.pem myroot.pem
+$ openssl verify -CAfile myrootca.pem end.pem
 
 APACHE SSO CONFIGURATION
 ------------------------
