@@ -174,7 +174,10 @@
 	</target>
 
 	<target name="install-no-build">
-		<copy todir="${dir.destdir}${dir.profiles}">
+		<copy
+			todir="${dir.destdir}${dir.profiles}"
+			overwrite="true"
+		>
 			<fileset dir="profiles"/>
 		</copy>
 		<chmod
@@ -183,7 +186,10 @@
 			type="both"
 			includes="**"
 		/>
-		<copy todir="${dir.destdir}${dir.examples}">
+		<copy
+			todir="${dir.destdir}${dir.examples}"
+			overwrite="true"
+		>
 			<fileset dir="examples"/>
 		</copy>
 		<chmod
@@ -192,7 +198,10 @@
 			type="both"
 			includes="**"
 		/>
-		<copy todir="${dir.destdir}${dir.pkgmodules}">
+		<copy
+			todir="${dir.destdir}${dir.pkgmodules}"
+			overwrite="true"
+		>
 			<fileset dir="${build.output}/modules"/>
 		</copy>
 		<chmod
@@ -204,6 +213,7 @@
 		<copy
 			file="${build.output}/engine.conf"
 			tofile="${dir.destdir}${dir.sysconf}/ovirt-engine/engine.conf.d/50-${package.name}.conf"
+			overwrite="true"
 		/>
 		<chmod
 			file="${dir.destdir}${dir.sysconf}/ovirt-engine/engine.conf.d/50-${package.name}.conf"
