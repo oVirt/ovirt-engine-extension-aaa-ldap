@@ -180,6 +180,8 @@
 		<chmod
 			dir="${dir.destdir}${dir.profiles}"
 			perm="u=rwX,go=rX"
+			type="both"
+			includes="**"
 		/>
 		<copy todir="${dir.destdir}${dir.examples}">
 			<fileset dir="examples"/>
@@ -187,6 +189,8 @@
 		<chmod
 			dir="${dir.destdir}${dir.examples}"
 			perm="u=rwX,go=rX"
+			type="both"
+			includes="**"
 		/>
 		<copy todir="${dir.destdir}${dir.pkgmodules}">
 			<fileset dir="${build.output}/modules"/>
@@ -194,6 +198,8 @@
 		<chmod
 			dir="${dir.destdir}${dir.pkgdata}"
 			perm="u=rwX,go=rX"
+			type="both"
+			includes="**"
 		/>
 		<copy
 			file="${build.output}/engine.conf"
