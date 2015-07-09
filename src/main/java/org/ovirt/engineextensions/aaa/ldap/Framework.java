@@ -423,10 +423,6 @@ public class Framework implements Closeable {
                     truststoreProps.getString("changeit", "password")
                 );
 
-                if (trustStore == null) {
-                    throw new IllegalArgumentException("Trust store must be provided");
-                }
-
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance(
                     truststoreProps.getString(
                         KeyManagerFactory.getDefaultAlgorithm(),

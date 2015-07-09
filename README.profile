@@ -243,12 +243,12 @@ Pool of LDAP connections, based on specific policy.
     pool.default.ssl.startTLSProtocol = TLSv1
     pool.default.ssl.truststore.provider = (JRE default)
     pool.default.ssl.truststore.type = (JRE default)
-    pool.default.ssl.truststore.file = @FILE@
-    pool.default.ssl.truststore.password = @STRING@
+    pool.default.ssl.truststore.file = (JRE default)
+    pool.default.ssl.truststore.password = (JRE default)|changeit
     pool.default.ssl.keystore.provider = (JRE default)
     pool.default.ssl.keystore.type = (JRE default)
     pool.default.ssl.keystore.file = @FILE@
-    pool.default.ssl.keystore.password = @STRING@
+    pool.default.ssl.keystore.password = changeit
     pool.default.ssl.trustmanager.algorithm = (JRE default)
     pool.default.ssl.keymanager.algorithm = (JRE default)
 
