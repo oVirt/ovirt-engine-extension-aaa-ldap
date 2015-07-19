@@ -6,6 +6,16 @@ Generic LDAP implementation for oVirt engine.
 QUICK START
 -----------
 
+USING INSTALLER
+
+Install ovirt-engine-extension-aaa-ldap-setup and execute:
+
+ # ovirt-engine-extension-aaa-ldap-setup
+
+The setup will guide you throughout the process of most common use cases.
+
+USING CONFIGURATION FILES
+
 Examples are available at the following directory:
 
   /usr/share/ovirt-engine-extension-aaa-ldap*/examples

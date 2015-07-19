@@ -7,6 +7,7 @@ oVirt LDAP authentication and authorization extension
  * profiles: rfc2307-edir: initial add, rhbz#1224722.
  * profiles: rfc2307: minor cleanups.
  * core: enable use of system width trust store, rhbz#1241262.
+ * setup: initial implementation.
 
 2015-01-15 - Version 1.0.2
 

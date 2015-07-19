@@ -20,6 +20,7 @@
 %global make_common_opts \\\
 	PREFIX=%{_prefix} \\\
 	SYSCONF_DIR=%{_sysconfdir} \\\
+	BIN_DIR=%{_bindir} \\\
 	DATA_DIR=%{_datadir} \\\
 	PKG_DATA_DIR=%{_datadir}/%{name} \\\
 	%{nil}
@@ -40,11 +41,22 @@ BuildRequires:	jpackage-utils
 BuildRequires:	ovirt-engine-extensions-api
 BuildRequires:	unboundid-ldapsdk
 
-Requires:	ovirt-engine >= 3.5
+Requires:	ovirt-engine
 Requires:	unboundid-ldapsdk >= 2.3.7
 
 %description
 Generic LDAP implementation for oVirt engine.
+
+%package setup
+Summary:	%{name} setup
+Requires:	%{name} = %{version}-%{release}
+Requires:	bind-utils
+Requires:	otopi >= 1.4.0
+Requires:	ovirt-engine >= 3.6
+Requires:	python-ldap
+
+%description setup
+Setup package for Generic LDAP.
 
 %prep
 %setup -c -q
@@ -52,6 +64,7 @@ Generic LDAP implementation for oVirt engine.
 %build
 cat > build.properties << __EOF__
 package.display.name=%{name}-%{version}-%{release}
+build.checks.statics.enable=false
 jar.slf4j-api=$(build-classpath %{slf4j}/slf4j-api)
 jar.ovirt-engine-extensions-api=$(build-classpath ovirt-engine/ovirt-engine-extensions-api)
 jar.unboundid-ldapsdk=$(build-classpath unboundid-ldapsdk)
@@ -69,9 +82,16 @@ ln -s \
 	"%{buildroot}/usr/share/ovirt-engine-extension-aaa-ldap/modules/org/ovirt/engine-extensions/aaa/ldap/main/unboundid-ldapsdk.jar"
 
 %files
+%dir %{_datadir}/%{name}
 %doc README*
-%{_datadir}/%{name}/
+%{_datadir}/%{name}/examples/
+%{_datadir}/%{name}/modules/
+%{_datadir}/%{name}/profiles/
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-%{name}.conf
+
+%files setup
+%{_bindir}/ovirt-engine-extension-aaa-ldap-setup
+%{_datadir}/%{name}/setup/
 
 %changelog
 * Thu Jan 15 2015 Alon Bar-Lev <alonbl@redhat.com> 1.0.2-1

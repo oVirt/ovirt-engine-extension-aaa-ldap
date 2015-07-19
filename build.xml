@@ -11,6 +11,7 @@
 	<property name="build.root" location="."/>
 	<property name="build.output" value="${build.root}/output"/>
 	<property name="build.intermediate" value="${build.root}/target"/>
+	<property name="build.checks.statics.enable" value="true"/>
 	<property name="lib" value="${build.root}/lib"/>
 
 	<property name="jar.slf4j-api" value="${lib}/slf4j-api.jar"/>
@@ -26,11 +27,16 @@
 	<property name="dir.destdir" value=""/>
 	<property name="dir.prefix" value="/usr/local"/>
 	<property name="dir.sysconf" value="${dir.prefix}/etc"/>
+	<property name="dir.bin" value="${dir.prefix}/bin"/>
 	<property name="dir.data" value="${dir.prefix}/share"/>
 	<property name="dir.pkgdata" value="${dir.prefix}/share/${package.name}"/>
 	<property name="dir.pkgmodules" value="${dir.pkgdata}/modules"/>
 	<property name="dir.profiles" value="${dir.pkgdata}/profiles"/>
+	<property name="dir.setup" value="${dir.pkgdata}/setup"/>
 	<property name="dir.examples" value="${dir.pkgdata}/examples"/>
+
+	<property name="dev.mode" value="0"/>
+	<property name="dir.python.dev" value=""/>
 
 	<path id="classpath.buildtime">
 		<pathelement path="${jar.slf4j-api}"/>
@@ -44,7 +50,7 @@
 		<pathelement path="${build.output}/modules/org/ovirt/engine-extensions/aaa/ldap/main/ovirt-engine-extension-aaa-ldap.jar"/>
 	</path>
 
-	<target name="all" depends="conf, main, tests, spec"/>
+	<target name="all" depends="python-check, conf, main, tests, spec"/>
 
 	<target name="install" depends="all, install-no-build"/>
 
@@ -52,6 +58,23 @@
 		<delete dir="${build.intermediate}"/>
 		<delete dir="${build.output}"/>
 		<delete file="ovirt-engine-extension-aaa-ldap.spec"/>
+	</target>
+
+	<target name="python-check" if="${build.checks.statics.enable}">
+		<exec
+			failonerror="true"
+			executable="pyflakes"
+
+		>
+			<arg value="setup"/>
+		</exec>
+		<exec
+			failonerror="true"
+			executable="pep8"
+
+		>
+			<arg value="setup"/>
+		</exec>
 	</target>
 
 	<target name="conf">
@@ -172,6 +195,7 @@
 				<include name="profiles/**"/>
 				<include name="examples/**"/>
 				<include name="src/**"/>
+				<include name="setup/**"/>
 			</tarfileset>
 		</tar>
 	</target>
@@ -221,6 +245,64 @@
 		<chmod
 			file="${dir.destdir}${dir.sysconf}/ovirt-engine/engine.conf.d/50-${package.name}.conf"
 			perm="u=rw,go=r"
+		/>
+		<copy
+			todir="${dir.destdir}${dir.setup}"
+			overwrite="true"
+		>
+			<fileset dir="setup">
+				<exclude name="**/*.in"/>
+			</fileset>
+		</copy>
+		<copy
+			file="setup/bin/ovirt-engine-extension-aaa-ldap-setup.env.in"
+			tofile="${dir.destdir}${dir.setup}/bin/ovirt-engine-extension-aaa-ldap-setup.env"
+			overwrite="true"
+		>
+			<filterset>
+				<filter token="DEVMODE" value="${dev.mode}"/>
+				<filter token="DEV_PYTHON_DIR" value="${dir.python.dev}"/>
+			</filterset>
+		</copy>
+		<copy
+			file="setup/ovirt_engine_extension_aaa_ldap_setup/config.py.in"
+			tofile="${dir.destdir}${dir.setup}/ovirt_engine_extension_aaa_ldap_setup/config.py"
+			overwrite="true"
+		>
+			<filterset>
+				<filter token="PACKAGE_NAME" value="${package.name}"/>
+				<filter token="PACKAGE_VERSION" value="${package.version}${package.version-suffix}"/>
+				<filter token="PACKAGE_DISPLAY_NAME" value="${package.display.name}"/>
+				<filter token="RPM_VERSION" value="${rpm.version}"/>
+				<filter token="RPM_RELEASE" value="${rpm.release}"/>
+				<filter token="DEV_PYTHON_DIR" value="${dir.python.dev}"/>
+				<filter token="BIN_DIR" value="${dir.bin}"/>
+				<filter token="SYSCONF_DIR" value="${dir.sysconf}"/>
+			</filterset>
+		</copy>
+		<chmod
+			dir="${dir.destdir}${dir.setup}"
+			perm="u=rwX,go=rX"
+			type="both"
+			includes="**"
+		/>
+		<chmod
+			perm="u=rwx,go=rx"
+			type="both"
+			file="${dir.destdir}${dir.setup}/bin/ovirt-engine-extension-aaa-ldap-setup"
+		/>
+		<mkdir
+			dir="${dir.destdir}${dir.bin}"
+		/>
+		<symlink
+			link="${dir.destdir}${dir.bin}/ovirt-engine-extension-aaa-ldap-setup"
+			resource="${dir.setup}/bin/ovirt-engine-extension-aaa-ldap-setup"
+			overwrite="true"
+		/>
+		<chmod
+			perm="u=rwX,go=rX"
+			type="both"
+			file="${dir.destdir}${dir.bin}"
 		/>
 	</target>
 
