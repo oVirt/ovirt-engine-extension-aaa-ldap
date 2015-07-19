@@ -59,6 +59,7 @@
 		<copy
 			file="src/resources/engine.conf"
 			tofile="${build.output}/engine.conf"
+			overwrite="true"
 		>
 			<filterset>
 				<filter token="MODULEPATH" value="${dir.pkgmodules}"/>
@@ -105,10 +106,12 @@
 		<copy
 			file="src/resources/module.xml"
 			todir="${build.output}/modules/org/ovirt/engine-extensions/aaa/ldap/main"
+			overwrite="true"
 		/>
 		<copy
 			file="${jar.unboundid-ldapsdk}"
 			tofile="${build.output}/modules/org/ovirt/engine-extensions/aaa/ldap/main/unboundid-ldapsdk.jar"
+			overwrite="true"
 		/>
 	</target>
 
