@@ -219,7 +219,7 @@ Pool of LDAP connections, based on specific policy.
 
     # SOCKET FACTORY
     pool.default.socketfactory.type = resolver
-    # default java
+    # standard java
     pool.default.socketfactory.java
     # jndi resolver hack
     # Support IPv6
