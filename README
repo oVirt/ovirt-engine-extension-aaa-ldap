@@ -16,12 +16,65 @@ Content is relative to /etc/ovirt-engine directory.
    examples/simple/. to /etc/ovirt-engine, optionally modify the profile1
    within the file names and profile1 within the content to a value
    that suites your environment.
+
 2. Customize the vars.* variables within files to meet your setup.
-3. Restart ovirt-engine, verify no startup errors.
-4. Within ovirt-engine try to search for users, add a user and assign
-   SuperUser system roles.
-5. Try to login using the newly added user.
-6. Complete customization of profile, such as enabling startTLS.
+
+3. Test drive your configuration
+
+   ovirt-engine>=3.6.0
+   -------------------
+
+   Test drive can be done as standalone process.
+
+   a. Test login:
+
+   Execute:
+
+   # ovirt-engine-extensions-tool aaa login-user \
+        --profile=@PROFILE@ --user-name=@USER@
+
+   Replace:
+    - @PROFILE@ with authn ovirt.engine.aaa.authn.profile.name.
+    - @USER@ with user you want to test.
+
+   Inspect output for initialization errors.
+
+   Inspect PrincipalRecord and GroupRecord within the output and verify it
+   matches expectations.
+
+   b. Test search:
+
+   Search by executing:
+
+   # ovirt-engine-extensions-tool aaa search --extension-name=@AUTHZ@ \
+        --entity=@ENTITY@ --entity-name=@NAME@
+
+   Optionally add the following to enable group resolution:
+       --authz-flag=resolve-groups --authz-flag=resolve-groups-recursive
+
+   Replace:
+    - @AUTHZ@ with authz extension name.
+    - @ENTITY@ with either 'principal' or 'group'.
+    - @NAME@ with requested name to search.
+
+   Inspect output for initialization errors.
+
+   Inspect PrincipalRecord and GroupRecord within the output and verify it
+   matches expectations.
+
+   c. Restart ovirt-engine, verify no startup errors.
+
+   ovirt-engine<3.6.0
+   ------------------
+
+   a. Restart ovirt-engine, verify no startup errors.
+
+   b. Within ovirt-engine try to search for users, add a user and assign
+      SuperUser system roles.
+
+   c. Try to login using the newly added user.
+
+4. Complete customization of profile, such as enabling startTLS.
 
 IMPLEMENTATION NOTES
 --------------------
