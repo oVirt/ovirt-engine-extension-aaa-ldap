@@ -274,8 +274,13 @@ out of scope for this document.
 
     AuthType Kerberos
     AuthName "Kerberos Login"
+
+    # Modify to match installation
     Krb5Keytab /etc/krb5.keytab
+
+    # Modify to match installation
     KrbAuthRealms REALM.COM
+
     KrbMethodK5Password off
     Require valid-user
 </LocationMatch>
