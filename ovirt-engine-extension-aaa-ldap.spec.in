@@ -41,7 +41,7 @@ BuildRequires:	jpackage-utils
 BuildRequires:	ovirt-engine-extensions-api
 BuildRequires:	unboundid-ldapsdk
 
-Requires:	ovirt-engine
+Requires:	ovirt-engine >= 3.5
 Requires:	unboundid-ldapsdk >= 2.3.7
 
 %description
