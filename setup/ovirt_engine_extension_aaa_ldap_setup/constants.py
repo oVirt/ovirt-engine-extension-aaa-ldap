@@ -90,6 +90,7 @@ class LDAPEnv(object):
     HOSTS = 'OVAAALDAP_LDAP/hosts'
     PROTOCOL = 'OVAAALDAP_LDAP/protocol'
     CACERT = 'OVAAALDAP_LDAP/cacert'
+    INSECURE = 'OVAAALDAP_LDAP/insecure'
     USER = 'OVAAALDAP_LDAP/user'
     PASSWORD = 'OVAAALDAP_LDAP/password'
     SOCKET_FACTORY = 'OVAAALDAP_LDAP/socketFactory'

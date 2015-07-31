@@ -298,7 +298,9 @@ class Plugin(plugin.PluginBase):
         return ret
 
     def _getCACert(self):
-        ret = (None, None)
+        insecure = False
+        cacertfile = None
+        cacert = None
 
         method = self.dialog.queryString(
             name='OVAAALDAP_LDAP_CACERT_METHOD',
@@ -308,9 +310,14 @@ class Plugin(plugin.PluginBase):
             ),
             prompt=True,
             caseSensitive=False,
-            validValues=(_('File'), _('URL'), _('Inline'), _('System')),
+            validValues=(
+                _('File'),
+                _('URL'),
+                _('Inline'),
+                _('System'),
+                _('Insecure'),
+            ),
         )
-        cacert = None
         if method == _('File').lower():
             file = self.dialog.queryString(
                 name='OVAAALDAP_LDAP_CACERT_FILE',
@@ -354,19 +361,21 @@ class Plugin(plugin.PluginBase):
                 name='OVAAALDAP_LDAP_CACERT_INLINE',
                 note=_('Please paste CA certificate'),
             )
+        elif method == _('Insecure').lower():
+            insecure = True
 
         if cacert is not None:
-            cacertfile = None
+            _cacertfile = None
             try:
-                cacertfile = tempfile.NamedTemporaryFile()
-                cacertfile.write('\n'.join(cacert) + '\n')
-                cacertfile.flush()
+                _cacertfile = tempfile.NamedTemporaryFile()
+                _cacertfile.write('\n'.join(cacert) + '\n')
+                _cacertfile.flush()
 
                 if getattr(ssl, 'create_default_context', None):
                     context = ssl.create_default_context()
                     parsed = None
                     try:
-                        context.load_verify_locations(cafile=cacertfile.name)
+                        context.load_verify_locations(cafile=_cacertfile.name)
                         parsed = context.get_ca_certs()[0]
                     except Exception as e:
                         raise self.SoftRuntimeError(
@@ -380,15 +389,15 @@ class Plugin(plugin.PluginBase):
                             _("Not Root CA certificate.")
                         )
 
-                ret = (cacert, cacertfile)
-                cacertfile = None
+                cacertfile = _cacertfile
+                _cacertfile = None
             finally:
-                if cacertfile is not None:
-                    cacertfile.close()
+                if _cacertfile is not None:
+                    _cacertfile.close()
 
-        return ret
+        return (cacert, cacertfile, insecure)
 
-    def _connectLDAP(self, cafile=None):
+    def _connectLDAP(self, cafile=None, insecure=False):
         ret = None
 
         for url in self._getURLs():
@@ -401,10 +410,16 @@ class Plugin(plugin.PluginBase):
                 c = ldap.initialize(url)
 
                 if self.environment[constants.LDAPEnv.PROTOCOL] != 'plain':
-                    c.set_option(
-                        ldap.OPT_X_TLS_REQUIRE_CERT,
-                        ldap.OPT_X_TLS_DEMAND
-                    )
+                    if insecure:
+                        c.set_option(
+                            ldap.OPT_X_TLS_REQUIRE_CERT,
+                            ldap.OPT_X_TLS_NEVER
+                        )
+                    else:
+                        c.set_option(
+                            ldap.OPT_X_TLS_REQUIRE_CERT,
+                            ldap.OPT_X_TLS_DEMAND
+                        )
 
                 if cafile is not None:
                     c.set_option(
@@ -536,6 +551,10 @@ class Plugin(plugin.PluginBase):
         self.environment.setdefault(
             constants.LDAPEnv.CACERT,
             None
+        )
+        self.environment.setdefault(
+            constants.LDAPEnv.INSECURE,
+            False
         )
         self.environment[
             constants.LDAPEnv.RESOLVER
@@ -725,23 +744,24 @@ class Plugin(plugin.PluginBase):
             if self.environment[constants.LDAPEnv.CACERT] is not None:
                 cacertfile = None
                 try:
-                    cacert, cacertfile = self._getCACert()
+                    cacert, cacertfile, insecure = self._getCACert()
                     connection = self._connectLDAP(
                         cafile=cacertfile.name if cacert else None,
+                        insecure=insecure,
                     )
                 finally:
                     if cacertfile is not None:
                         cacertfile.close()
             else:
-                while self.environment[
-                    constants.LDAPEnv.CACERT
-                ] is None:
+                while connection is None:
                     cacertfile = None
                     try:
-                        cacert, cacertfile = self._getCACert()
+                        cacert, cacertfile, insecure = self._getCACert()
                         connection = self._connectLDAP(
                             cafile=cacertfile.name if cacert else None,
+                            insecure=insecure,
                         )
+                        self.environment[constants.LDAPEnv.INSECURE] = insecure
                         self.environment[constants.LDAPEnv.CACERT] = cacert
                     except self.SoftRuntimeError as e:
                         self.logger.error('%s', e)

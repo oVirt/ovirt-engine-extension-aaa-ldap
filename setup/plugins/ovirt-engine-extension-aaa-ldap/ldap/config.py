@@ -224,6 +224,10 @@ class Plugin(plugin.PluginBase):
             content += (
                 'pool.default.ssl.enable = true\n'
             )
+        if self.environment[constants.LDAPEnv.INSECURE]:
+            content += (
+                'pool.default.ssl.insecure = true\n'
+            )
         if self.environment[constants.LDAPEnv.CACERT] is not None:
             content += (
                 'pool.default.ssl.truststore.file = '
