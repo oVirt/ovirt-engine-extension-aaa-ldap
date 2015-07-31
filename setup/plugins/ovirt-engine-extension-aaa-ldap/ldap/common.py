@@ -319,7 +319,7 @@ class Plugin(plugin.PluginBase):
             ),
         )
         if method == _('File').lower():
-            file = self.dialog.queryString(
+            filepath = self.dialog.queryString(
                 name='OVAAALDAP_LDAP_CACERT_FILE',
                 note=_(
                     'File path: '
@@ -327,12 +327,12 @@ class Plugin(plugin.PluginBase):
                 prompt=True,
             )
             try:
-                with open(file) as f:
+                with open(filepath) as f:
                     cacert = f.read().splitlines()
             except IOError as e:
                 raise self.SoftRuntimeError(
-                    _("Cannot open CA file '{file}': {error}").format(
-                        file=file,
+                    _("Cannot open CA file '{filepath}': {error}").format(
+                        filepath=filepath,
                         error=e,
                     ),
                 )
