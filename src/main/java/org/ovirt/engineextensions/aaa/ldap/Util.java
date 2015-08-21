@@ -130,12 +130,12 @@ public class Util {
         File file
     ) throws IOException {
         Properties props = new Properties();
-        props.load(
-            new InputStreamReader(
-                new FileInputStream(file),
-                Charset.forName("UTF-8")
-            )
-        );
+        try (
+            InputStream is = new FileInputStream(file);
+            Reader reader = new InputStreamReader(is, Charset.forName("UTF-8"));
+        ) {
+            props.load(reader);
+        }
         props.put("_basedir", file.getParent());
         props = expandProperties(props, "local", props, true);
         for (String key : stringPropertyNames(props, includeKey)) {
