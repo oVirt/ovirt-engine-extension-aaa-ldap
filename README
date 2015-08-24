@@ -387,18 +387,22 @@ $ dig _ldap._tcp.@DOMAIN@ SRV
 ENGINE LOG
 
 A logger by the name of org.ovirt.engineextensions.aaa.ldap can be set to
-DEBUG, FINE, FINER or ALL to receive verbose output.
+INFO, DEBUG, FINE, FINER or ALL to receive verbose output.
 
-Per the time this text is written, setting the log level of a logger within
-ovirt-engine is performed by updating:
+To modify logger level to ALL while ovirt-engine is running use the following
+command, replace admin@internal with any user with SuperUser role:
 
-  /usr/share/ovirt-engine/services/ovirt-engine/ovirt-engine.xml.in
-
-And adding the following before the <root-logger> line:
-
-      <logger category="org.ovirt.engineextensions.aaa.ldap">
-        <level name="ALL"/>
-      </logger>
+    $ "${JBOSS_HOME}/bin/jboss-cli.sh" \
+        --connect \
+        --timeout=30000 \
+        --controller=localhost:8706 \
+        --user=admin@internal \
+        --commands="
+            if (outcome != success) of /subsystem=logging/logger=org.ovirt.engineextensions.aaa.ldap:read-attribute(name=level),
+              /subsystem=logging/logger=org.ovirt.engineextensions.aaa.ldap:add,
+            end-if,
+            /subsystem=logging/logger=org.ovirt.engineextensions.aaa.ldap:write-attribute(name=level,value=ALL)
+        "
 
 ADVANCED EXTENSION CONFIGURATION
 --------------------------------
