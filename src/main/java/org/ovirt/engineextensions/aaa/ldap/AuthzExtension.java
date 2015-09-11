@@ -535,7 +535,7 @@ public class AuthzExtension implements Extension {
         framework.runSequence(sequenceResolvePrincipal, vars);
         Framework.SearchInstance instance = (Framework.SearchInstance)vars.get(ExtensionUtil.VARS_QUERY);
         if (instance == null) {
-            throw new RuntimeException(String.format("No search for principal '%s'", principal));
+            throw new RuntimeException(String.format("Cannot resolve principal '%s'", principal));
         }
 
         ExtMap principalRecord = null;
