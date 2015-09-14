@@ -51,15 +51,15 @@ class Plugin(plugin.PluginBase):
         },
         {
             'display': _('RFC-2307 Schema (Generic)'),
-            'profile': 'rfc2307',
+            'profile': 'rfc2307-generic',
         },
         {
             'display': _('389ds RFC-2307 Schema'),
-            'profile': 'rfc2307',
+            'profile': 'rfc2307-389ds',
         },
         {
             'display': _('RHDS RFC-2307 Schema'),
-            'profile': 'rfc2307',
+            'profile': 'rfc2307-rhds',
         },
         {
             'display': _('Novell eDirectory RFC-2307 Schema'),
