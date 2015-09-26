@@ -455,7 +455,7 @@ SEQUENCE
     # At replacements ${xxx} can be used to replace group names.
     sequence.@ID@.@SORT@.regex.pattern = @PATTERN@
     sequence.@ID@.@SORT@.regex.value = @STRING@
-    sequence.@ID@.@SORT@.regex.replacement.@VAR@ = replacement
+    sequence.@ID@.@SORT@.regex.replacement.@VAR@ = @REPLACEMENT@
     # Execute credentials modify.
     sequence.@ID@.@SORT@.credentials-modify.pool = @ID@
     sequence.@ID@.@SORT@.credentials-modify.user = @STRING@
