@@ -157,7 +157,9 @@ Using simple bind transport using startTLS:
     #include = <rhds.properties>
     #include = <ipa.properties>
     #include = <iplanet.properties>
-    #include = <rfc2307.properties>
+    #include = <rfc2307-generic.properties>
+    #include = <rfc2307-389ds.properties>
+    #include = <rfc2307-rhds.properties>
     #include = <rfc2307-openldap.properties>
     #include = <rfc2307-edir.properties>
 
