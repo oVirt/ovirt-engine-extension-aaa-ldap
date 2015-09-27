@@ -192,8 +192,11 @@ ACTIVE DIRECTORY
 
 Active Directory 2003 R2 and above is supported.
 
-Using simple bind transport using startTLS. Unfortunately, SASL does not provide
-bind failure reasons.
+Using simple bind transport using startTLS. Unfortunately, SASL does not
+provide bind failure reasons.
+
+User name is the userPrincipalName field of the user, the suffix is usually the
+domain name.
 
 Connect to Domain Controller DNS Server directly, use SRV record to
 resolve hosts.
