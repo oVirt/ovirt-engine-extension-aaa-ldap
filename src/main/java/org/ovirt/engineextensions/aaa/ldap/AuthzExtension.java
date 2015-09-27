@@ -255,7 +255,7 @@ public class AuthzExtension implements Extension {
                     String fieldValue = filter.<String>get(key);
                     boolean prefixEquals = false;
 
-                    if (AttrConversion.STRING.equals(attrInfo.getConversion())) {
+                    if (attrInfo.isString()) {
                         if (fieldValue.endsWith("*")) {
                             fieldValue = fieldValue.substring(0, fieldValue.length()-1);
                             prefixEquals = true;

@@ -40,42 +40,38 @@ public class Framework implements Closeable {
     public static class AttrMapInfo {
 
         private final String name;
+        private final MapProperties props;
         private final AttrConversion conversion;
-        private final String format;
-        private final String map;
-        private AttrMapInfo(String name, String conversion, String format, String map) {
+        private final MapProperties conversionProps;
+
+        private AttrMapInfo(String name, MapProperties props) {
             this.name = name;
-            this.conversion = AttrConversion.valueOf(conversion);
-            this.format = format;
-            this.map = map;
+            this.props = props;
+            this.conversion = AttrConversion.valueOf(props.getString(AttrConversion.STRING.toString(), "conversion"));
+            this.conversionProps = props.getOrEmpty("conversion", conversion.toString());
         }
         @Override
         public String toString() {
             return String.format(
-                "AttrMapInfo(%s, %s, '%s', %s)",
+                "AttrMapInfo(%s, %s)",
                 name,
-                conversion,
-                format,
-                map
+                conversion
             );
         }
         public String getName() {
             return name;
         }
-        public AttrConversion getConversion() {
-            return conversion;
-        }
-        public String getFormat() {
-            return format;
-        }
         public String getMap() {
-            return map;
+            return props.getMandatoryString("map");
         }
         public String encode(ASN1OctetString value) {
-            return String.format(format, conversion.encode(value));
+            return conversion.encode(value, conversionProps);
         }
         public ASN1OctetString decode(String value) {
-            return conversion.decode(value);
+            return conversion.decode(value, conversionProps);
+        }
+        public boolean isString() {
+            return conversion.isString();
         }
     }
 
@@ -898,14 +894,7 @@ public class Framework implements Closeable {
             vars
         );
         for (Map.Entry<String, MapProperties> entry : attrProps.getOrEmpty("attr").getMap().entrySet()) {
-            ret.add (
-                new AttrMapInfo(
-                    entry.getKey(),
-                    entry.getValue().getString(AttrConversion.STRING.toString(), "conversion"),
-                    entry.getValue().getString("%s", "format"),
-                    entry.getValue().getMandatoryString("map")
-                )
-            );
+            ret.add (new AttrMapInfo(entry.getKey(), entry.getValue()));
         }
 
         log.debug("getAttrMap Return {}", ret);

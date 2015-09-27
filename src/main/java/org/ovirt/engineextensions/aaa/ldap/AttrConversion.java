@@ -22,36 +22,81 @@ import java.util.regex.*;
 
 import com.unboundid.asn1.*;
 import com.unboundid.util.Base64;
+import org.slf4j.*;
 
 public enum AttrConversion {
 
     STRING(
         new Format() {
-            public String encode(ASN1OctetString value) {
+            @Override
+            public String encode(ASN1OctetString value, MapProperties props) {
                 return value.stringValue();
             }
-            public ASN1OctetString decode(String value) {
+            @Override
+            public ASN1OctetString decode(String value, MapProperties props) {
                 return new ASN1OctetString(value);
+            }
+            @Override
+            public boolean isString() {
+                return true;
+            }
+        }
+    ),
+    REGEX(
+        new Format() {
+            private String doPattern(String value, MapProperties props, String mode) {
+                String pattern = props.getMandatoryString(mode, "pattern");
+                Matcher matcher = Pattern.compile(pattern).matcher(value);
+                String ret = value;
+                if (matcher.matches()) {
+                    ret = matcher.replaceFirst(props.getMandatoryString(mode, "replacement"));
+                }
+                log.debug("Mode: '{}', Pattern: {}, Value: '{}', Result='{}'", mode, pattern, value, ret);
+                return ret;
+            }
+            @Override
+            public String encode(ASN1OctetString value, MapProperties props) {
+                return doPattern(value.stringValue(), props, "encode");
+            }
+            @Override
+            public ASN1OctetString decode(String value, MapProperties props) {
+                return new ASN1OctetString(doPattern(value, props, "decode"));
+            }
+            @Override
+            public boolean isString() {
+                return true;
             }
         }
     ),
     BASE64(
         new Format() {
-            public String encode(ASN1OctetString value) {
+            @Override
+            public String encode(ASN1OctetString value, MapProperties props) {
                 return Base64.encode(value.getValue());
             }
-            public ASN1OctetString decode(String value) {
+            @Override
+            public ASN1OctetString decode(String value, MapProperties props) {
                 try {
                     return new ASN1OctetString(Base64.decode(value));
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
             }
+            @Override
+            public boolean isString() {
+                return false;
+            }
         }
     ),
     DATE(
         new Format() {
-            public String encode(ASN1OctetString value) {
+            private final Pattern GENERALIZED_TIME = Pattern.compile(
+                "(?<date>\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d(\\d\\d(\\d\\d)?)?)([,.]\\d)?" +
+                "(Z|(?<offset>[+-]\\d\\d(\\d\\d)?))"
+            );
+
+            @Override
+            public String encode(ASN1OctetString value, MapProperties props) {
                 try {
                     Matcher matcher = GENERALIZED_TIME.matcher(value.stringValue());
                     if (!matcher.matches()) {
@@ -76,23 +121,26 @@ public enum AttrConversion {
                     throw new RuntimeException("Invalid date: " + value, e);
                 }
             }
-            public ASN1OctetString decode(String value) {
+            @Override
+            public ASN1OctetString decode(String value, MapProperties props) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                 sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
                 return new ASN1OctetString(sdf.format(new Date(Long.valueOf(value)))+"Z");
+            }
+            @Override
+            public boolean isString() {
+                return false;
             }
         }
     );
 
     private interface Format {
-        String encode(ASN1OctetString value);
-        ASN1OctetString decode(String value);
+        String encode(ASN1OctetString value, MapProperties props);
+        ASN1OctetString decode(String value, MapProperties props);
+        boolean isString();
     }
 
-    private static final Pattern GENERALIZED_TIME = Pattern.compile(
-        "(?<date>\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d(\\d\\d(\\d\\d)?)?)([,.]\\d)?" +
-        "(Z|(?<offset>[+-]\\d\\d(\\d\\d)?))"
-    );
+    private static final Logger log = LoggerFactory.getLogger(AttrConversion.class);
 
     private final Format format;
 
@@ -100,12 +148,16 @@ public enum AttrConversion {
         this.format = format;
     }
 
-    public String encode(ASN1OctetString value) {
-        return format.encode(value);
+    public String encode(ASN1OctetString value, MapProperties props) {
+        return format.encode(value, props);
     }
 
-    public ASN1OctetString decode(String value) {
-        return format.decode(value);
+    public ASN1OctetString decode(String value, MapProperties props) {
+        return format.decode(value, props);
+    }
+
+    public boolean isString() {
+        return format.isString();
     }
 }
 

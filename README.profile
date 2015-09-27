@@ -341,12 +341,14 @@ ATTRIBUTE MAP
     # Specific settings
     attrmap.@POOLID@.*
 
-    # Conversion to use: STRING, BASE64, DATE
+    # Conversion to use: STRING, BASE64, DATE, REGEX
     attrmap.default.attr.@ALIAS@.conversion = STRING
+    attrmap.default.attr.@ALIAS@.conversion.REGEX.decode.pattern = @PATTERN@
+    attrmap.default.attr.@ALIAS@.conversion.REGEX.decode.replacement = @REPLACEMENT@
+    attrmap.default.attr.@ALIAS@.conversion.REGEX.encode.pattern = @PATTERN@
+    attrmap.default.attr.@ALIAS@.conversion.REGEX.encode.replacement = @REPLACEMENT@
     # Map attribute.
     attrmap.default.attr.@ALIAS@.map = @ATTRIBUTE@
-    # String.format
-    attrmap.default.attr.@ALIAS@.format = %s
 
 SEARCH
 
