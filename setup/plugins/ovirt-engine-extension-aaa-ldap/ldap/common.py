@@ -586,7 +586,10 @@ class Plugin(plugin.PluginBase):
                 constants.LDAPEnv.AAA_PROFILE_NAME
             ] = self.dialog.queryString(
                 name='OVAAALDAP_LDAP_AAA_PROFILE',
-                note=_('Please specify user visible profile name: '),
+                note=_(
+                    'Please specify profile name that will be visible '
+                    'to users: '
+                ),
                 prompt=True,
             )
 
