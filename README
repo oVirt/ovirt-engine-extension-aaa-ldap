@@ -389,6 +389,10 @@ Resolve domain LDAP SRV record
 
 $ dig _ldap._tcp.@DOMAIN@ SRV
 
+Resolve global catalog SRV record from specific domain controller
+
+$ dig @dc1.@DOMAIN@ _gc._tcp.@DOMAIN@ SRV
+
 ENGINE LOG
 
 A logger by the name of org.ovirt.engineextensions.aaa.ldap can be set to
