@@ -6,6 +6,8 @@ oVirt LDAP authentication and authorization extension
  * core: auto disable paging if not supported.
  * profiles: rfc2307-edir: initial add, rhbz#1224722.
  * profiles: rfc2307: minor cleanups.
+ * profiles: ad: resolve gc using _ldap._tcp.gc.DOMAIN instead of
+   _gc._tcp.DOMAIN to be more portable.
  * core: enable use of system width trust store, rhbz#1241262.
  * setup: initial implementation.
 
