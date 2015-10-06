@@ -392,8 +392,6 @@ public class Framework implements Closeable {
         SocketFactory socketFactory = SocketFactory.getDefault();
         TrustManager[] trustManagers = null;
         KeyManager[] keyManagers = null;
-        KeyStore keyStore = null;
-        KeyStore trustStore = null;
         MapProperties sslProps = poolProps.get("ssl");
         boolean enableSSL = sslProps.getBoolean(Boolean.FALSE, "enable");
         boolean enableStartTLS = sslProps.getBoolean(Boolean.FALSE, "startTLS");
@@ -412,12 +410,6 @@ public class Framework implements Closeable {
             } else {
                 log.debug("Creating trust store");
                 MapProperties truststoreProps = sslProps.getOrEmpty("truststore");
-                trustStore = Util.loadKeyStore(
-                    truststoreProps.getString(null, "provider"),
-                    truststoreProps.getString(null, "type"),
-                    truststoreProps.getString(null, "file"),
-                    truststoreProps.getString("changeit", "password")
-                );
 
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance(
                     truststoreProps.getString(
@@ -426,13 +418,20 @@ public class Framework implements Closeable {
                         "algorithm"
                     )
                 );
-                tmf.init(trustStore);
+                tmf.init(
+                    Util.loadKeyStore(
+                        truststoreProps.getString(null, "provider"),
+                        truststoreProps.getString(null, "type"),
+                        truststoreProps.getString(null, "file"),
+                        truststoreProps.getString("changeit", "password")
+                    )
+                );
                 trustManagers = tmf.getTrustManagers();
             }
 
             log.debug("Creating key store");
             MapProperties keystoreProps = sslProps.getOrEmpty("keystore");
-            keyStore = Util.loadKeyStore(
+            KeyStore keyStore = Util.loadKeyStore(
                 keystoreProps.getString(null, "provider"),
                 keystoreProps.getString(null, "type"),
                 keystoreProps.getString(null, "file"),
