@@ -421,7 +421,17 @@ class Plugin(plugin.PluginBase):
                             ldap.OPT_X_TLS_DEMAND
                         )
 
-                if cafile is not None:
+                if cafile is None:
+                    if self.environment[
+                        constants.LDAPEnv.SYSTEM_CACERTS
+                    ] is not None:
+                        c.set_option(
+                            ldap.OPT_X_TLS_CACERTFILE,
+                            self.environment[
+                                constants.LDAPEnv.SYSTEM_CACERTS
+                            ],
+                        )
+                else:
                     c.set_option(
                         ldap.OPT_X_TLS_CACERTFILE,
                         cafile
@@ -550,6 +560,10 @@ class Plugin(plugin.PluginBase):
         )
         self.environment.setdefault(
             constants.LDAPEnv.CACERT,
+            None
+        )
+        self.environment.setdefault(
+            constants.LDAPEnv.SYSTEM_CACERTS,
             None
         )
         self.environment.setdefault(

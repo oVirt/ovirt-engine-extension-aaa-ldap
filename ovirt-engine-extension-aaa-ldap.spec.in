@@ -87,12 +87,20 @@ ln -s \
 	"$(build-classpath unboundid-ldapsdk)" \
 	"%{buildroot}/usr/share/ovirt-engine-extension-aaa-ldap/modules/org/ovirt/engine-extensions/aaa/ldap/main/unboundid-ldapsdk.jar"
 
+install -d "%{buildroot}%{_sysconfdir}/ovirt-engine-extension-aaa-ldap-setup.conf.d"
+cat > "%{buildroot}%{_sysconfdir}/ovirt-engine-extension-aaa-ldap-setup.conf.d/10-packaging.conf" << __EOF__
+[environment:default]
+OVAAALDAP_LDAP/systemCACerts=str:/etc/pki/tls/certs/ca-bundle.crt
+__EOF__
+
 %files
 %dir %{_datadir}/%{name}
+%dir %{_sysconfdir}/ovirt-engine-extension-aaa-ldap-setup.conf.d
 %doc README*
 %{_datadir}/%{name}/examples/
 %{_datadir}/%{name}/modules/
 %{_datadir}/%{name}/profiles/
+%{_sysconfdir}/ovirt-engine-extension-aaa-ldap-setup.conf.d/10-packaging.conf
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-%{name}.conf
 
 %files setup
