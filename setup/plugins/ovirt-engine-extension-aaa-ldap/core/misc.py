@@ -42,11 +42,31 @@ class Plugin(plugin.PluginBase):
     @plugin.event(
         stage=plugin.Stages.STAGE_BOOT,
         before=(
+            otopicons.Stages.CORE_CONFIG_INIT,
+        ),
+        priority=plugin.Stages.PRIORITY_HIGH - 20,
+    )
+    def _preinitConfig(self):
+        self.environment.setdefault(
+            otopicons.CoreEnv.CONFIG_FILE_NAME,
+            self.resolveFile(
+                os.environ.get(
+                    otopicons.SystemEnvironment.CONFIG,
+                    self.resolveFile(
+                        constants.FileLocations.SETUP_CONFIG_FILE
+                    )
+                )
+            )
+        )
+
+    @plugin.event(
+        stage=plugin.Stages.STAGE_BOOT,
+        before=(
             otopicons.Stages.CORE_LOG_INIT,
         ),
         priority=plugin.Stages.PRIORITY_HIGH - 10,
     )
-    def _preinit(self):
+    def _preinitLog(self):
         self.environment.setdefault(
             otopicons.CoreEnv.LOG_FILE_NAME_PREFIX,
             constants.FileLocations.LOG_PREFIX

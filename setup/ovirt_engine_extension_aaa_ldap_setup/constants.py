@@ -42,6 +42,11 @@ class FileLocations(object):
 
     LOG_PREFIX = 'ovirt-engine-extension-aaa-ldap-setup'
 
+    SETUP_CONFIG_FILE = os.path.join(
+        SYSCONF_DIR,
+        'ovirt-engine-extension-aaa-ldap-setup.conf',
+    )
+
 
 @util.export
 class Defaults(object):
