@@ -43,8 +43,8 @@ class Plugin(plugin.PluginBase):
         ret = True
 
         for e in (
-            ('_gc', _('Global Catalog')),
-            ('_ldap', _('LDAP')),
+            ('gc._msdcs.', _('Global Catalog')),
+            ('', _('LDAP')),
         ):
             self.logger.info(
                 _('Resolving {what} SRV record for {domain}').format(
@@ -57,7 +57,7 @@ class Plugin(plugin.PluginBase):
                 plugin=self,
                 dnsServers=self.environment[constants.LDAPEnv.DNS_SERVERS],
                 record='SRV',
-                what='%s._tcp.%s' % (
+                what='_ldap._tcp.%s%s' % (
                     e[0],
                     self.environment[
                         constants.LDAPEnv.DOMAIN
@@ -109,7 +109,7 @@ class Plugin(plugin.PluginBase):
                 constants.LDAPEnv.DOMAIN
             ] = self.dialog.queryString(
                 name='OVAAALDAP_LDAP_AD_DOMAIN',
-                note=_('Please enter Active Directory Domain name: '),
+                note=_('Please enter Active Directory Forest name: '),
                 prompt=True,
             )
 

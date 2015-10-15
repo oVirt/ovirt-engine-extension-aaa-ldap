@@ -203,19 +203,19 @@ resolve hosts.
 
     include = <ad.properties>
 
-    vars.domain = company.com
-    vars.user = search@${global:vars.domain}
+    vars.forest = company.com
+    vars.user = search@${global:vars.forest}
     vars.password = 123456
-    vars.dns = dns://dc1.${global:vars.domain} dns://dc2.${global:vars.domain}
+    vars.dns = dns://dc1.${global:vars.forest} dns://dc2.${global:vars.forest}
 
     pool.default.serverset.type = srvrecord
-    pool.default.serverset.srvrecord.domain = ${global:vars.domain}
+    pool.default.serverset.srvrecord.domain = ${global:vars.forest}
     pool.default.auth.simple.bindDN = ${global:vars.user}
     pool.default.auth.simple.password = ${global:vars.password}
     pool.default.serverset.srvrecord.jndi-properties.java.naming.provider.url = ${global:vars.dns}
     pool.default.socketfactory.resolver.uRL = ${global:vars.dns}
     pool.default.ssl.startTLS = true
-    pool.default.ssl.truststore.file = ${local:_basedir}/${global:vars.domain}.jks
+    pool.default.ssl.truststore.file = ${local:_basedir}/${global:vars.forest}.jks
     pool.default.ssl.truststore.password = changeit
 
 More supported configuration at README.profile.
@@ -385,13 +385,13 @@ with LDAPTLS_CACERT=ca.cer.
 
 USEFUL DNS COMMANDS
 
-Resolve domain LDAP SRV record
+Resolve forest LDAP SRV record
 
-$ dig _ldap._tcp.@DOMAIN@ SRV
+$ dig _ldap._tcp.@FOREST@ SRV
 
-Resolve global catalog SRV record from specific domain controller
+Resolve global catalog SRV record from specific dns server
 
-$ dig @dc1.@DOMAIN@ _gc._tcp.@DOMAIN@ SRV
+$ dig @dc1.@FOREST@ _ldap._tcp.gc._msdcs.@FOREST@ SRV
 
 ENGINE LOG
 
