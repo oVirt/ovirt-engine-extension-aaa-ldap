@@ -720,11 +720,13 @@ public class Framework implements Closeable {
     }
 
     public void stats() {
-        long now = new Date().getTime();
-        if (now > nextStats) {
-            nextStats = now + statsTTL;
-            for (ConnectionPoolEntry entry : connectionPools.values()) {
-                log.debug("Stats: {} {}", entry.name, entry.connectionPool.getConnectionPoolStatistics());
+        if (log.isDebugEnabled()) {
+            long now = new Date().getTime();
+            if (now > nextStats) {
+                nextStats = now + statsTTL;
+                for (ConnectionPoolEntry entry : connectionPools.values()) {
+                    log.debug("Stats: {} {}", entry.name, entry.connectionPool.getConnectionPoolStatistics());
+                }
             }
         }
     }
