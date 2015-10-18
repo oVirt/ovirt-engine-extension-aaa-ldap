@@ -279,6 +279,10 @@ Pool of LDAP connections, based on specific policy.
     pool.default.serverset.srvrecord.ttlMillis = @INT@
     # jndi properties to use, prefix is truncated.
     pool.default.serverset.srvrecord.jndi-properties.@PROPERTY@ = @STRING@
+    # domain conversion
+    pool.default.serverset.srvrecord.domain-conversion.type = none
+    pool.default.serverset.srvrecord.domain-conversion.regex.pattern = @PATTERN@
+    pool.default.serverset.srvrecord.domain-conversion.regex.replacement = @REPLACEMENT@
 
     # AUTHENTICATION
     pool.default.auth.type = none

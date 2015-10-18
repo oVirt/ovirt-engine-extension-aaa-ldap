@@ -585,12 +585,31 @@ public class Framework implements Closeable {
                 connectionOptions
             );
         } else if ("srvrecord".equals(serversetType)) {
+            final String CONVERSION_PREFIX = "domain-conversion";
+            String conversionType = serverSetProps.getString("none", CONVERSION_PREFIX, "type");
+            MapProperties conversionProps = serverSetProps.getOrEmpty(CONVERSION_PREFIX, conversionType);
+            String domain = serverSetProps.getMandatoryString("domain");
+            if ("none".equals(conversionType)) {
+                // noop
+            } else if ("regex".equals(conversionType)) {
+                String pattern = conversionProps.getMandatoryString("pattern");
+                log.debug("Domain conversion pattern: {}", pattern);
+                Matcher matcher = Pattern.compile(pattern).matcher(domain);
+                if (matcher.matches()) {
+                    domain = matcher.replaceFirst(conversionProps.getMandatoryString("replacement"));
+                }
+            } else {
+                throw new IllegalArgumentException(
+                    String.format("Invalid srvrecord set conversion type '%s'", conversionType)
+                );
+            }
+
             serverset = new DNSSRVRecordServerSet(
                 String.format(
                     "_%s._%s.%s",
                     serverSetProps.getMandatoryString("service"),
                     serverSetProps.getMandatoryString("protocol"),
-                    serverSetProps.getMandatoryString("domain")
+                    domain
                 ),
                 null,
                 serverSetProps.getOrEmpty("jndi-properties").toProperties(),

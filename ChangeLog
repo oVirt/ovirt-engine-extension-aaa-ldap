@@ -8,6 +8,8 @@ oVirt LDAP authentication and authorization extension
  * core: add regex conversion to mapping.
  * core: add dc-resolve pool option to resolve dc components using srv record
    instead of chasing referrals.
+ * core: add domain-conversion for srvrecord to enable modification of domain
+   before resolving srvrecord.
  * profiles: rfc2307-edir: initial add, rhbz#1224722.
  * profiles: rfc2307-generic: initial add rhbz#1266730.
  * profiles: rfc2307: minor cleanups.
