@@ -304,6 +304,16 @@ Pool of LDAP connections, based on specific policy.
         authenticationID = @STRING@
         password = @STRING@
 
+    # DC RESOLVE
+    # enable so core will resolve dc=x,d=y component using srv record
+    # instead of chasing referrals.
+    pool.default.dc-resolve.enable = false
+    # pool properties may be overridden
+    pool.default.dc-resolve.default.@POOL_PROPERTY@ = @VALUE@
+    # pool properties may be overridden per domain
+    # notice: domain dots are converted to underscores.
+    pool.default.dc-resolve.@DOMAIN_DOT_AS_DASH@.@POOL_PROPERTY@ = @VALUE@
+
 STATS
 
     # statistics interval in milliseconds
@@ -366,6 +376,8 @@ SEARCH
     search.default.pageSize = 100
     # Limit.
     search.default.limit = (Max Integer)
+    # Control dc-resolve
+    search.default.dc-resolve.enable = true
     # SEARCH OPTIONS
     # Class: SearchRequest.
     # Documentation and options at:

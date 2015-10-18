@@ -165,6 +165,23 @@ public class Framework implements Closeable {
     private final Map<String, Object> globals = new ConcurrentHashMap<>();
     private volatile long nextStats = 0;
 
+    public static String getDNDomainComponent(String dn) throws LDAPException {
+        StringBuilder ret = new StringBuilder();
+        for (RDN rdn : new DN(DN.normalize(dn)).getRDNs()) {
+            for (String name : rdn.getAttributeNames()) {
+                if ("dc".equals(name)) {
+                    for (String value : rdn.getAttributeValues()) {
+                        if (ret.length() > 0) {
+                            ret.append('.');
+                        }
+                        ret.append(value);
+                    }
+                }
+            }
+        }
+        return ret.toString();
+    }
+
     private MapProperties applyDefault(MapProperties props) throws IOException {
         MapProperties ret = new MapProperties();
 
@@ -609,7 +626,7 @@ public class Framework implements Closeable {
         return connectionPool;
     }
 
-    private ConnectionPoolEntry createConnectionPoolEntry(String name, Map<String, Object> vars)
+    private ConnectionPoolEntry createConnectionPoolEntry(String name, MapProperties poolProps, Map<String, Object> vars)
     throws Exception {
 
         log.info("{} Creating LDAP pool '{}'", logPrefix, name);
@@ -617,16 +634,7 @@ public class Framework implements Closeable {
 
         ConnectionPoolEntry entry = new ConnectionPoolEntry();
         entry.name = name;
-
-        final String PREFIX_POOL = "pool";
-        entry.props = Util.expandMap(
-            new MapProperties(
-                props.get(PREFIX_POOL, "default"),
-                props.get(PREFIX_POOL, entry.name)
-            ),
-            "seq",
-            vars
-        );
+        entry.props = poolProps;
         entry.connectionPool = createConnectionPool(entry.props);
 
         RootDSE rootDSE = entry.connectionPool.getRootDSE();
@@ -704,16 +712,57 @@ public class Framework implements Closeable {
         log.debug("close Return");
     }
 
-    public ConnectionPoolEntry getConnectionPoolEntry(String name, Map<String, Object> vars)
+    public ConnectionPoolEntry getConnectionPoolEntry(String name, String dn, Map<String, Object> vars)
     throws Exception {
-        log.debug("getConnectionPoolEntry Entry name='{}'", name);
+        log.debug("getConnectionPoolEntry Entry name='{}', dn='{}'", name, dn);
+
+        String domainComponent = null;
+        if (dn != null && !dn.isEmpty()) {
+            domainComponent = getDNDomainComponent(dn);
+            if (domainComponent.isEmpty()) {
+                domainComponent = null;
+            }
+        }
+
+        final String PREFIX_POOL = "pool";
+        final String PREFIX_POOL_DC_RESOLVE = "dc-resolve";
+        final String VAR_RESOLVE_DOMAIN = "__dc_resolve_domain";
+        MapProperties poolProps = new MapProperties(
+            props.get(PREFIX_POOL, "default"),
+            props.get(PREFIX_POOL, name)
+        );
+        if (domainComponent != null && !domainComponent.isEmpty()) {
+            MapProperties poolPropsDC = new MapProperties(
+                poolProps,
+                poolProps.get(PREFIX_POOL_DC_RESOLVE, "default"),
+                poolProps.get(PREFIX_POOL_DC_RESOLVE, domainComponent.replace('.', '_'))
+            );
+            if (poolPropsDC.getBoolean(false, PREFIX_POOL_DC_RESOLVE, "enable")) {
+                log.debug("getConnectionPoolEntry dc-resolve enabled");
+                poolProps = poolPropsDC;
+                name += "@" + domainComponent;
+                vars.put(VAR_RESOLVE_DOMAIN, domainComponent);
+            }
+        }
+
         ConnectionPoolEntry entry = connectionPools.get(name);
         if (entry == null) {
-            entry = createConnectionPoolEntry(
-                name,
-                vars
-            );
-            connectionPools.put(entry.name, entry);
+            log.debug("getConnectionPoolEntry no pool for '{}'", name);
+
+            try {
+                entry = createConnectionPoolEntry(
+                    name,
+                    Util.expandMap(
+                        poolProps,
+                        "seq",
+                        vars
+                    ),
+                    vars
+                );
+                connectionPools.put(entry.name, entry);
+            } finally {
+                vars.remove(VAR_RESOLVE_DOMAIN);
+            }
         }
         return entry;
     }
@@ -753,7 +802,7 @@ public class Framework implements Closeable {
             throw new IllegalArgumentException("User required for authentication check");
         }
 
-        ConnectionPoolEntry connectionPoolEntry = getConnectionPoolEntry(pool, vars);
+        ConnectionPoolEntry connectionPoolEntry = getConnectionPoolEntry(pool, null, vars);
         LDAPConnection connection = null;
         try {
             connection = connectionPoolEntry.connectionPool.getConnection();
@@ -873,7 +922,11 @@ public class Framework implements Closeable {
         String newPassword,
         Map<String, Object> vars
     ) throws Exception {
-        PasswordModifyExtendedResult passwordModifyResult = (PasswordModifyExtendedResult)getConnectionPoolEntry(pool, vars).connectionPool.processExtendedOperation(
+        PasswordModifyExtendedResult passwordModifyResult = (PasswordModifyExtendedResult)getConnectionPoolEntry(
+            pool,
+            null,
+            vars
+        ).connectionPool.processExtendedOperation(
             new PasswordModifyExtendedRequest(user, currentPassword, newPassword)
         );
         if (passwordModifyResult.getResultCode() != ResultCode.SUCCESS) {
@@ -1010,7 +1063,11 @@ public class Framework implements Closeable {
         log.debug("SearchRequest: {}", searchRequest);
 
         SearchInstance instance = new SearchInstance();
-        instance.connectionPoolEntry = getConnectionPoolEntry(searchProps.getMandatoryString("pool"), vars);
+        instance.connectionPoolEntry = getConnectionPoolEntry(
+            searchProps.getMandatoryString("pool"),
+            searchProps.getBoolean(true, "dc-resolve", "enable") ? searchRequest.getBaseDN() : null,
+            vars
+        );
         instance.searchRequest = searchRequest;
         instance.doPaging = instance.connectionPoolEntry.supportPaging && searchProps.getBoolean(Boolean.TRUE, "paging");
         instance.pageSize = pageSize != 0 ? pageSize : searchProps.getInt(100, "pageSize");
@@ -1060,7 +1117,7 @@ public class Framework implements Closeable {
 
         if (!instance.done) {
             if (instance.connection == null) {
-                log.debug("Getting connection");
+                log.debug("Getting connection out of pool '{}'", instance.connectionPoolEntry.name);
                 instance.connection = instance.connectionPoolEntry.connectionPool.getConnection();
             }
 
@@ -1381,6 +1438,7 @@ public class Framework implements Closeable {
                         } else if ("pool-create".equals(type)) {
                             getConnectionPoolEntry(
                                 opProps.getMandatoryString("name"),
+                                null,
                                 vars
                             );
                         } else if ("search-open".equals(type)) {

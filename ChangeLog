@@ -6,6 +6,8 @@ oVirt LDAP authentication and authorization extension
  * core: auto disable paging if not supported.
  * core: enable use of system width trust store, rhbz#1241262.
  * core: add regex conversion to mapping.
+ * core: add dc-resolve pool option to resolve dc components using srv record
+   instead of chasing referrals.
  * profiles: rfc2307-edir: initial add, rhbz#1224722.
  * profiles: rfc2307-generic: initial add rhbz#1266730.
  * profiles: rfc2307: minor cleanups.
