@@ -204,7 +204,7 @@ public class Framework implements Closeable {
             log.debug("PROPERTIES-BEGIN");
 
             Set<String> sensitiveKeys = new HashSet<>();
-            for (MapProperties entry : props.get("sensitive-keys").getMap().values()) {
+            for (MapProperties entry : props.getOrEmpty("sensitive-keys").getMap().values()) {
                 sensitiveKeys.add(entry.getValue());
             }
 
