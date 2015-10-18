@@ -15,6 +15,7 @@ oVirt LDAP authentication and authorization extension
  * profiles: rfc2307: minor cleanups.
  * profiles: ad: resolve gc using _ldap._tcp.gc.DOMAIN instead of
    _gc._tcp.DOMAIN to be more portable.
+ * profiles: ad: enable dc-resolve by default.
  * setup: initial implementation.
 
 2015-01-15 - Version 1.0.2
