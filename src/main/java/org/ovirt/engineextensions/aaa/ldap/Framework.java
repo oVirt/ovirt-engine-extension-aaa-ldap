@@ -609,7 +609,7 @@ public class Framework implements Closeable {
         return connectionPool;
     }
 
-    private void createPool(String name, Map<String, Object> vars)
+    private ConnectionPoolEntry createConnectionPoolEntry(String name, Map<String, Object> vars)
     throws Exception {
 
         log.info("{} Creating LDAP pool '{}'", logPrefix, name);
@@ -656,12 +656,8 @@ public class Framework implements Closeable {
             }
         }
 
-        ConnectionPoolEntry previous = connectionPools.put(entry.name, entry);
-        if (previous != null) {
-            previous.close();
-        }
-
         log.debug("createPool Return {}", entry);
+        return entry;
     }
 
     public void init() throws Exception {
@@ -708,15 +704,18 @@ public class Framework implements Closeable {
         log.debug("close Return");
     }
 
-    public LDAPConnectionPool getConnectionPool(String name) {
-        log.debug("getConnectionPool Entry name='{}'", name);
+    public ConnectionPoolEntry getConnectionPoolEntry(String name, Map<String, Object> vars)
+    throws Exception {
+        log.debug("getConnectionPoolEntry Entry name='{}'", name);
         ConnectionPoolEntry entry = connectionPools.get(name);
         if (entry == null) {
-            throw new IllegalArgumentException(
-                String.format("No connection pool '%s'", name)
+            entry = createConnectionPoolEntry(
+                name,
+                vars
             );
+            connectionPools.put(entry.name, entry);
         }
-        return entry.connectionPool;
+        return entry;
     }
 
     public void stats() {
@@ -734,7 +733,7 @@ public class Framework implements Closeable {
     public void authCheck(
         String name,
         Map<String, Object> vars
-    ) throws LDAPException {
+    ) throws Exception {
 
         log.debug("authCheck Entry name='{}'", name);
 
@@ -754,10 +753,10 @@ public class Framework implements Closeable {
             throw new IllegalArgumentException("User required for authentication check");
         }
 
-        LDAPConnectionPool connectionPool = getConnectionPool(pool);
+        ConnectionPoolEntry connectionPoolEntry = getConnectionPoolEntry(pool, vars);
         LDAPConnection connection = null;
         try {
-            connection = connectionPool.getConnection();
+            connection = connectionPoolEntry.connectionPool.getConnection();
 
             log.debug("Creating BindRequest");
             BindRequest bindRequest = createBindRequest(
@@ -786,7 +785,7 @@ public class Framework implements Closeable {
             }
 
             if (
-                connectionPools.get(pool).supportWhoAmI &&
+                connectionPoolEntry.supportWhoAmI &&
                 authCheckProps.getBoolean(Boolean.TRUE, "whoami", "enable")
             ) {
                 log.debug("Trying WhoAmI");
@@ -849,9 +848,9 @@ public class Framework implements Closeable {
         } finally {
             if (connection != null) {
                 if (authCheckProps.getBoolean(Boolean.FALSE, "reuse-connections")) {
-                    connectionPool.releaseAndReAuthenticateConnection(connection);
+                    connectionPoolEntry.connectionPool.releaseAndReAuthenticateConnection(connection);
                 } else {
-                    connectionPool.discardConnection(connection);
+                    connectionPoolEntry.connectionPool.discardConnection(connection);
                 }
             }
         }
@@ -867,8 +866,14 @@ public class Framework implements Closeable {
         log.debug("authCheck Return");
     }
 
-    public void modifyCredentials(String pool, String user, String currentPassword, String newPassword) throws LDAPException {
-        PasswordModifyExtendedResult passwordModifyResult = (PasswordModifyExtendedResult)getConnectionPool(pool).processExtendedOperation(
+    public void modifyCredentials(
+        String pool,
+        String user,
+        String currentPassword,
+        String newPassword,
+        Map<String, Object> vars
+    ) throws Exception {
+        PasswordModifyExtendedResult passwordModifyResult = (PasswordModifyExtendedResult)getConnectionPoolEntry(pool, vars).connectionPool.processExtendedOperation(
             new PasswordModifyExtendedRequest(user, currentPassword, newPassword)
         );
         if (passwordModifyResult.getResultCode() != ResultCode.SUCCESS) {
@@ -948,7 +953,7 @@ public class Framework implements Closeable {
         int pageSize,
         int limit,
         Map<String, Object> vars
-    ) throws LDAPException {
+    ) throws Exception {
         List<Map<String, List<String>>> ret = new LinkedList<>();
         SearchInstance searchInstance = searchOpen(
             name,
@@ -975,7 +980,7 @@ public class Framework implements Closeable {
         int pageSize,
         int limit,
         Map<String, Object> vars
-    ) throws LDAPException {
+    ) throws Exception {
 
         log.debug(
             "searchOpen Entry name='{}', pageSize={}, limit={}",
@@ -1005,7 +1010,7 @@ public class Framework implements Closeable {
         log.debug("SearchRequest: {}", searchRequest);
 
         SearchInstance instance = new SearchInstance();
-        instance.connectionPoolEntry = connectionPools.get(searchProps.getMandatoryString("pool"));
+        instance.connectionPoolEntry = getConnectionPoolEntry(searchProps.getMandatoryString("pool"), vars);
         instance.searchRequest = searchRequest;
         instance.doPaging = instance.connectionPoolEntry.supportPaging && searchProps.getBoolean(Boolean.TRUE, "paging");
         instance.pageSize = pageSize != 0 ? pageSize : searchProps.getInt(100, "pageSize");
@@ -1370,10 +1375,11 @@ public class Framework implements Closeable {
                                 opProps.getMandatoryString("pool"),
                                 opProps.getMandatoryString("user"),
                                 opProps.getMandatoryString("password", "current"),
-                                opProps.getMandatoryString("password", "new")
+                                opProps.getMandatoryString("password", "new"),
+                                vars
                             );
                         } else if ("pool-create".equals(type)) {
-                            createPool(
+                            getConnectionPoolEntry(
                                 opProps.getMandatoryString("name"),
                                 vars
                             );
