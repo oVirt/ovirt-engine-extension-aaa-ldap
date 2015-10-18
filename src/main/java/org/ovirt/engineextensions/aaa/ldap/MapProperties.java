@@ -122,21 +122,6 @@ public class MapProperties {
         return this;
     }
 
-    public MapProperties put(String key, String value) {
-        this.value = value;
-        return this;
-    }
-
-    public MapProperties put(String key, Integer value) {
-        this.value = value.toString();
-        return this;
-    }
-
-    public MapProperties put(String key, Boolean value) {
-        this.value = value.toString();
-        return this;
-    }
-
     public StringBuilder toString(String prefix, Set<String> sensitiveKeys, StringBuilder builder) {
         if (value != null) {
             builder.append(prefix);
