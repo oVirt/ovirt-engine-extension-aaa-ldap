@@ -284,7 +284,7 @@ out of scope for this document.
 <LocationMatch ^(/ovirt-engine/(webadmin|userportal|api)|/api)>
     RewriteEngine on
     RewriteCond %{LA-U:REMOTE_USER} ^(.*)$
-    RewriteRule ^(.*)$ - [L,P,E=REMOTE_USER:%1]
+    RewriteRule ^(.*)$ - [L,NS,P,E=REMOTE_USER:%1]
     RequestHeader set X-Remote-User %{REMOTE_USER}s
 
     AuthType Kerberos
