@@ -1,0 +1,7 @@
+TODO
+====
+
+JAVASCRIPT SEQUENCES
+
+When Java and JBoss will host javascript properly, drop the current
+sequences scheme in favour of javascript callbacks.

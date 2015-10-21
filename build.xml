@@ -189,13 +189,14 @@
 				<include name="ChangeLog"/>
 				<include name="Makefile"/>
 				<include name="README*"/>
+				<include name="TODO"/>
 				<include name="build.xml"/>
+				<include name="examples/**"/>
 				<include name="ovirt-engine-extension-aaa-ldap.spec"/>
 				<include name="ovirt-engine-extension-aaa-ldap.spec.in"/>
 				<include name="profiles/**"/>
-				<include name="examples/**"/>
-				<include name="src/**"/>
 				<include name="setup/**"/>
+				<include name="src/**"/>
 			</tarfileset>
 		</tar>
 	</target>
