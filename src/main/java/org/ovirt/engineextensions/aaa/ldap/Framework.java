@@ -972,7 +972,9 @@ public class Framework implements Closeable {
             vars
         );
         for (Map.Entry<String, MapProperties> entry : attrProps.getOrEmpty("attr").getMap().entrySet()) {
-            ret.add (new AttrMapInfo(entry.getKey(), entry.getValue()));
+            if (entry.getValue().getBoolean(true, "enable")) {
+                ret.add (new AttrMapInfo(entry.getKey(), entry.getValue()));
+            }
         }
 
         log.debug("getAttrMap Return {}", ret);

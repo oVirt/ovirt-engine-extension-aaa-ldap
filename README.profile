@@ -355,6 +355,8 @@ ATTRIBUTE MAP
     # Specific settings
     attrmap.@POOLID@.*
 
+    # Enable attribute.
+    attrmap.default.attr.@ALIAS@.enable = true
     # Conversion to use: STRING, BASE64, DATE, REGEX
     attrmap.default.attr.@ALIAS@.conversion = STRING
     attrmap.default.attr.@ALIAS@.conversion.REGEX.decode.pattern = @PATTERN@
