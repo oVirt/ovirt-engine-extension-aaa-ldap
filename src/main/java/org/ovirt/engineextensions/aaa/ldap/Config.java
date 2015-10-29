@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 public class Config {
@@ -32,7 +32,7 @@ public class Config {
     static {
         try (
             InputStream is = Config.class.getResourceAsStream("config.properties");
-            Reader reader = new InputStreamReader(is, Charset.forName("UTF-8"));
+            Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
         ) {
             Properties p = new Properties();
             p.load(reader);

@@ -187,7 +187,7 @@ public class Framework implements Closeable {
 
         try (
             InputStream is = this.getClass().getResourceAsStream("profile-defaults.properties");
-            Reader reader = new InputStreamReader(is, Charset.forName("UTF-8"));
+            Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
         ) {
             Properties p = new Properties();
             p.load(reader);

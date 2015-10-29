@@ -40,7 +40,7 @@ public class AuthTest {
                     )
                 )
             );
-            Reader reader = new InputStreamReader(System.in, Charset.forName("UTF-8"));
+            Reader reader = new InputStreamReader(System.in, StandardCharsets.UTF_8);
             BufferedReader breader = new BufferedReader(reader);
         ) {
             framework.getGlobals().put("authn_enable", "1");

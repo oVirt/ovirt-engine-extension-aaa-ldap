@@ -132,7 +132,7 @@ public class Util {
         Properties props = new Properties();
         try (
             InputStream is = new FileInputStream(file);
-            Reader reader = new InputStreamReader(is, Charset.forName("UTF-8"));
+            Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
         ) {
             props.load(reader);
         }
