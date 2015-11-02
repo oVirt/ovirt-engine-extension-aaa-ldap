@@ -282,6 +282,7 @@ Pool of LDAP connections, based on specific policy.
     # domain conversion
     pool.default.serverset.srvrecord.domain-conversion.type = none
     pool.default.serverset.srvrecord.domain-conversion.regex.pattern = @PATTERN@
+    pool.default.serverset.srvrecord.domain-conversion.regex.flags = @FLAGS@    # a for all
     pool.default.serverset.srvrecord.domain-conversion.regex.replacement = @REPLACEMENT@
 
     # AUTHENTICATION
@@ -475,6 +476,7 @@ SEQUENCE
     # Apply pattern on value and execute replacements.
     # At replacements ${xxx} can be used to replace group names.
     sequence.@ID@.@SORT@.regex.pattern = @PATTERN@
+    sequence.@ID@.@SORT@.regex.flags = @FLAGS@    # a for all, f for force
     sequence.@ID@.@SORT@.regex.value = @STRING@
     sequence.@ID@.@SORT@.regex.replacement.@VAR@ = @REPLACEMENT@
     # Execute credentials modify.

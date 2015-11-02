@@ -593,11 +593,14 @@ public class Framework implements Closeable {
                 // noop
             } else if ("regex".equals(conversionType)) {
                 String pattern = conversionProps.getMandatoryString("pattern");
-                log.debug("Domain conversion pattern: {}", pattern);
+                String flags = conversionProps.getString("", "flags");
+                log.debug("Domain conversion pattern: {} ({})", pattern, flags);
                 Matcher matcher = Pattern.compile(pattern).matcher(domain);
-                if (matcher.matches()) {
-                    domain = matcher.replaceFirst(conversionProps.getMandatoryString("replacement"));
-                }
+                domain = (
+                    flags.indexOf('a') != -1 ?
+                    matcher.replaceAll(conversionProps.getMandatoryString("replacement")) :
+                    matcher.replaceFirst(conversionProps.getMandatoryString("replacement"))
+                );
             } else {
                 throw new IllegalArgumentException(
                     String.format("Invalid srvrecord set conversion type '%s'", conversionType)
@@ -1436,16 +1439,27 @@ public class Framework implements Closeable {
                             );
                         } else if ("regex".equals(type)) {
                             String pattern = opProps.getMandatoryString("pattern");
-                            log.debug("Pattern: {}", pattern);
+                            String flags = opProps.getString("", "flags");
+                            log.debug("Pattern: {} ({})", pattern, flags);
                             Matcher matcher = Pattern.compile(pattern).matcher(
                                 opProps.getMandatoryString("value")
                             );
-                            if (matcher.matches()) {
+                            boolean all = flags.indexOf('a') != -1;
+                            boolean always = flags.indexOf('a') != -1;
+                            boolean force = flags.indexOf('f') != -1;
+                            boolean go = force || (all ? matcher.find() : matcher.matches());
+                            if (go) {
                                 for (Map.Entry<String, MapProperties> e : opProps.getOrEmpty("replacement").getMap().entrySet()) {
                                     vars.put(
                                         e.getKey(),
-                                        matcher.replaceFirst(
-                                            e.getValue().getValue()
+                                        (
+                                            all ?
+                                            matcher.replaceAll(
+                                                e.getValue().getValue()
+                                            ) :
+                                            matcher.replaceFirst(
+                                                e.getValue().getValue()
+                                            )
                                         )
                                     );
                                 }
