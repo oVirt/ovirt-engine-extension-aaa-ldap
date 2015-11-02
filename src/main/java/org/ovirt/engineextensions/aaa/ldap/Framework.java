@@ -1220,6 +1220,11 @@ public class Framework implements Closeable {
     public void runSequence(String name, Map<String, Object> vars)
     throws Exception {
 
+        // skip null sequences
+        if (name == null) {
+            return;
+        }
+
         stats();
 
         log.debug("runSequence Entry name='{}'", name);
@@ -1330,24 +1335,17 @@ public class Framework implements Closeable {
                             );
                         } else if ("fetch-record".equals(type)) {
                             final String ATTRVARS_PREFIX = "search_attr_";
-                            Iterator<Map.Entry<String, Object>> iter = vars.entrySet().iterator();
-                            while(iter.hasNext()) {
-                                Map.Entry<String, Object> e = iter.next();
-                                if (e.getKey().startsWith(ATTRVARS_PREFIX)) {
-                                    iter.remove();
-                                }
-                            }
+                            Util.removeKeysWithPrefix(vars, ATTRVARS_PREFIX);
                             List<Map<String, List<String>>> searchEntries = search(
                                 opProps.getMandatoryString("search"),
                                 0,
                                 5,
                                 vars
                             );
-                            if (searchEntries.size() > 1) {
-                                log.debug("ERROR: Unexpected number of records n={}", searchEntries.size());
-                            } else if (searchEntries.size() == 1) {
+                            for (Map<String, List<String>> searchEntry : searchEntries) {
+                                Util.removeKeysWithPrefix(vars, ATTRVARS_PREFIX);
                                 MapProperties mapProps = opProps.getOrEmpty("map");
-                                for (Map.Entry<String, List<String>> e : searchEntries.get(0).entrySet()) {
+                                for (Map.Entry<String, List<String>> e : searchEntry.entrySet()) {
                                     MapProperties info = mapProps.get(e.getKey());
                                     if (info == null) {
                                         vars.put(ATTRVARS_PREFIX + e.getKey(), e.getValue().get(0));
@@ -1363,6 +1361,10 @@ public class Framework implements Closeable {
                                         }
                                     }
                                 }
+                                runSequence(
+                                    opProps.getString(null, "sequence"),
+                                    vars
+                                );
                             }
                         } else if ("var-set".equals(type)) {
                             vars.put(

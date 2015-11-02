@@ -453,6 +453,7 @@ SEQUENCE
     # Map attributes to variables.
     # Select index of attribute, -1 stores entire list.
     sequence.@ID@.@SORT@.fetch-record.search = @ID@
+    sequence.@ID@.@SORT@.fetch-record.sequence = @ID@    # optional sequence to run for each record
     sequence.@ID@.@SORT@.fetch-record.map.@ATTR@.name = @VAR@
     sequence.@ID@.@SORT@.fetch-record.map.@ATTR@.select = 0
     # Set variable.

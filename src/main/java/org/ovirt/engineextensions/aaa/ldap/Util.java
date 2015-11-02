@@ -48,6 +48,16 @@ public class Util {
         return toString(o, "");
     }
 
+    public static void removeKeysWithPrefix(Map<String, Object> map, String prefix) {
+        Iterator<Map.Entry<String, Object>> iter = map.entrySet().iterator();
+        while(iter.hasNext()) {
+            Map.Entry<String, Object> e = iter.next();
+            if (e.getKey().startsWith(prefix)) {
+                iter.remove();
+            }
+        }
+    }
+
     public static String expandString(String s, String namespace, Map<? extends Object, ? extends Object> vars) {
         StringBuilder ret = new StringBuilder();
         Matcher m = VAR_PATTERN.matcher(s);

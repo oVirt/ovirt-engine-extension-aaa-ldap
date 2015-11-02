@@ -2,6 +2,7 @@ oVirt LDAP authentication and authorization extension
 
 ????-??-?? - Version 1.1.1
 
+ * core: add ability to execute sequence per each record in fetch-record.
 
 2015-10-22 - Version 1.1.0
 
