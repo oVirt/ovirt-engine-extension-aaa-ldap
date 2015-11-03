@@ -1029,16 +1029,18 @@ public class Framework implements Closeable {
         String name,
         int pageSize,
         int limit,
+        boolean ignoreErrors,
         Map<String, Object> vars
     ) throws Exception {
+        SearchInstance searchInstance = null;
         List<Map<String, List<String>>> ret = new LinkedList<>();
-        SearchInstance searchInstance = searchOpen(
-            name,
-            pageSize,
-            limit,
-            vars
-        );
         try {
+            searchInstance = searchOpen(
+                name,
+                pageSize,
+                limit,
+                vars
+            );
             while (true) {
                 List<Map<String, List<String>>> result = searchExecute(searchInstance, 0);
                 if (result == null) {
@@ -1046,8 +1048,17 @@ public class Framework implements Closeable {
                 }
                 ret.addAll(result);
             }
+        } catch (Exception e) {
+            if (ignoreErrors) {
+                log.warn("Search failure: {}", e.getMessage());
+                log.debug("Exception", e);
+            } else {
+                throw e;
+            }
         } finally {
-            searchClose(searchInstance);
+            if (searchInstance != null) {
+                searchClose(searchInstance);
+            }
         }
         return ret;
     }
@@ -1353,6 +1364,7 @@ public class Framework implements Closeable {
                                 opProps.getMandatoryString("search"),
                                 0,
                                 5,
+                                opProps.getBoolean(false, "ignore-errors"),
                                 vars
                             );
                             for (Map<String, List<String>> searchEntry : searchEntries) {
