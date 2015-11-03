@@ -1086,10 +1086,20 @@ public class Framework implements Closeable {
         Util.setObjectByProperties(searchRequest, searchProps.get("search-request"), "set");
         log.debug("SearchRequest: {}", searchRequest);
 
+        String override = searchProps.getString(
+            "",
+            "dc-resolve",
+            "override"
+        );
+
         SearchInstance instance = new SearchInstance();
         instance.connectionPoolEntry = getConnectionPoolEntry(
             searchProps.getMandatoryString("pool"),
-            searchProps.getBoolean(true, "dc-resolve", "enable") ? searchRequest.getBaseDN() : null,
+            (
+                searchProps.getBoolean(true, "dc-resolve", "enable") ?
+                ("".equals(override) ? searchRequest.getBaseDN() : override) :
+                null
+            ),
             vars
         );
         instance.searchRequest = searchRequest;

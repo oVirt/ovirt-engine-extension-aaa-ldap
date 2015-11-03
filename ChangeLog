@@ -4,6 +4,7 @@ oVirt LDAP authentication and authorization extension
 
  * core: add ability to execute sequence per each record in fetch-record.
  * core: add flags to allow replace all and force in regex.
+ * core: add dc-domain override to enable redirect searches.
 
 2015-10-22 - Version 1.1.0
 

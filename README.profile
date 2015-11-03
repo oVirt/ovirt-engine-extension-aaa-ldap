@@ -385,6 +385,8 @@ SEARCH
     search.default.limit = (Max Integer)
     # Control dc-resolve
     search.default.dc-resolve.enable = true
+    # Override search-requesst.baseDN
+    search.default.dc-resolve.override =
     # SEARCH OPTIONS
     # Class: SearchRequest.
     # Documentation and options at:
