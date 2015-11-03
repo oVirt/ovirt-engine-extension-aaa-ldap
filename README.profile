@@ -439,6 +439,8 @@ SEQUENCE
     sequence.@ID@.@SORT@.noop
     # Stop sequence
     sequence.@ID@.@SORT@.stop
+    # Return from a sequence to previous
+    sequence.@ID@.@SORT@.return
     # Call other sequence 
     sequence.@ID@.@SORT@.call.name = @ID@
     # Iterate collection by calling sequence
