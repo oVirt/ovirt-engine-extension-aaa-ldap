@@ -586,25 +586,32 @@ public class Framework implements Closeable {
             );
         } else if ("srvrecord".equals(serversetType)) {
             final String CONVERSION_PREFIX = "domain-conversion";
-            String conversionType = serverSetProps.getString("none", CONVERSION_PREFIX, "type");
-            MapProperties conversionProps = serverSetProps.getOrEmpty(CONVERSION_PREFIX, conversionType);
+
             String domain = serverSetProps.getMandatoryString("domain");
-            if ("none".equals(conversionType)) {
-                // noop
-            } else if ("regex".equals(conversionType)) {
-                String pattern = conversionProps.getMandatoryString("pattern");
-                String flags = conversionProps.getString("", "flags");
-                log.debug("Domain conversion pattern: {} ({})", pattern, flags);
-                Matcher matcher = Pattern.compile(pattern).matcher(domain);
-                domain = (
-                    flags.indexOf('a') != -1 ?
-                    matcher.replaceAll(conversionProps.getMandatoryString("replacement")) :
-                    matcher.replaceFirst(conversionProps.getMandatoryString("replacement"))
-                );
-            } else {
-                throw new IllegalArgumentException(
-                    String.format("Invalid srvrecord set conversion type '%s'", conversionType)
-                );
+
+            List<MapProperties> conversions = new ArrayList<>();
+            conversions.add(serverSetProps.getOrEmpty(CONVERSION_PREFIX, "prep"));
+            conversions.add(serverSetProps.getOrEmpty(CONVERSION_PREFIX));
+            for (MapProperties conversionPropsRoot : conversions) {
+                String conversionType = conversionPropsRoot.getString("none", "type");
+                MapProperties conversionProps = conversionPropsRoot.getOrEmpty(conversionType);
+                if ("none".equals(conversionType)) {
+                    // noop
+                } else if ("regex".equals(conversionType)) {
+                    String pattern = conversionProps.getMandatoryString("pattern");
+                    String flags = conversionProps.getString("", "flags");
+                    log.debug("Domain conversion pattern: {} ({})", pattern, flags);
+                    Matcher matcher = Pattern.compile(pattern).matcher(domain);
+                    domain = (
+                        flags.indexOf('a') != -1 ?
+                        matcher.replaceAll(conversionProps.getMandatoryString("replacement")) :
+                        matcher.replaceFirst(conversionProps.getMandatoryString("replacement"))
+                    );
+                } else {
+                    throw new IllegalArgumentException(
+                        String.format("Invalid srvrecord set conversion type '%s'", conversionType)
+                    );
+                }
             }
 
             serverset = new DNSSRVRecordServerSet(

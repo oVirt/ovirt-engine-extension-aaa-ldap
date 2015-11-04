@@ -284,6 +284,8 @@ Pool of LDAP connections, based on specific policy.
     pool.default.serverset.srvrecord.domain-conversion.regex.pattern = @PATTERN@
     pool.default.serverset.srvrecord.domain-conversion.regex.flags = @FLAGS@    # a for all
     pool.default.serverset.srvrecord.domain-conversion.regex.replacement = @REPLACEMENT@
+    # domain conversion pre processing
+    pool.default.serverset.srvrecord.domain-conversion.prep.* = ...
 
     # AUTHENTICATION
     pool.default.auth.type = none
