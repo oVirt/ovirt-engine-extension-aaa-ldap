@@ -59,7 +59,7 @@ public class AuthzExtension implements Extension {
 
     private Framework framework;
     private volatile boolean frameworkInitialized = false;
-    private Collection<String> namespaces = new ArrayList<>();
+    private Collection<String> namespaces = Collections.emptySet();
 
     private String logPrefix;
     private String attrmapGroupRecord;
@@ -161,7 +161,7 @@ public class AuthzExtension implements Extension {
                             );
                         }
 
-                        namespaces = new ArrayList<>();
+                        namespaces = new TreeSet<>();
                         defaultNamespace = null;
                         Map<String, Object> vars = framework.createSequenceVars();
                         framework.runSequence(sequenceNamespace, vars);
