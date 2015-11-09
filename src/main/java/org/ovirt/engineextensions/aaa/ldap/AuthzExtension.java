@@ -59,7 +59,7 @@ public class AuthzExtension implements Extension {
 
     private Framework framework;
     private volatile boolean frameworkInitialized = false;
-    private Collection<String> namespaces = Collections.emptySet();
+    private Collection<String> namespaces = Collections.emptyList();    // TODO: replace with emptySet when engine stops assume List
 
     private String logPrefix;
     private String attrmapGroupRecord;
@@ -184,7 +184,7 @@ public class AuthzExtension implements Extension {
                         );
                         context.put(
                             Authz.ContextKeys.AVAILABLE_NAMESPACES,
-                            namespaces
+                            new ArrayList<>(namespaces)   // TODO: remove ArrayList when engine stops assume List
                         );
 
                         if (vars.containsKey(ExtensionUtil.VARS_NAMESPACE_DEFAULT)) {
