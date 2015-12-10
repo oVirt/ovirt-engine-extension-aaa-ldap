@@ -108,7 +108,10 @@ __EOF__
 %{_datadir}/%{name}/setup/
 
 %changelog
-* Wed Oct 22 2015 Alon Bar-Lev <alonbl@redhat.com> 1.1.0-1
+* Thu Dec 10 2015 Alon Bar-Lev <alonbl@redhat.com> 1.1.1-1
+- Release.
+
+* Thu Oct 22 2015 Alon Bar-Lev <alonbl@redhat.com> 1.1.0-1
 - Release.
 
 * Thu Jan 15 2015 Alon Bar-Lev <alonbl@redhat.com> 1.0.2-1

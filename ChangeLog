@@ -1,6 +1,6 @@
 oVirt LDAP authentication and authorization extension
 
-????-??-?? - Version 1.1.1
+2015-12-10 - Version 1.1.1
 
  * core: add ability to execute sequence per each record in fetch-record.
  * core: add flags to allow replace all and force in regex.
