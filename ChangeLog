@@ -7,6 +7,7 @@ oVirt LDAP authentication and authorization extension
  * core: add dc-domain override to enable redirect searches.
  * core: add domain processor pre-processor.
  * profiles: ad: relax error code correlation.
+ * profiles: simple: provide change-credentials with valid user name.
 
 2015-10-22 - Version 1.1.0
 
