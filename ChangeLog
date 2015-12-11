@@ -1,6 +1,6 @@
 oVirt LDAP authentication and authorization extension
 
-????-??-?? - Version 1.1.2
+2015-12-11 - Version 1.1.2
 
  * core: do not overwrite already set globals in default, enables easier
    override when using extension global set.
