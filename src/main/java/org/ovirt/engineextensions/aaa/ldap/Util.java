@@ -193,23 +193,22 @@ public class Util {
         return props;
     }
 
-    public static int[] asIntArray(List<?> l) {
-        int[] ret = new int[l.size()];
-        int i=0;
-        for (Object o : l) {
-            ret[i++] = Integer.valueOf(o.toString());
+    public static int[] asIntArray(List<?> l, int def, int size) {
+        int[] ret = new int[size];
+        Arrays.fill(ret, def);
+        for (int i = 0; i < l.size() && i < size; i++) {
+            ret[i] = Integer.valueOf(l.get(i).toString());
         }
         return ret;
     }
 
-    public static List<String> getValueFromMapRecord(MapProperties props, String key, String def) {
+    public static List<String> getValueFromMapRecord(MapProperties props, String key) {
         List<String> ret = new ArrayList<>();
         for (MapProperties entry : props.getMap().values()) {
             String v = entry.getString(null, key);
-            if (v == null) {
-                v = def;
+            if (v != null) {
+                ret.add(v);
             }
-            ret.add(v);
         }
         return ret;
     }

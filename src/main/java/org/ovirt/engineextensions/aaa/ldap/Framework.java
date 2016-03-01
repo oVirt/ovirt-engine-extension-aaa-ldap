@@ -529,7 +529,7 @@ public class Framework implements Closeable {
         final String SERVERSET_PORT = "port";
         String serversetType = poolProps.getString("single", POOL_PREFIX_SERVERSET, "type");
         MapProperties serverSetProps = poolProps.get(POOL_PREFIX_SERVERSET, serversetType);
-        String defaultPort = serverSetProps.getString("389", SERVERSET_PORT);
+        int defaultPort = Integer.valueOf(serverSetProps.getString("389", SERVERSET_PORT));
         ServerSet serverset;
         if ("single".equals(serversetType)) {
             serverset = new SingleServerSet(
@@ -539,30 +539,34 @@ public class Framework implements Closeable {
                 connectionOptions
             );
         } else if ("round-robin".equals(serversetType)) {
+            String[] addresess = Util.getValueFromMapRecord(serverSetProps, SERVERSET_SERVER).toArray(new String[0]);
             serverset = new RoundRobinServerSet(
-                Util.getValueFromMapRecord(serverSetProps, SERVERSET_SERVER, null).toArray(new String[0]),
-                Util.asIntArray(Util.getValueFromMapRecord(serverSetProps, SERVERSET_PORT, defaultPort)),
+                addresess,
+                Util.asIntArray(Util.getValueFromMapRecord(serverSetProps, SERVERSET_PORT), defaultPort, addresess.length),
                 socketFactory,
                 connectionOptions
             );
         } else if ("failover".equals(serversetType)) {
+            String[] addresess = Util.getValueFromMapRecord(serverSetProps, SERVERSET_SERVER).toArray(new String[0]);
             serverset = new FailoverServerSet(
-                Util.getValueFromMapRecord(serverSetProps, SERVERSET_SERVER, null).toArray(new String[0]),
-                Util.asIntArray(Util.getValueFromMapRecord(serverSetProps, SERVERSET_PORT, defaultPort)),
+                addresess,
+                Util.asIntArray(Util.getValueFromMapRecord(serverSetProps, SERVERSET_PORT), defaultPort, addresess.length),
                 socketFactory,
                 connectionOptions
             );
         } else if ("fastest-connect".equals(serversetType)) {
+            String[] addresess = Util.getValueFromMapRecord(serverSetProps, SERVERSET_SERVER).toArray(new String[0]);
             serverset = new FastestConnectServerSet(
-                Util.getValueFromMapRecord(serverSetProps, SERVERSET_SERVER, null).toArray(new String[0]),
-                Util.asIntArray(Util.getValueFromMapRecord(serverSetProps, SERVERSET_PORT, defaultPort)),
+                addresess,
+                Util.asIntArray(Util.getValueFromMapRecord(serverSetProps, SERVERSET_PORT), defaultPort, addresess.length),
                 socketFactory,
                 connectionOptions
             );
         } else if ("fewest-connections".equals(serversetType)) {
+            String[] addresess = Util.getValueFromMapRecord(serverSetProps, SERVERSET_SERVER).toArray(new String[0]);
             serverset = new FewestConnectionsServerSet(
-                Util.getValueFromMapRecord(serverSetProps.get(POOL_PREFIX_SERVERSET), SERVERSET_SERVER, null).toArray(new String[0]),
-                Util.asIntArray(Util.getValueFromMapRecord(serverSetProps.get(POOL_PREFIX_SERVERSET), SERVERSET_PORT, defaultPort)),
+                addresess,
+                Util.asIntArray(Util.getValueFromMapRecord(serverSetProps, SERVERSET_PORT), defaultPort, addresess.length),
                 socketFactory,
                 connectionOptions
             );
