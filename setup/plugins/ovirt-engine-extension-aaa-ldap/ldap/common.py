@@ -140,22 +140,13 @@ class Plugin(plugin.PluginBase):
                 return f.read().decode('utf-8').splitlines()
 
     @staticmethod
-    def _resolver(plugin, dnsServers, record, what):
+    def _resolver(plugin, record, what):
         rc, stdout, stderr = plugin.execute(
             args=(
                 (
                     plugin.command.get('dig'),
                     '+noall',
                     '+answer',
-                ) +
-                (
-                    () if dnsServers is None
-                    else tuple(
-                        '@%s' % s.strip()
-                        for s in dnsServers.split()
-                    )
-                ) +
-                (
                     what,
                     record
                 )
@@ -189,17 +180,11 @@ class Plugin(plugin.PluginBase):
                 if not (
                     self.environment[constants.LDAPEnv.RESOLVER](
                         plugin=self,
-                        dnsServers=self.environment[
-                            constants.LDAPEnv.DNS_SERVERS
-                        ],
                         record='A',
                         what=h,
                     ) or
                     self.environment[constants.LDAPEnv.RESOLVER](
                         plugin=self,
-                        dnsServers=self.environment[
-                            constants.LDAPEnv.DNS_SERVERS
-                        ],
                         record='AAAA',
                         what=h,
                     )
@@ -221,7 +206,6 @@ class Plugin(plugin.PluginBase):
         )
         if self.environment[constants.LDAPEnv.RESOLVER](
             plugin=self,
-            dnsServers=self.environment[constants.LDAPEnv.DNS_SERVERS],
             record='SRV',
             what='_ldap._tcp.%s' % arg,
         ):
@@ -263,7 +247,6 @@ class Plugin(plugin.PluginBase):
             )
             stdout = self.environment[constants.LDAPEnv.RESOLVER](
                 self,
-                self.environment[constants.LDAPEnv.DNS_SERVERS],
                 'SRV',
                 '_ldap._tcp.%s' % self.environment[
                     constants.LDAPEnv.DOMAIN
@@ -544,10 +527,6 @@ class Plugin(plugin.PluginBase):
         )
         self.environment.setdefault(
             constants.LDAPEnv.DOMAIN,
-            None
-        )
-        self.environment.setdefault(
-            constants.LDAPEnv.DNS_SERVERS,
             None
         )
         self.environment.setdefault(

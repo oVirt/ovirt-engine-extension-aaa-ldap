@@ -90,7 +90,6 @@ class LDAPEnv(object):
     PROFILE = 'OVAAALDAP_LDAP/profile'
     USE_DNS = 'OVAAALDAP_LDAP/useDNS'
     SERVERSET = 'OVAAALDAP_LDAP/serverset'
-    DNS_SERVERS = 'OVAAALDAP_LDAP/dnsServers'
     DOMAIN = 'OVAAALDAP_LDAP/domain'
     HOSTS = 'OVAAALDAP_LDAP/hosts'
     PROTOCOL = 'OVAAALDAP_LDAP/protocol'

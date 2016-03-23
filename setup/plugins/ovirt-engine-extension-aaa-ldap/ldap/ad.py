@@ -55,7 +55,6 @@ class Plugin(plugin.PluginBase):
 
             if not self.environment[constants.LDAPEnv.RESOLVER](
                 plugin=self,
-                dnsServers=self.environment[constants.LDAPEnv.DNS_SERVERS],
                 record='SRV',
                 what='_ldap._tcp.%s%s' % (
                     e[0],
@@ -66,8 +65,10 @@ class Plugin(plugin.PluginBase):
             ):
                 self.logger.warning(
                     _(
-                        'Cannot resolve {what} SRV '
-                        'record for {domain}'
+                        'Cannot resolve {what} SRV record for {domain}. '
+                        'Please check you have entered correct Active '
+                        'Directory forest name and check that forest '
+                        'is resolvable by your system DNS servers'
                     ).format(
                         what=e[1],
                         domain=self.environment[constants.LDAPEnv.DOMAIN],
@@ -112,30 +113,10 @@ class Plugin(plugin.PluginBase):
                 note=_('Please enter Active Directory Forest name: '),
                 prompt=True,
             )
-
             if not self._resolve():
-                if self.environment[constants.LDAPEnv.DNS_SERVERS] is None:
-                    self.dialog.note(
-                        _(
-                            'Usually this can be fixed by using Active '
-                            'Directory DNS directly.'
-                        )
-                    )
-
-                    while True:
-                        self.environment[
-                            constants.LDAPEnv.DNS_SERVERS
-                        ] = self.dialog.queryString(
-                            name='OVAAALDAP_LDAP_AD_DNS_SERVERS',
-                            note=_(
-                                'Please enter space seperated list of '
-                                'Active Directory DNS Servers names: '
-                            ),
-                            prompt=True,
-                        )
-
-                        if self._resolve():
-                            break
+                raise RuntimeError(
+                    _("Active Directory forest is not resolvable")
+                )
 
         self.environment[
             constants.LDAPEnv.SERVERSET

@@ -70,12 +70,6 @@ class Plugin(plugin.PluginBase):
                     constants.LDAPEnv.HOSTS
                 ].split()
             ]
-        if self.environment[constants.LDAPEnv.DNS_SERVERS]:
-            mydict['dnsurls'] = ' '.join([
-                'dns://%s' % h.strip() for h in self.environment[
-                    constants.LDAPEnv.DNS_SERVERS
-                ].split()
-            ])
         mydict['authnName'] = '%s-%s' % (
             mydict['aaaprofile'],
             'authn',
@@ -155,10 +149,6 @@ class Plugin(plugin.PluginBase):
                 'vars.user = {user}\n'
                 'vars.password = {password}\n'
             )
-        if self.environment[constants.LDAPEnv.DNS_SERVERS]:
-            content += (
-                'vars.dns = {dnsurls}\n'
-            )
 
         content += '\n'
 
@@ -208,13 +198,6 @@ class Plugin(plugin.PluginBase):
         if not self.environment[constants.LDAPEnv.USE_DNS]:
             content += (
                 'pool.default.socketfactory.type = java\n'
-            )
-        if self.environment[constants.LDAPEnv.DNS_SERVERS]:
-            content += (
-                'pool.default.serverset.srvrecord.jndi-properties.java.'
-                'naming.provider.url = ${{global:vars.dns}}\n'
-                'pool.default.socketfactory.resolver.uRL = '
-                '${{global:vars.dns}}\n'
             )
         if self.environment[constants.LDAPEnv.PROTOCOL] == 'starttls':
             content += (
