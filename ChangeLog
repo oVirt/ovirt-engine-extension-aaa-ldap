@@ -1,7 +1,9 @@
 oVirt LDAP authentication and authorization extension
 
-????-??-?? - Version 1.1.3
+2016-03-31 - Version 1.1.3
 
+_* core: initialize servers/ports array correctly.
+_* setup: remove support for additional DNS servers.
 
 2015-12-11 - Version 1.1.2
 
