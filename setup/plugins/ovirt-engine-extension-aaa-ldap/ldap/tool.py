@@ -95,14 +95,14 @@ class Plugin(plugin.PluginBase):
         user = self.dialog.queryString(
             name='OVAAALDAP_LDAP_TOOL_SEQUENCE_LOGIN_USER',
             note=_(
-                'Enter search user name: '
+                'Enter user name: '
             ),
             prompt=True,
         )
         password = self.dialog.queryString(
             name='OVAAALDAP_LDAP_TOOL_SEQUENCE_LOGIN_PASSWORD',
             note=_(
-                'Enter search user password: '
+                'Enter user password: '
             ),
             prompt=True,
             hidden=True
@@ -138,22 +138,29 @@ class Plugin(plugin.PluginBase):
             )
         )
         if rc == 0:
+            self.logger.info("Login sequence executed successfully")
             self.dialog.note(
                 text=(
                     _(
-                        'Please make sure that user details are correct, '
-                        'and group membership meets expectations.'
+                        'Please make sure that user details are correct '
+                        'and group membership meets expectations '
+                        '(search for PrincipalRecord and GroupRecord titles).'
                     ),
                     _(
-                        'Search for PrincipalRecord and GroupRecord titles'
-                    ),
-                    _(
-                        'Abort if output is incorrect'
+                        'Abort if output is incorrect.'
                     ),
                 )
             )
         else:
-            self.logger.error(_('Sequence failed'))
+            self.logger.error(_('Login sequence failed'))
+            self.dialog.note(
+                text=(
+                    _(
+                        'Please investigate details of the failure '
+                        '(search for lines containing SEVERE log level).'
+                    )
+                )
+            )
 
     def sequenceSearch(self, extensionsDir):
         entity = self.dialog.queryString(
@@ -211,15 +218,14 @@ class Plugin(plugin.PluginBase):
             )
         )
         if rc == 0:
+            self.logger.info("Search sequence executed successfully")
             self.dialog.note(
                 text=(
                     _(
-                        'Please make sure that entity details are correct, '
-                        'and depending type of query that group membership '
-                        'meets expectations.'
-                    ),
-                    _(
-                        'Search for PrincipalRecord and GroupRecord titles'
+                        'Please make sure that entity details are correct '
+                        'and that depending on the type of the query group '
+                        'membership meets expectations (search for '
+                        'PrincipalRecord and GroupRecord titles).'
                     ),
                     _(
                         'Abort if output is incorrect'
@@ -227,7 +233,15 @@ class Plugin(plugin.PluginBase):
                 )
             )
         else:
-            self.logger.error(_('Sequence failed'))
+            self.logger.error(_('Search sequence failed'))
+            self.dialog.note(
+                text=(
+                    _(
+                        'Please investigate details of the failure '
+                        '(search for lines containing SEVERE log level).'
+                    )
+                )
+            )
 
     def __init__(self, context):
         super(Plugin, self).__init__(context=context)
