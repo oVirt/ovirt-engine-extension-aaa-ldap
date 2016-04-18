@@ -1,5 +1,8 @@
 oVirt LDAP authentication and authorization extension
 
+????-??-?? - Version 1.1.5
+
+
 2016-04-18 - Version 1.1.4
 
  * setup: make result of test tool more clear
