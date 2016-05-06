@@ -31,8 +31,8 @@ Content is relative to /etc/ovirt-engine directory.
 
 3. Test drive your configuration
 
-   ovirt-engine>=3.6.0
-   -------------------
+   oVirt 3.6/4.x
+   -------------
 
    Test drive can be done as standalone process.
 
@@ -74,8 +74,8 @@ Content is relative to /etc/ovirt-engine directory.
 
    c. Restart ovirt-engine, verify no startup errors.
 
-   ovirt-engine<3.6.0
-   ------------------
+   oVirt 3.5
+   ---------
 
    a. Restart ovirt-engine, verify no startup errors.
 
@@ -298,24 +298,53 @@ The following example enforces kerberos authentication, and delegate
 principal name via HTTP headers. The actual kerberos configuration is
 out of scope for this document.
 
-<LocationMatch ^(/ovirt-engine/(webadmin|userportal|api)|/api)>
-    RewriteEngine on
-    RewriteCond %{LA-U:REMOTE_USER} ^(.*)$
-    RewriteRule ^(.*)$ - [L,NS,P,E=REMOTE_USER:%1]
-    RequestHeader set X-Remote-User %{REMOTE_USER}s
+   oVirt 3.x
+   ---------
 
-    AuthType Kerberos
-    AuthName "Kerberos Login"
+   <LocationMatch ^(/ovirt-engine/(webadmin|userportal|api)|/api)>
+       RewriteEngine on
+       RewriteCond %{LA-U:REMOTE_USER} ^(.*)$
+       RewriteRule ^(.*)$ - [L,NS,P,E=REMOTE_USER:%1]
+       RequestHeader set X-Remote-User %{REMOTE_USER}s
 
-    # Modify to match installation
-    Krb5Keytab /etc/krb5.keytab
+       AuthType Kerberos
+       AuthName "Kerberos Login"
 
-    # Modify to match installation
-    KrbAuthRealms REALM.COM
+       # Modify to match installation
+       Krb5Keytab /etc/krb5.keytab
 
-    KrbMethodK5Password off
-    Require valid-user
-</LocationMatch>
+       # Modify to match installation
+       KrbAuthRealms REALM.COM
+
+       KrbMethodK5Password off
+       Require valid-user
+   </LocationMatch>
+
+   oVirt 4.x
+   ---------
+
+   <LocationMatch ^/ovirt-engine/sso/(interactive-login-negotiate|oauth/token-http-auth)>
+       RewriteEngine on
+       RewriteCond %{LA-U:REMOTE_USER} ^(.*)$
+       RewriteRule ^(.*)$ - [L,P,E=REMOTE_USER:%1]
+       RequestHeader set X-Remote-User %{REMOTE_USER}s
+
+       AuthType Kerberos
+       AuthName "Kerberos Login"
+
+       # Modify to match installation
+       Krb5Keytab /etc/krb5.keytab
+
+
+       # Modify to match installation
+       KrbAuthRealms REALM.COM
+
+       KrbMethodK5Passwd off
+       Require valid-user
+
+       ErrorDocument 401 "<html><meta http-equiv=\"refresh\" content=\"0; url=/ovirt-engine/sso/login-unauthorized\"/><body><a href=\"/ovirt-engine/sso/login-unauthorized\">Here</a></body></html>"
+   </LocationMatch>
+
 
 WARNING!!!
 
