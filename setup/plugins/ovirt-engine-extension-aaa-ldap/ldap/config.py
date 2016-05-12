@@ -74,9 +74,11 @@ class Plugin(plugin.PluginBase):
             mydict['aaaprofile'],
             'authn',
         )
-        mydict['authzName'] = '%s-%s' % (
+        mydict['authzName'] = '%s%s' % (
             mydict['aaaprofile'],
-            'authz',
+            '' if self.environment[
+                constants.LDAPEnv.AAA_USE_VM_SSO
+            ] else '-authz',
         )
 
         for e in (

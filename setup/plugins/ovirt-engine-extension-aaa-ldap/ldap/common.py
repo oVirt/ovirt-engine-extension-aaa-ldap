@@ -506,6 +506,10 @@ class Plugin(plugin.PluginBase):
             None
         )
         self.environment.setdefault(
+            constants.LDAPEnv.AAA_USE_VM_SSO,
+            None
+        )
+        self.environment.setdefault(
             constants.LDAPEnv.SOCKET_FACTORY,
             None
         )
@@ -573,6 +577,32 @@ class Plugin(plugin.PluginBase):
                 'Welcome to LDAP extension configuration program'
             ),
         )
+
+        if self.environment[constants.LDAPEnv.AAA_USE_VM_SSO] is None:
+            self.environment[
+                constants.LDAPEnv.AAA_USE_VM_SSO
+            ] = self.dialog.queryString(
+                name='OVAAALDAP_LDAP_AAA_USE_VM_SSO',
+                note=_(
+                    'Are you going to use Single Sing-On for Virtual Machines'
+                    ' (@VALUES@) [@DEFAULT@]: '
+                ),
+                prompt=True,
+                caseSensitive=False,
+                validValues=(_('Yes'), _('No')),
+                default=_('No'),
+            ) != _('No').lower()
+
+        if self.environment[constants.LDAPEnv.AAA_USE_VM_SSO]:
+            self.dialog.note(
+                (
+                    _('NOTE:'),
+                    _(
+                        'Profile name has to match domain name, otherwise '
+                        'Single Sign-On for Virtual Machines will not work.'
+                    ),
+                )
+            )
 
         if self.environment[constants.LDAPEnv.AAA_PROFILE_NAME] is None:
             self.environment[

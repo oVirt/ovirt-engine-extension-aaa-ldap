@@ -220,6 +220,23 @@ resolve hosts.
 
 More supported configuration at README.profile.
 
+
+Single Sign-On for Virtual Machines
+-----------------------------------
+If you are going to use Single Sign-On for Virtual Machines, your authz name
+has to match your real domain name.
+
+If you are going to use ovirt-engine-extension-aaa-ldap-setup, you will be
+asked to support Single Sign-On for Virtual Machines or not. So generated
+configuration files will be created upon answer to that question.
+
+If you are going to create your configuration files manually, please beware
+that by default authz name is specified with '-authz' suffix in all examples,
+so please make sure to correct it in your final configuration file.
+
+Once rhbz#1133137 is resolved, this behaviour would not be longer needed.
+
+
 X.509 CERTIFICATE TRUST STORE
 -----------------------------
 

@@ -100,6 +100,7 @@ class LDAPEnv(object):
     PASSWORD = 'OVAAALDAP_LDAP/password'
     SOCKET_FACTORY = 'OVAAALDAP_LDAP/socketFactory'
     AAA_PROFILE_NAME = 'OVAAALDAP_LDAP/aaaProfileName'
+    AAA_USE_VM_SSO = 'OVAAALDAP_LDAP/useVmSso'
 
     CONFIG_AUTHN_FILE_NAME = 'OVAAALDAP_LDAP/configAuthnFileName'
     CONFIG_AUTHZ_FILE_NAME = 'OVAAALDAP_LDAP/configAuthzFileName'
