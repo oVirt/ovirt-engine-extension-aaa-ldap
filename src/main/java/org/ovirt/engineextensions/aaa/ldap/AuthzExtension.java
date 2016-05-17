@@ -32,6 +32,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import com.unboundid.asn1.ASN1OctetString;
 import com.unboundid.ldap.sdk.Filter;
@@ -127,33 +132,43 @@ public class AuthzExtension implements Extension {
             }
         }
 
-        try {
-            for (String var : queryVars) {
-                log.debug("Resolving query var '{}'", var);
-                Framework.SearchInstance instance = (Framework.SearchInstance)vars.get(var);
-                if (instance != null) {
-                    List<Map<String, List<String>>> entries;
-                    while (
-                        (entries = framework.searchExecute(
-                            instance,
-                            0
-                        )) != null
-                    ) {
-                        ret.addAll(entries);
+        if (queryVars.size() > 0) {
+            try {
+                ExecutorService executor = Executors.newFixedThreadPool(queryVars.size());
+                List<Future<List<Map<String, List<String>>>>> list = new ArrayList<>();
+
+                for (String var : queryVars) {
+                    log.debug("Resolving query var '{}'", var);
+                    Framework.SearchInstance instance = (Framework.SearchInstance) vars.get(var);
+                    if (instance != null) {
+                        Callable<List<Map<String, List<String>>>> searchExecute = framework.new SearchExecute(instance, 0);
+                        Future<List<Map<String, List<String>>>> submit = executor.submit(searchExecute);
+                        list.add(submit);
                     }
                 }
-            }
-        } finally {
-            for (String var : queryVars) {
-                Framework.SearchInstance instance = (Framework.SearchInstance)vars.get(var);
-                if (instance != null) {
-                    vars.remove(var);
+                for (Future<List<Map<String, List<String>>>> future : list) {
                     try {
-                        framework.searchClose(instance);
-                    } catch(Exception e) {
-                        log.error("Cannot close search of var '{}'", var);
-                        log.debug("Cannot close search of var '{}', search: {}", var, instance);
-                        log.debug("Exception", e);
+                        ret.addAll(future.get());
+                    }
+                    catch (InterruptedException | ExecutionException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                executor.shutdown();
+            }
+            finally {
+                for (String var : queryVars) {
+                    Framework.SearchInstance instance = (Framework.SearchInstance) vars.get(var);
+                    if (instance != null) {
+                        vars.remove(var);
+                        try {
+                            framework.searchClose(instance);
+                        }
+                        catch (Exception e) {
+                            log.error("Cannot close search of var '{}': {}", var, e.getMessage());
+                            log.debug("Search: {}", instance);
+                            log.debug("Exception", e);
+                        }
                     }
                 }
             }
@@ -381,6 +396,10 @@ public class AuthzExtension implements Extension {
             vars.put(
                 ExtensionUtil.VARS_DN_TYPE,
                 groupsKey.equals(Authz.PrincipalRecord.GROUPS) ? "principal" : "group"
+            );
+            vars.put(
+                ExtensionUtil.VARS_NAMESPACES,
+                namespaces
             );
             framework.runSequence(sequenceResolveGroups, vars);
 

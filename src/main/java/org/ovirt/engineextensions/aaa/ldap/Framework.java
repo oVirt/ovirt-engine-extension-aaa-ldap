@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1224,6 +1225,28 @@ public class Framework implements Closeable {
         }
 
         log.debug("searchClose Return");
+    }
+
+    class SearchExecute implements Callable<List<Map<String, List<String>>>> {
+
+        SearchInstance instance;
+        int pageSize;
+
+        public SearchExecute(SearchInstance instance, int pageSize) {
+            this.instance = instance;
+            this.pageSize = pageSize;
+        }
+
+        @Override
+        public List<Map<String, List<String>>> call() throws Exception {
+            List<Map<String, List<String>>> ret = new ArrayList<>();
+            List<Map<String, List<String>>> entries;
+            while ((entries = searchExecute(instance, 0)) != null) {
+                ret.addAll(entries);
+            }
+            return  ret;
+        }
+
     }
 
     public List<Map<String, List<String>>> searchExecute(
