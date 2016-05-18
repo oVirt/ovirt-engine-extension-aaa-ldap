@@ -16,11 +16,21 @@
  */
 package org.ovirt.engineextensions.aaa.ldap;
 
-import java.net.*;
-import javax.net.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import javax.net.SocketFactory;
 
-import com.unboundid.ldap.sdk.*;
-import org.slf4j.*;
+import com.unboundid.ldap.sdk.BindRequest;
+import com.unboundid.ldap.sdk.DisconnectType;
+import com.unboundid.ldap.sdk.ExtendedRequest;
+import com.unboundid.ldap.sdk.ExtendedResult;
+import com.unboundid.ldap.sdk.LDAPConnection;
+import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.ldap.sdk.LDAPURL;
+import com.unboundid.ldap.sdk.ReferralConnector;
+import com.unboundid.ldap.sdk.ResultCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ResolverReferralConnector implements ReferralConnector {
 

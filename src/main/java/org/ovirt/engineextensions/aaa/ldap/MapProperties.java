@@ -16,9 +16,14 @@
  */
 package org.ovirt.engineextensions.aaa.ldap;
 
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 public class MapProperties {
 

@@ -16,11 +16,11 @@
  */
 package org.ovirt.engineextensions.aaa.ldap;
 
-import java.io.*;
-import java.net.*;
-import javax.net.*;
-
-import javax.naming.*;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import javax.net.SocketFactory;
 
 public class ResolverSocketFactory extends SocketFactory {
 

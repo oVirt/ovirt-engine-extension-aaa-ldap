@@ -1,6 +1,8 @@
+.idea/
 lib/
 target/
 output/
 
 build.properties
 ovirt-engine-extension-aaa-ldap.spec
+*.iml

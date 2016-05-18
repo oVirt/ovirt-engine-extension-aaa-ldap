@@ -16,12 +16,33 @@
  */
 package org.ovirt.engineextensions.aaa.ldap;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.nio.charset.*;
-import java.security.*;
-import java.util.*;
-import java.util.regex.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Util {
 
@@ -240,7 +261,7 @@ public class Util {
                         r.add(getObjectValueByString(clazz.getComponentType(), c));
                     }
                 }
-                v = (Object)r.toArray((Object[])Array.newInstance(clazz.getComponentType(), 0));
+                v = (Object)r.toArray((Object[]) Array.newInstance(clazz.getComponentType(), 0));
             }
         }
 

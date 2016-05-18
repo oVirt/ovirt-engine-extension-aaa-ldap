@@ -16,13 +16,17 @@
  */
 package org.ovirt.engineextensions.aaa.ldap;
 
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import com.unboundid.asn1.*;
+import com.unboundid.asn1.ASN1OctetString;
 import com.unboundid.util.Base64;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public enum AttrConversion {
 

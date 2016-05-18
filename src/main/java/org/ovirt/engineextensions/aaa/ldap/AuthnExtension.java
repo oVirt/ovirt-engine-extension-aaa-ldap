@@ -16,14 +16,16 @@
  */
 package org.ovirt.engineextensions.aaa.ldap;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
 
-import com.unboundid.ldap.sdk.*;
-import org.slf4j.*;
-
-import org.ovirt.engine.api.extensions.*;
-import org.ovirt.engine.api.extensions.aaa.*;
+import org.ovirt.engine.api.extensions.Base;
+import org.ovirt.engine.api.extensions.ExtMap;
+import org.ovirt.engine.api.extensions.Extension;
+import org.ovirt.engine.api.extensions.aaa.Authn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AuthnExtension implements Extension {
 

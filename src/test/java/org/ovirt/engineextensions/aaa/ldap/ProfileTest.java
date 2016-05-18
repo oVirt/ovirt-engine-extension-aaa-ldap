@@ -16,10 +16,10 @@
  */
 package org.ovirt.engineextensions.aaa.ldap;
 
-import java.io.*;
-import java.util.*;
-
-import com.unboundid.ldap.sdk.*;
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class ProfileTest {
 
