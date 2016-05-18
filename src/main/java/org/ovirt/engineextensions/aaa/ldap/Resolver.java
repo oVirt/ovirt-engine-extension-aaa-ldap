@@ -249,7 +249,7 @@ class Resolver implements Closeable {
         if (addresses.size() == 1) {
             ret = addresses;
         } else {
-            ret = new ArrayList<InetAddress>(addresses);
+            ret = new ArrayList<>(addresses);
             Collections.shuffle(ret, random);
         }
         log.debug("Return: {}", ret);

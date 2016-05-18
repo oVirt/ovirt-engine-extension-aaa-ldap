@@ -204,7 +204,7 @@ public class Framework implements Closeable {
     private static final Map<ResultCode, String> resultCodeNameMap;
     static {
         try {
-            resultCodeNameMap = new HashMap<ResultCode, String>();
+            resultCodeNameMap = new HashMap<>();
             List<ResultCode> codes = Arrays.asList(ResultCode.values());
             for (java.lang.reflect.Field field : ResultCode.class.getFields()) {
                 Object o = field.get(null);
@@ -435,7 +435,7 @@ public class Framework implements Closeable {
         if (debug != null) {
             Debug.setEnabled(
                 debug,
-                new HashSet<DebugType>(
+                new HashSet<>(
                     Util.getEnumFromString(
                         DebugType.class,
                         debugProps.getString("", "types")
@@ -1275,7 +1275,7 @@ public class Framework implements Closeable {
                     );
                     instance.connection.close();
                     instance.connection = connection;
-                    ret = new ArrayList<Map<String, List<String>>>();
+                    ret = new ArrayList<>();
                 } catch (LDAPException e) {
                     log.warn("{} Cannot connect referral '{}': {}", logPrefix, host, e.getMessage());
                     log.debug("Exception", e);
