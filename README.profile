@@ -203,6 +203,9 @@ Pool of LDAP connections, based on specific policy.
     pool.@ID@.*
 
     # CONNECTION OPTIONS
+    pool.default.connection-options.abandonOnTimeout = true
+    pool.default.connection-options.connectTimeoutMillis = 5000
+    pool.default.connection-options.responseTimeoutMillis = 60000
     # Class: LDAPConnectionOptions.
     # Documentation and options at:
     # https://docs.ldap.com/ldap-sdk/docs/javadoc/com/unboundid/ldap/sdk/LDAPConnectionOptions.html
