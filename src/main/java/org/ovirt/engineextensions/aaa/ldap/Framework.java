@@ -977,7 +977,7 @@ public class Framework implements Closeable {
                     vars.put(VARS_MESSAGE, "Password expired");
                 }
             } catch(LDAPException e1) {
-                log.debug("Ignoring xception during get of expired control", e1);
+                log.debug("Ignoring exception during get of expired control", e1);
             }
         } catch(Exception e) {
             log.debug("Authentication exception", e);

@@ -569,7 +569,7 @@ public class AuthzExtension implements Extension {
             if (entries == null) {
                 throw new RuntimeException(String.format("Cannot locate principal '%s'", principal));
             } else if (entries.size() != 1) {
-                throw new RuntimeException(String.format("Expected signle result (%s) while searching principal '%s'", entries.size(), principal));
+                throw new RuntimeException(String.format("Expected single result (%s) while searching principal '%s'", entries.size(), principal));
             }
             principalRecord = transformSearchToRecord(
                 entries.get(0),
