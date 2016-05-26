@@ -1,22 +1,3 @@
-%if 0%{?rhel}
-%if 0%{?rhel} < 7
-%global java_devel java7-devel
-%if 0%{?centos}
-%global slf4j slf4j
-%else
-%global slf4j slf4j-eap6
-%endif
-%else
-%global java_devel java-devel >= 1.7.0
-%global slf4j slf4j
-%endif
-%endif
-
-%if 0%{?fedora}
-%global java_devel java-devel >= 1.7.0
-%global slf4j slf4j
-%endif
-
 %global make_common_opts \\\
 	PREFIX=%{_prefix} \\\
 	SYSCONF_DIR=%{_sysconfdir} \\\
@@ -34,18 +15,13 @@ URL:		http://www.ovirt.org
 BuildArch:	noarch
 Source:		http://resources.ovirt.org/pub/src/%{name}/%{name}-@PACKAGE_VERSION@.tar.gz
 
-BuildRequires:	%{java_devel}
-BuildRequires:	%{slf4j} >= 1.7
+BuildRequires:	java-devel >= 1.7.0
+BuildRequires:	slf4j >= 1.7
 BuildRequires:	ant
 BuildRequires:	jpackage-utils
 BuildRequires:	ovirt-engine-extensions-api
 BuildRequires:	unboundid-ldapsdk
 
-%if 0%{?rhel}
-%if 0%{?rhel} < 7
-BuildRequires:	ant-nodeps
-%endif
-%endif
 
 Requires:	ovirt-engine >= 3.5
 Requires:	unboundid-ldapsdk >= 2.3.7
@@ -71,7 +47,7 @@ Setup package for Generic LDAP.
 cat > build.properties << __EOF__
 package.display.name=%{name}-%{version}-%{release}
 build.checks.statics.enable=false
-jar.slf4j-api=$(build-classpath %{slf4j}/slf4j-api)
+jar.slf4j-api=$(build-classpath slf4j/slf4j-api)
 jar.ovirt-engine-extensions-api=$(build-classpath ovirt-engine/ovirt-engine-extensions-api)
 jar.unboundid-ldapsdk=$(build-classpath unboundid-ldapsdk)
 __EOF__
