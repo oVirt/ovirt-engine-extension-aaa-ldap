@@ -1,7 +1,9 @@
 oVirt LDAP authentication and authorization extension
 
-????-??-?? - Version 1.1.5
-
+2016-05-26 - Version 1.2.0
+ * setup: ask for SSO and name authz properly
+ * packaging: Remove EL6 support from spec
+ * doc: README.profile: add default connection option values
 
 2016-04-18 - Version 1.1.4
 
