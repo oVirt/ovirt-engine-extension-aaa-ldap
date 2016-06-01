@@ -578,44 +578,6 @@ class Plugin(plugin.PluginBase):
             ),
         )
 
-        if self.environment[constants.LDAPEnv.AAA_USE_VM_SSO] is None:
-            self.environment[
-                constants.LDAPEnv.AAA_USE_VM_SSO
-            ] = self.dialog.queryString(
-                name='OVAAALDAP_LDAP_AAA_USE_VM_SSO',
-                note=_(
-                    'Are you going to use Single Sing-On for Virtual Machines'
-                    ' (@VALUES@) [@DEFAULT@]: '
-                ),
-                prompt=True,
-                caseSensitive=False,
-                validValues=(_('Yes'), _('No')),
-                default=_('No'),
-            ) != _('No').lower()
-
-        if self.environment[constants.LDAPEnv.AAA_USE_VM_SSO]:
-            self.dialog.note(
-                (
-                    _('NOTE:'),
-                    _(
-                        'Profile name has to match domain name, otherwise '
-                        'Single Sign-On for Virtual Machines will not work.'
-                    ),
-                )
-            )
-
-        if self.environment[constants.LDAPEnv.AAA_PROFILE_NAME] is None:
-            self.environment[
-                constants.LDAPEnv.AAA_PROFILE_NAME
-            ] = self.dialog.queryString(
-                name='OVAAALDAP_LDAP_AAA_PROFILE',
-                note=_(
-                    'Please specify profile name that will be visible '
-                    'to users: '
-                ),
-                prompt=True,
-            )
-
         if self.environment[constants.LDAPEnv.PROFILE] is None:
             profiles = []
             values = {}
@@ -842,6 +804,52 @@ class Plugin(plugin.PluginBase):
             self.environment[
                 otopicons.CoreEnv.LOG_FILTER
             ].append(self.environment[constants.LDAPEnv.PASSWORD])
+
+        if self.environment[constants.LDAPEnv.AAA_USE_VM_SSO] is None:
+            self.environment[
+                constants.LDAPEnv.AAA_USE_VM_SSO
+            ] = self.dialog.queryString(
+                name='OVAAALDAP_LDAP_AAA_USE_VM_SSO',
+                note=_(
+                    'Are you going to use Single Sing-On for Virtual Machines'
+                    ' (@VALUES@) [@DEFAULT@]: '
+                ),
+                prompt=True,
+                caseSensitive=False,
+                validValues=(_('Yes'), _('No')),
+                default=_('No'),
+            ) != _('No').lower()
+
+        if self.environment[constants.LDAPEnv.AAA_USE_VM_SSO]:
+            self.dialog.note(
+                (
+                    _('NOTE:'),
+                    _(
+                        'Profile name has to match domain name, otherwise '
+                        'Single Sign-On for Virtual Machines will not work.'
+                    ),
+                )
+            )
+
+        # Default profile name:
+        default = ''
+        if self.environment[constants.LDAPEnv.SERVERSET] == 'single':
+            default = self.environment[constants.LDAPEnv.HOSTS]
+        elif self.environment[constants.LDAPEnv.SERVERSET] == 'srvrecord':
+            default = self.environment[constants.LDAPEnv.DOMAIN]
+
+        if self.environment[constants.LDAPEnv.AAA_PROFILE_NAME] is None:
+            self.environment[
+                constants.LDAPEnv.AAA_PROFILE_NAME
+            ] = self.dialog.queryString(
+                name='OVAAALDAP_LDAP_AAA_PROFILE',
+                note=_(
+                    'Please specify profile name that will be visible to '
+                    'users %s: ' % ('[%s]' % default if default else '')
+                ),
+                default=default if default else None,
+                prompt=True,
+            )
 
 
 # vim: expandtab tabstop=4 shiftwidth=4
