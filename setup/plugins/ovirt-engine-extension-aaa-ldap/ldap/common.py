@@ -442,11 +442,12 @@ class Plugin(plugin.PluginBase):
                     c.start_tls_s()
 
                 self.logger.debug('Perform search')
-                ret = c.search_s(
+                ret = c.search_st(
                     '',
                     ldap.SCOPE_BASE,
                     '(objectClass=*)',
                     ['supportedLDAPVersion'],
+                    timeout=60,
                 )
                 self.logger.debug('Result: %s', ret)
                 if ret:
