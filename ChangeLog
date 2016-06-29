@@ -1,5 +1,7 @@
 oVirt LDAP authentication and authorization extension
 
+????-??-?? - Version 1.2.2
+
 2016-06-30 - Version 1.2.1
  * doc: README: specify configuration of kerberos in oVirt 4.0
  * profiles: ipa: Fix account expiration date
