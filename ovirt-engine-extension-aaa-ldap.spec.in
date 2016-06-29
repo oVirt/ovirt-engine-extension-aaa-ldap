@@ -7,7 +7,7 @@
 	%{nil}
 Name:		@PACKAGE_NAME@
 Version:	@RPM_VERSION@
-Release:	@RPM_RELEASE@%{?release_suffix}%{?dist}
+Release:	@RPM_RELEASE@%{?dist}
 License:	ASL 2.0
 Summary:	oVirt Script Engine Gateway Extension
 Group:		Virtualization/Management
@@ -84,6 +84,9 @@ __EOF__
 %{_datadir}/%{name}/setup/
 
 %changelog
+* Fri Jun 30 2016 Martin Perina <mperina@redhat.com> 1.2.1-1
+- Fixed bugs: BZ1349178, BZ1349305, BZ1340380
+
 * Thu May 26 2016 Martin Perina <mperina@redhat.com> 1.2.0-1
 - Fixed bug: BZ1333878
 - Removed EL6 build support
