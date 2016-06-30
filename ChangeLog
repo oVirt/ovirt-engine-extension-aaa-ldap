@@ -1,5 +1,7 @@
 oVirt LDAP authentication and authorization extension
 
+????-??-?? - Version 1.1.6
+
 2016-06-30 - Version 1.1.5
 
  * profiles: ipa: Fix account expiration date
