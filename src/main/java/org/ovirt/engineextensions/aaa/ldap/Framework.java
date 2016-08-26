@@ -912,7 +912,7 @@ public class Framework implements Closeable {
             );
             log.debug("BindRequest: {}", bindRequest);
 
-            log.debug("bind");
+            log.debug("User '{}' is performing bind request to: {}", user, connection.getConnectedAddress());
             BindResult bindResult = connection.bind(bindRequest);
             log.debug("BindResult: {}", bindResult);
 
@@ -1249,10 +1249,14 @@ public class Framework implements Closeable {
                     )
                 );
             }
-            log.debug("SearchRequest: {}", instance.searchRequest);
             instance.resumeCookie = null;
             SearchResult searchResult;
             try {
+                log.debug(
+                    "Performing SearchRequest '{}' request on server '{}'",
+                    instance.searchRequest,
+                    instance.connection.getConnectedAddress()
+                );
                 searchResult = instance.connection.search(instance.searchRequest);
             } catch (LDAPSearchException e) {
                 log.debug("SearchRequest: Exception {}", (Object)e);
