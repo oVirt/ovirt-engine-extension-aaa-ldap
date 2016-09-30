@@ -39,6 +39,11 @@ class Plugin(plugin.PluginBase):
             'basedn': 'defaultNamingContext',
         },
         {
+            'display': _('IBM Security Directory Server'),
+            'profile': constants.PROFILES.ISDS,
+            'basedn': 'namingContexts',
+        },
+        {
             'display': _('IPA'),
             'profile': constants.PROFILES.IPA,
             'basedn': 'defaultNamingContext',
@@ -62,6 +67,11 @@ class Plugin(plugin.PluginBase):
             'display': _('389ds RFC-2307 Schema'),
             'profile': constants.PROFILES.RFC2307_389DS,
             'basedn': 'defaultNamingContext',
+        },
+        {
+            'display': _('IBM Security Directory Server RFC-2307 Schema'),
+            'profile': constants.PROFILES.RFC2307_ISDS,
+            'basedn': 'namingContexts',
         },
         {
             'display': _('RHDS RFC-2307 Schema'),
