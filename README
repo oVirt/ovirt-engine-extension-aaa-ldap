@@ -301,6 +301,7 @@ out of scope for this document.
    oVirt 3.x
    ---------
 
+   # mod_auth_kerb module has to be enabled and loaded
    <LocationMatch ^(/ovirt-engine/(webadmin|userportal|api)|/api)>
        RewriteEngine on
        RewriteCond %{LA-U:REMOTE_USER} ^(.*)$
@@ -323,28 +324,26 @@ out of scope for this document.
    oVirt 4.x
    ---------
 
-   <LocationMatch ^/ovirt-engine/sso/(interactive-login-negotiate|oauth/token-http-auth)>
+   # mod_auth_gssapi and mod_session modules have to be enabled and loaded
+   <LocationMatch ^/ovirt-engine/sso/(interactive-login-negotiate|oauth/token-http-auth)|^/ovirt-engine/api>
+     <If "req('Authorization') !~ /^(Bearer|Basic)/i">
        RewriteEngine on
        RewriteCond %{LA-U:REMOTE_USER} ^(.*)$
-       RewriteRule ^(.*)$ - [L,P,E=REMOTE_USER:%1]
+       RewriteRule ^(.*)$ - [L,NS,P,E=REMOTE_USER:%1]
        RequestHeader set X-Remote-User %{REMOTE_USER}s
 
-       AuthType Kerberos
+       AuthType GSSAPI
        AuthName "Kerberos Login"
 
-       # Modify to match installation
-       Krb5Keytab /etc/krb5.keytab
+       GssapiCredStore keytab:/etc/httpd/http.keytab
+       GssapiUseSessions On
+       Session On
+       SessionCookieName ovirt_gssapi_session path=/private;httponly;secure;
 
-
-       # Modify to match installation
-       KrbAuthRealms REALM.COM
-
-       KrbMethodK5Passwd off
        Require valid-user
-
        ErrorDocument 401 "<html><meta http-equiv=\"refresh\" content=\"0; url=/ovirt-engine/sso/login-unauthorized\"/><body><a href=\"/ovirt-engine/sso/login-unauthorized\">Here</a></body></html>"
+     </If>
    </LocationMatch>
-
 
 WARNING!!!
 
