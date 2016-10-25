@@ -131,6 +131,15 @@ class Plugin(plugin.PluginBase):
             'config.profile.file.1 = ../aaa/{aaaprofile}.properties\n'
         ).format(**mydict).splitlines()
 
+        if self.environment[constants.LDAPEnv.BASE_DN] is not None:
+            self.environment[
+                constants.LDAPEnv.CONFIG_AUTHZ
+            ].append(
+                'config.globals.baseDN.simple_baseDN = %s' % (
+                    self.environment[constants.LDAPEnv.BASE_DN]
+                )
+            )
+
         #
         # This is ugly, however, we want human readable output.
         #

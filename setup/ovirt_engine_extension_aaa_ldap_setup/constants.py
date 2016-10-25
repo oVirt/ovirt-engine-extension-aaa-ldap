@@ -82,6 +82,22 @@ class CoreEnv(object):
 
 @util.export
 @util.codegen
+class PROFILES(object):
+    AD = 'ad'
+    DS_389 = '389ds'
+    IPA = 'ipa'
+    IPLANET = 'iplanet'
+    OPENLDAP = 'openldap'
+    RFC2307_GENERIC = 'rfc2307-generic'
+    RFC2307_389DS = 'rfc2307-389ds'
+    RFC2307_RHDS = 'rfc2307-rhds'
+    RFC2307_EDIR = 'rfc2307-edir'
+    RFC2307_OPENLDAP = 'rfc2307-openldap'
+    RHDS = 'rhds'
+
+
+@util.export
+@util.codegen
 class LDAPEnv(object):
 
     RESOLVER = 'OVAAALDAP_LDAP/resolver'
@@ -100,6 +116,7 @@ class LDAPEnv(object):
     PASSWORD = 'OVAAALDAP_LDAP/password'
     SOCKET_FACTORY = 'OVAAALDAP_LDAP/socketFactory'
     AAA_PROFILE_NAME = 'OVAAALDAP_LDAP/aaaProfileName'
+    BASE_DN = 'OVAAALDAP_LDAP/baseDN'
     AAA_USE_VM_SSO = 'OVAAALDAP_LDAP/useVmSso'
 
     CONFIG_AUTHN_FILE_NAME = 'OVAAALDAP_LDAP/configAuthnFileName'

@@ -35,7 +35,7 @@ class Plugin(plugin.PluginBase):
     MY_PROFILES = (
         {
             'display': _('Active Directory'),
-            'profile': 'ad',
+            'profile': constants.PROFILES.AD,
         },
     )
 

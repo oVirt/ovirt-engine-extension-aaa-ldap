@@ -35,47 +35,58 @@ class Plugin(plugin.PluginBase):
     MY_PROFILES = (
         {
             'display': _('389ds'),
-            'profile': '389ds',
+            'profile': constants.PROFILES.DS_389,
+            'basedn': 'defaultNamingContext',
         },
         {
             'display': _('IPA'),
-            'profile': 'ipa',
+            'profile': constants.PROFILES.IPA,
+            'basedn': 'defaultNamingContext',
         },
         {
             'display': _('iPlanet'),
-            'profile': 'iplanet',
+            'profile': constants.PROFILES.IPLANET,
+            'basedn': 'namingContexts',
         },
         {
             'display': _('OpenLDAP Standard Schema'),
-            'profile': 'openldap',
+            'profile': constants.PROFILES.OPENLDAP,
+            'basedn': 'namingContexts',
         },
         {
             'display': _('RFC-2307 Schema (Generic)'),
-            'profile': 'rfc2307-generic',
+            'profile': constants.PROFILES.RFC2307_GENERIC,
+            'basedn': 'namingContexts',
         },
         {
             'display': _('389ds RFC-2307 Schema'),
-            'profile': 'rfc2307-389ds',
+            'profile': constants.PROFILES.RFC2307_389DS,
+            'basedn': 'defaultNamingContext',
         },
         {
             'display': _('RHDS RFC-2307 Schema'),
-            'profile': 'rfc2307-rhds',
+            'profile': constants.PROFILES.RFC2307_RHDS,
+            'basedn': 'defaultNamingContext',
         },
         {
             'display': _('Novell eDirectory RFC-2307 Schema'),
-            'profile': 'rfc2307-edir',
+            'profile': constants.PROFILES.RFC2307_EDIR,
+            'basedn': 'namingContexts',
         },
         {
             'display': _('OpenLDAP RFC-2307 Schema'),
-            'profile': 'rfc2307-openldap',
+            'profile': constants.PROFILES.RFC2307_OPENLDAP,
+            'basedn': 'namingContexts',
         },
         {
             'display': _('Oracle Unified Directory RFC-2307 Schema'),
-            'profile': 'rfc2307-openldap',
+            'profile': constants.PROFILES.RFC2307_OPENLDAP,
+            'basedn': 'namingContexts',
         },
         {
             'display': _('RHDS'),
-            'profile': 'rhds',
+            'profile': constants.PROFILES.RFC2307_RHDS,
+            'basedn': 'defaultNamingContext',
         },
     )
 

@@ -554,6 +554,10 @@ class Plugin(plugin.PluginBase):
             constants.LDAPEnv.INSECURE,
             False
         )
+        self.environment.setdefault(
+            constants.LDAPEnv.BASE_DN,
+            None
+        )
         self.environment[
             constants.LDAPEnv.RESOLVER
         ] = self._resolver
@@ -805,6 +809,46 @@ class Plugin(plugin.PluginBase):
             self.environment[
                 otopicons.CoreEnv.LOG_FILTER
             ].append(self.environment[constants.LDAPEnv.PASSWORD])
+
+        if (
+            self.environment[
+                constants.LDAPEnv.BASE_DN
+            ] is None and
+            self.environment[
+                constants.LDAPEnv.PROFILE
+            ] != constants.PROFILES.AD
+        ):
+            basedn = [
+                v['basedn'] for v in self.environment[
+                    constants.LDAPEnv.AVAILABLE_PROFILES
+                ] if v['profile'] == self.environment[
+                    constants.LDAPEnv.PROFILE
+                ]
+            ]
+            self.logger.debug('Perform search for base DN: %s', basedn)
+            result = connection.search_st(
+                '',
+                ldap.SCOPE_BASE,
+                '(objectClass=*)',
+                basedn,
+                timeout=60,
+            )[0][1]
+            self.logger.debug('Result: %s', result)
+            if result:
+                values = result.values()[0]
+                default = values[0]
+                self.environment[
+                    constants.LDAPEnv.BASE_DN
+                ] = self.dialog.queryString(
+                    name='OVAAALDAP_LDAP_BASE_DN',
+                    note=_(
+                        'Please enter base DN (%s) [@DEFAULT@]: ' % (
+                            ','.join(values)
+                        )
+                    ),
+                    default=default,
+                    prompt=True,
+                )
 
         if self.environment[constants.LDAPEnv.AAA_USE_VM_SSO] is None:
             self.environment[
