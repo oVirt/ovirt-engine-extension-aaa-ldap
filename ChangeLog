@@ -1,6 +1,8 @@
 oVirt LDAP authentication and authorization extension
 
-????-??-?? - Version 1.2.2
+2016-10-31 - Version 1.2.2
+ * doc: Update doc and examples to use mod_auth_gssapi and mod_session instead
+ of mod_auth_kerb for Kerberos SSO setup
 
 2016-06-30 - Version 1.2.1
  * doc: README: specify configuration of kerberos in oVirt 4.0
