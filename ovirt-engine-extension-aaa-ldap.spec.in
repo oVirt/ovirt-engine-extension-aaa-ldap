@@ -15,7 +15,7 @@ URL:		http://www.ovirt.org
 BuildArch:	noarch
 Source:		http://resources.ovirt.org/pub/src/%{name}/%{name}-@PACKAGE_VERSION@.tar.gz
 
-BuildRequires:	java-devel >= 1.7.0
+BuildRequires:	java-1.8.0-openjdk-devel >= 1:1.8.0
 BuildRequires:	slf4j >= 1.7
 BuildRequires:	ant
 BuildRequires:	jpackage-utils

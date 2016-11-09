@@ -115,8 +115,8 @@
 			includeantruntime="no"
 			srcdir="src/main/java"
 			destdir="${build.intermediate}/main"
-			source="1.7"
-			target="1.7"
+			source="1.8"
+			target="1.8"
 		>
 			<compilerarg value="-Xlint"/>
 			<classpath refid="classpath.buildtime"/>
@@ -148,8 +148,8 @@
 			includeantruntime="no"
 			srcdir="src/test/java"
 			destdir="${build.intermediate}/test"
-			source="1.7"
-			target="1.7"
+			source="1.8"
+			target="1.8"
 		>
 			<compilerarg value="-Xlint"/>
 			<classpath refid="classpath.runtime"/>
