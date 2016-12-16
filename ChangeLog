@@ -1,6 +1,10 @@
 oVirt LDAP authentication and authorization extension
 
-????-??-? - Version 1.2.3
+2016-12-16 - Version 1.3.0
+ * profiles: ad: Use LDAP_MATCHING_RULE_IN_CHAIN to speed up group memberships
+ resolution
+ * profiles: ad: Add support for domain local group memberships resolution
+ * profiles: isds: Add support for IBM Security Directory Server
 
 2016-10-31 - Version 1.2.2
  * doc: Update doc and examples to use mod_auth_gssapi and mod_session instead
