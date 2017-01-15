@@ -856,7 +856,7 @@ class Plugin(plugin.PluginBase):
             ] = self.dialog.queryString(
                 name='OVAAALDAP_LDAP_AAA_USE_VM_SSO',
                 note=_(
-                    'Are you going to use Single Sing-On for Virtual Machines'
+                    'Are you going to use Single Sign-On for Virtual Machines'
                     ' (@VALUES@) [@DEFAULT@]: '
                 ),
                 prompt=True,
