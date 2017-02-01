@@ -776,7 +776,8 @@ class Plugin(plugin.PluginBase):
                 user = self.dialog.queryString(
                     name='OVAAALDAP_LDAP_USER',
                     note=_(
-                        'Enter search user DN (empty for anonymous): '
+                        'Enter search user DN (for example uid=username,'
+                        'dc=example,dc=com or leave empty for anonymous): '
                     ),
                     prompt=True,
                     default='',
