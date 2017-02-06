@@ -1,0 +1,7 @@
+ant
+git
+java-1.7.0-openjdk-devel
+jpackage-utils
+ovirt-engine-extensions-api
+unboundid-ldapsdk
+yum-utils

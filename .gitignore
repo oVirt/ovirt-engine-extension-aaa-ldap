@@ -4,3 +4,10 @@ output/
 
 build.properties
 ovirt-engine-extension-aaa-ldap.spec
+
+*.iml
+.idea
+
+.bash_history
+exported-artifacts
+mocker*.cfg
