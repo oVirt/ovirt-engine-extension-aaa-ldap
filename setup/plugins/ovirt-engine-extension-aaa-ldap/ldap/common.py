@@ -583,7 +583,18 @@ class Plugin(plugin.PluginBase):
             ),
         )
 
-        if self.environment[constants.LDAPEnv.PROFILE] is None:
+        if self.environment[constants.LDAPEnv.PROFILE] is not None:
+            if self.environment[constants.LDAPEnv.PROFILE] not in [
+                e['profile'] for e in self.environment[
+                    constants.LDAPEnv.AVAILABLE_PROFILES
+                ]
+            ]:
+                raise self.SoftRuntimeError(
+                    _("Profile {profile} was not found.").format(
+                        profile=self.environment[constants.LDAPEnv.PROFILE],
+                    )
+                )
+        else:
             profiles = []
             values = {}
             for i, p in enumerate(
