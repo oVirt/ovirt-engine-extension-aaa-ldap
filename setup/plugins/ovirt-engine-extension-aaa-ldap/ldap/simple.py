@@ -95,7 +95,7 @@ class Plugin(plugin.PluginBase):
         },
         {
             'display': _('RHDS'),
-            'profile': constants.PROFILES.RFC2307_RHDS,
+            'profile': constants.PROFILES.RHDS,
             'basedn': 'defaultNamingContext',
         },
     )
