@@ -1,6 +1,8 @@
 oVirt LDAP authentication and authorization extension
 
-????-??-? - Version 1.2.3
+2017-02-09 - Version 1.2.3
+ * setup: Fix typo in SSO question
+ * packaging: Include scripts for standard CI builds
 
 2016-10-31 - Version 1.2.2
  * doc: Update doc and examples to use mod_auth_gssapi and mod_session instead
