@@ -709,16 +709,22 @@ public class Framework implements Closeable {
 
         log.debug("Creating LDAPConnectionPool");
         MapProperties cpoolProps = poolProps.get("connection-pool");
-        LDAPConnectionPool connectionPool = new LDAPConnectionPool(
-            serverset,
-            bindRequest,
-            cpoolProps.getInt(1, "initialConnections"),
-            cpoolProps.getInt(10, "maxConnections"),
-            cpoolProps.getInt(1, "initialConnectThreads"),
-            postConnectProcessor,
-            true
-        );
-        Util.setObjectByProperties(connectionPool, cpoolProps, "set");
+
+        LDAPConnectionPool connectionPool = null;
+        try {
+            connectionPool = new LDAPConnectionPool(
+                serverset,
+                bindRequest,
+                cpoolProps.getInt(1, "initialConnections"),
+                cpoolProps.getInt(10, "maxConnections"),
+                cpoolProps.getInt(1, "initialConnectThreads"),
+                postConnectProcessor,
+                true
+            );
+            Util.setObjectByProperties(connectionPool, cpoolProps, "set");
+        } catch (LDAPException ex) {
+            log.warn("Exception: {}", ex.getMessage());
+        }
         log.debug("createConnectionPool Return: {}", connectionPool);
 
         return connectionPool;
@@ -735,30 +741,32 @@ public class Framework implements Closeable {
         entry.props = poolProps;
         entry.connectionPool = createConnectionPool(entry.props);
 
-        RootDSE rootDSE = entry.connectionPool.getRootDSE();
-        if (rootDSE != null) {
-            log.info(
-                "{} LDAP pool '{}' information: vendor='{}' version='{}'",
-                logPrefix,
-                name,
-                rootDSE.getVendorName(),
-                rootDSE.getVendorVersion()
-            );
-            if (log.isDebugEnabled()) {
-                log.debug("RootDSE: {}", rootDSE.getAttributes());
-            }
+        if (entry.connectionPool != null) {
+            RootDSE rootDSE = entry.connectionPool.getRootDSE();
+            if (rootDSE != null) {
+                log.info(
+                    "{} LDAP pool '{}' information: vendor='{}' version='{}'",
+                    logPrefix,
+                    name,
+                    rootDSE.getVendorName(),
+                    rootDSE.getVendorVersion()
+                );
+                if (log.isDebugEnabled()) {
+                    log.debug("RootDSE: {}", rootDSE.getAttributes());
+                }
 
-            String supportedControls[] = rootDSE.getSupportedControlOIDs();
-            if (supportedControls != null) {
-                List<String> supportedControlsList = Arrays.asList(supportedControls);
-                entry.supportPaging = supportedControlsList.contains(SimplePagedResultsControl.PAGED_RESULTS_OID);
-            }
+                String supportedControls[] = rootDSE.getSupportedControlOIDs();
+                if (supportedControls != null) {
+                    List<String> supportedControlsList = Arrays.asList(supportedControls);
+                    entry.supportPaging = supportedControlsList.contains(SimplePagedResultsControl.PAGED_RESULTS_OID);
+                }
 
-            String supportedExtendedOperations[] = rootDSE.getSupportedExtendedOperationOIDs();
-            if (supportedExtendedOperations != null) {
-                List<String> supportedExtendedOperationsList = Arrays.asList(supportedExtendedOperations);
-                entry.supportPasswordModify = supportedExtendedOperationsList.contains(PasswordModifyExtendedRequest.PASSWORD_MODIFY_REQUEST_OID);
-                entry.supportWhoAmI = supportedExtendedOperationsList.contains(WhoAmIExtendedRequest.WHO_AM_I_REQUEST_OID);
+                String supportedExtendedOperations[] = rootDSE.getSupportedExtendedOperationOIDs();
+                if (supportedExtendedOperations != null) {
+                    List<String> supportedExtendedOperationsList = Arrays.asList(supportedExtendedOperations);
+                    entry.supportPasswordModify = supportedExtendedOperationsList.contains(PasswordModifyExtendedRequest.PASSWORD_MODIFY_REQUEST_OID);
+                    entry.supportWhoAmI = supportedExtendedOperationsList.contains(WhoAmIExtendedRequest.WHO_AM_I_REQUEST_OID);
+                }
             }
         }
 
@@ -1261,7 +1269,13 @@ public class Framework implements Closeable {
         if (!instance.done) {
             if (instance.connection == null) {
                 log.debug("Getting connection out of pool '{}'", instance.connectionPoolEntry.name);
-                instance.connection = instance.connectionPoolEntry.connectionPool.getConnection();
+                if (instance.connectionPoolEntry.connectionPool != null) {
+                    instance.connection = instance.connectionPoolEntry.connectionPool.getConnection();
+                }
+            }
+            if (instance.connection == null) {
+                log.warn("Ignoring records from pool: '{}'", instance.connectionPoolEntry.name);
+                return ret;
             }
 
             if (instance.doPaging) {

@@ -125,6 +125,10 @@ public class AuthzExtension implements Extension {
     private List<Map<String, List<String>>> executeVarQuery(Map<String, Object> vars, String varName) throws LDAPException {
         List<Map<String, List<String>>> ret = new ArrayList<>();
 
+        if (vars == null) {
+            return ret;
+        }
+
         List<String> queryVars = new ArrayList<>();
         for (String var : vars.keySet()) {
             if (var.startsWith(varName)) {
