@@ -144,6 +144,34 @@ config.profile.file.1 = @PROFILE_CONFIGURATION@
 @PROFILE_CONFIGURATION@
     Profile configuration file, may be relative to extension configuration.
 
+REMOVING CONFIGURED PROFILE
+---------------------------
+
+Following steps describe how to remove a configured LDAP profile (profile name
+'profile1' is assumed in commands, please adapt to profile name that should be
+removed):
+
+  1. Remove profile configuration files
+
+      rm /etc/ovirt-engine/extensions.d/profile1-authn.properties
+      rm /etc/ovirt-engine/extensions.d/profile1-authz.properties
+      rm /etc/ovirt-engine/aaa/profile1.properties
+
+  2. Restart ovirt-engine
+
+      systemctl restart ovirt-engine
+
+
+Note:
+  The above steps will remove profile configuration, so users from this
+  profile will no longer be able to login into engine. But those users still
+  have permissions defined in engine, so if you want to remove those
+  permissions you need to do following:
+
+    1. Login into webadmin and switch to Users tab
+    2. Remove all users from the provider you have removed above (they should
+       have their Authorization provider set to 'profile1-authz'
+
 PROFILE CONFIGURATION EXAMPLES
 ------------------------------
 
