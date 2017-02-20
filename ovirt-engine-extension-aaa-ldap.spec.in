@@ -7,7 +7,7 @@
 	%{nil}
 Name:		@PACKAGE_NAME@
 Version:	@RPM_VERSION@
-Release:	@RPM_RELEASE@%{?release_suffix}%{?dist}
+Release:	@RPM_RELEASE@%{?dist}
 License:	ASL 2.0
 Summary:	oVirt Script Engine Gateway Extension
 Group:		Virtualization/Management
@@ -84,6 +84,9 @@ __EOF__
 %{_datadir}/%{name}/setup/
 
 %changelog
+* Mon Feb 20 2017 Martin Perina <mperina@redhat.com> 1.3.1-1
+- Fixed bugs: BZ1413144, BZ1408678, BZ1420745, BZ1420281, BZ1409827
+
 * Fri Dec 16 2016 Martin Perina <mperina@redhat.com> 1.3.0-1
 - Fixed bugs: BZ1379000, BZ1387254, BZ1353750, BZ1393407
 
