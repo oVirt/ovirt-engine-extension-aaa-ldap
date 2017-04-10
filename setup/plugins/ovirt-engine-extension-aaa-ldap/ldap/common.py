@@ -17,6 +17,7 @@
 
 import gettext
 import ldap
+import ldap.dn
 import re
 import socket
 import ssl
@@ -849,18 +850,27 @@ class Plugin(plugin.PluginBase):
             if result:
                 values = result.values()[0]
                 default = values[0]
-                self.environment[
+                base_dn = None
+                while self.environment[
                     constants.LDAPEnv.BASE_DN
-                ] = self.dialog.queryString(
-                    name='OVAAALDAP_LDAP_BASE_DN',
-                    note=_(
-                        'Please enter base DN (%s) [@DEFAULT@]: ' % (
-                            ','.join(values)
-                        )
-                    ),
-                    default=default,
-                    prompt=True,
-                )
+                ] is None:
+                    base_dn = self.dialog.queryString(
+                        name='OVAAALDAP_LDAP_BASE_DN',
+                        note=_(
+                            'Please enter base DN (%s) [@DEFAULT@]: ' % (
+                                ','.join(values)
+                            )
+                        ),
+                        default=default,
+                        prompt=True,
+                    )
+                    try:
+                        ldap.dn.str2dn(base_dn)
+                        self.environment[
+                            constants.LDAPEnv.BASE_DN
+                        ] = base_dn
+                    except ldap.DECODING_ERROR as e:
+                        self.logger.error("'%s' is not valid DN", base_dn)
 
         if self.environment[constants.LDAPEnv.AAA_USE_VM_SSO] is None:
             self.environment[
