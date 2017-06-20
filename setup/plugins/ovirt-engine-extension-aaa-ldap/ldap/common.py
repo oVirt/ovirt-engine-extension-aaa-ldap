@@ -884,7 +884,7 @@ class Plugin(plugin.PluginBase):
                 prompt=True,
                 caseSensitive=False,
                 validValues=(_('Yes'), _('No')),
-                default=_('No'),
+                default=_('Yes'),
             ) != _('No').lower()
 
         if self.environment[constants.LDAPEnv.AAA_USE_VM_SSO]:
