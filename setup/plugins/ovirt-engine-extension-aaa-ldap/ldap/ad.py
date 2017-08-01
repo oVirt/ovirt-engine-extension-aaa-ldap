@@ -39,44 +39,35 @@ class Plugin(plugin.PluginBase):
         },
     )
 
-    def _resolve(self):
-        ret = True
+    def _resolveGC(self):
+        self.logger.info(
+            _('Resolving Global Catalog SRV record for {domain}').format(
+                domain=self.environment[constants.LDAPEnv.DOMAIN],
+            )
+        )
 
-        for e in (
-            ('gc._msdcs.', _('Global Catalog')),
-            ('', _('LDAP')),
+        if not self.environment[constants.LDAPEnv.RESOLVER](
+            plugin=self,
+            record='SRV',
+            what='_ldap._tcp.gc._msdcs.%s' % (
+                self.environment[
+                    constants.LDAPEnv.DOMAIN
+                ],
+            )
         ):
-            self.logger.info(
-                _('Resolving {what} SRV record for {domain}').format(
-                    what=e[1],
+            self.logger.warning(
+                _(
+                    'Cannot resolve Global Catalog SRV record for {domain}. '
+                    'Please check you have entered correct Active '
+                    'Directory forest name and check that forest '
+                    'is resolvable by your system DNS servers'
+                ).format(
                     domain=self.environment[constants.LDAPEnv.DOMAIN],
                 )
             )
+            return False
 
-            if not self.environment[constants.LDAPEnv.RESOLVER](
-                plugin=self,
-                record='SRV',
-                what='_ldap._tcp.%s%s' % (
-                    e[0],
-                    self.environment[
-                        constants.LDAPEnv.DOMAIN
-                    ],
-                )
-            ):
-                self.logger.warning(
-                    _(
-                        'Cannot resolve {what} SRV record for {domain}. '
-                        'Please check you have entered correct Active '
-                        'Directory forest name and check that forest '
-                        'is resolvable by your system DNS servers'
-                    ).format(
-                        what=e[1],
-                        domain=self.environment[constants.LDAPEnv.DOMAIN],
-                    )
-                )
-                ret = False
-
-        return ret
+        return True
 
     def __init__(self, context):
         super(Plugin, self).__init__(context=context)
@@ -113,9 +104,14 @@ class Plugin(plugin.PluginBase):
                 note=_('Please enter Active Directory Forest name: '),
                 prompt=True,
             )
-            if not self._resolve():
+            if not self._resolveGC():
                 raise RuntimeError(
-                    _("Active Directory forest is not resolvable")
+                    _("Active Directory forest is not resolvable, please make"
+                      " sure you've entered correct forest name. If for some"
+                      " reason you can't use forest and you need some special"
+                      " configuration instead, please refer to examples"
+                      " directory provided by ovirt-engine-extension-aaa-ldap"
+                      " package.")
                 )
 
         self.environment[
