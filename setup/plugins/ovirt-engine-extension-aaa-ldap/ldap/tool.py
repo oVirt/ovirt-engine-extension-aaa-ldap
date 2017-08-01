@@ -91,22 +91,24 @@ class Plugin(plugin.PluginBase):
             if extensionsDir is not None and os.path.exists(extensionsDir):
                 shutil.rmtree(extensionsDir)
 
-    def sequenceLogin(self, extensionsDir):
-        user = self.dialog.queryString(
-            name='OVAAALDAP_LDAP_TOOL_SEQUENCE_LOGIN_USER',
-            note=_(
-                'Enter user name: '
-            ),
-            prompt=True,
-        )
-        password = self.dialog.queryString(
-            name='OVAAALDAP_LDAP_TOOL_SEQUENCE_LOGIN_PASSWORD',
-            note=_(
-                'Enter user password: '
-            ),
-            prompt=True,
-            hidden=True
-        )
+    def sequenceLogin(self, extensionsDir, user=None, password=None):
+        if user is None:
+            user = self.dialog.queryString(
+                name='OVAAALDAP_LDAP_TOOL_SEQUENCE_LOGIN_USER',
+                note=_(
+                    'Enter user name: '
+                ),
+                prompt=True,
+            )
+        if password is None:
+            password = self.dialog.queryString(
+                name='OVAAALDAP_LDAP_TOOL_SEQUENCE_LOGIN_PASSWORD',
+                note=_(
+                    'Enter user password: '
+                ),
+                prompt=True,
+                hidden=True
+            )
         self.environment[
             otopicons.CoreEnv.LOG_FILTER
         ].append(password)
@@ -276,6 +278,12 @@ class Plugin(plugin.PluginBase):
                         'sequence.'
                     ),
                 )
+            )
+            # By default test login with entered credentials:
+            self.sequenceLogin(
+                extensionsDir=extensionsDir,
+                user=self.environment[constants.LDAPEnv.USER],
+                password=self.environment[constants.LDAPEnv.PASSWORD]
             )
             while True:
                 sequence = self.dialog.queryString(
