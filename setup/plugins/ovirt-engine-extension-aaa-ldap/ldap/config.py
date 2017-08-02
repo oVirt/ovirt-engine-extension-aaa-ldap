@@ -132,13 +132,11 @@ class Plugin(plugin.PluginBase):
         ).format(**mydict).splitlines()
 
         if self.environment[constants.LDAPEnv.BASE_DN] is not None:
-            self.environment[
-                constants.LDAPEnv.CONFIG_AUTHZ
-            ].append(
-                'config.globals.baseDN.simple_baseDN = %s' % (
-                    self.environment[constants.LDAPEnv.BASE_DN]
-                )
+            base_dn = 'config.globals.baseDN.simple_baseDN = %s' % (
+                self.environment[constants.LDAPEnv.BASE_DN]
             )
+            self.environment[constants.LDAPEnv.CONFIG_AUTHZ].append(base_dn)
+            self.environment[constants.LDAPEnv.CONFIG_AUTHN].append(base_dn)
 
         #
         # This is ugly, however, we want human readable output.

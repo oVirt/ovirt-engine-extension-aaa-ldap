@@ -858,7 +858,7 @@ class Plugin(plugin.PluginBase):
                         name='OVAAALDAP_LDAP_BASE_DN',
                         note=_(
                             'Please enter base DN (%s) [@DEFAULT@]: ' % (
-                                ','.join(values)
+                                ' | '.join(values)
                             )
                         ),
                         default=default,
