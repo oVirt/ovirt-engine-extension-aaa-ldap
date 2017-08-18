@@ -279,12 +279,8 @@ class Plugin(plugin.PluginBase):
                     ),
                 )
             )
-            # By default test login with entered credentials:
-            self.sequenceLogin(
-                extensionsDir=extensionsDir,
-                user=self.environment[constants.LDAPEnv.USER],
-                password=self.environment[constants.LDAPEnv.PASSWORD]
-            )
+            # By default force user to test login:
+            self.sequenceLogin(extensionsDir)
             while True:
                 sequence = self.dialog.queryString(
                     name='OVAAALDAP_LDAP_TOOL_SEQUENCE',
