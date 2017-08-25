@@ -163,6 +163,7 @@ class Plugin(plugin.PluginBase):
                     )
                 )
             )
+        return rc == 0
 
     def sequenceSearch(self, extensionsDir):
         entity = self.dialog.queryString(
@@ -244,6 +245,7 @@ class Plugin(plugin.PluginBase):
                     )
                 )
             )
+        return rc == 0
 
     def __init__(self, context):
         super(Plugin, self).__init__(context=context)
@@ -280,7 +282,7 @@ class Plugin(plugin.PluginBase):
                 )
             )
             # By default force user to test login:
-            self.sequenceLogin(extensionsDir)
+            sequenceResult = self.sequenceLogin(extensionsDir)
             while True:
                 sequence = self.dialog.queryString(
                     name='OVAAALDAP_LDAP_TOOL_SEQUENCE',
@@ -296,16 +298,16 @@ class Plugin(plugin.PluginBase):
                         _('Login'),
                         _('Search'),
                     ),
-                    default=_('Abort'),
+                    default=_('Done' if sequenceResult else 'Abort'),
                 )
                 if sequence == _('Done').lower():
                     break
                 elif sequence == _('Abort').lower():
                     raise RuntimeError(_('Aborted by user'))
                 elif sequence == _('Login').lower():
-                    self.sequenceLogin(extensionsDir)
+                    sequenceResult = self.sequenceLogin(extensionsDir)
                 elif sequence == _('Search').lower():
-                    self.sequenceSearch(extensionsDir)
+                    sequenceResult = self.sequenceSearch(extensionsDir)
         finally:
             if extensionsDir is not None and os.path.exists(extensionsDir):
                 shutil.rmtree(extensionsDir)
