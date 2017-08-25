@@ -641,6 +641,7 @@ class Plugin(plugin.PluginBase):
         if self.environment[constants.LDAPEnv.USE_DNS] is None:
             self.dialog.note(
                 (
+                    ' ',
                     _('NOTE:'),
                     _(
                         'It is highly recommended to use DNS resolution for '
@@ -650,6 +651,7 @@ class Plugin(plugin.PluginBase):
                         'If for some reason you intend to use hosts or plain '
                         'address disable DNS usage.'
                     ),
+                    ' ',
                 )
             )
             self.environment[
@@ -710,6 +712,7 @@ class Plugin(plugin.PluginBase):
         if self.environment[constants.LDAPEnv.PROTOCOL] is None:
             self.dialog.note(
                 (
+                    ' ',
                     _('NOTE:'),
                     _(
                         'It is highly recommended to use secure protocol to '
@@ -726,6 +729,7 @@ class Plugin(plugin.PluginBase):
                     (
                         'Use plain for test environments only.'
                     ),
+                    ' ',
                 )
             )
             self.environment[
@@ -890,11 +894,13 @@ class Plugin(plugin.PluginBase):
         if self.environment[constants.LDAPEnv.AAA_USE_VM_SSO]:
             self.dialog.note(
                 (
+                    ' ',
                     _('NOTE:'),
                     _(
                         'Profile name has to match domain name, otherwise '
                         'Single Sign-On for Virtual Machines will not work.'
                     ),
+                    ' ',
                 )
             )
 

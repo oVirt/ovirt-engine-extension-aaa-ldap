@@ -92,6 +92,11 @@ class Plugin(plugin.PluginBase):
                 shutil.rmtree(extensionsDir)
 
     def sequenceLogin(self, extensionsDir, user=None, password=None):
+        self.dialog.note(
+            text=(
+                _('Please provide credentials to test login flow:')
+            )
+        )
         if user is None:
             user = self.dialog.queryString(
                 name='OVAAALDAP_LDAP_TOOL_SEQUENCE_LOGIN_USER',
@@ -166,6 +171,11 @@ class Plugin(plugin.PluginBase):
         return rc == 0
 
     def sequenceSearch(self, extensionsDir):
+        self.dialog.note(
+            text=(
+                _('Please provide parameters for Search sequence:')
+            )
+        )
         entity = self.dialog.queryString(
             name='OVAAALDAP_LDAP_TOOL_SEQUENCE_SEARCH_ENTITY',
             note=_(
@@ -270,15 +280,18 @@ class Plugin(plugin.PluginBase):
         try:
             self.dialog.note(
                 (
+                    ' ',
                     _('NOTE:'),
                     _(
                         'It is highly recommended to test drive the '
                         'configuration before applying it into engine.'
                     ),
                     _(
-                        'Perform at least one Login sequence and one Search '
-                        'sequence.'
+                        'Login sequence is executed automatically, '
+                        'but it is recommended to also execute Search '
+                        'sequence manually after successful Login sequence.'
                     ),
+                    ' ',
                 )
             )
             # By default force user to test login:
