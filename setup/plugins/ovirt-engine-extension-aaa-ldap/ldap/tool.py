@@ -209,9 +209,12 @@ class Plugin(plugin.PluginBase):
                 ),
                 '--extensions-dir=%s/extensions.d' % extensionsDir,
                 'aaa', 'search',
-                '--extension-name=%s-authz' % self.environment[
-                    constants.LDAPEnv.AAA_PROFILE_NAME
-                ],
+                '--extension-name=%s%s' % (
+                    self.environment[constants.LDAPEnv.AAA_PROFILE_NAME],
+                    '' if self.environment[
+                        constants.LDAPEnv.AAA_USE_VM_SSO
+                    ] else '-authz'
+                ),
                 '--entity=%s' % entity,
                 '--entity-name=%s' % name,
             ) +
