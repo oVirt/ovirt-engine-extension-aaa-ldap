@@ -1,5 +1,7 @@
 oVirt LDAP authentication and authorization extension
 
+????-??-?? - Version 1.3.5
+
 2017-08-28 - Version 1.3.4
  * setup: Don't execute login with search user
  * setup: Use executed sequence result for default operation question
