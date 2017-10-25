@@ -93,5 +93,49 @@ In order to pass the principal from HTTP header to aaa-ldap we need to setup als
 aaa-misc extension. First we need to configure mapping, if needed which maps the
 kerberos realm to aaa-ldap principal.
 
-As acpache configuration set X-Remote-User header, we need read this header and set
+As apache configuration set X-Remote-User header, we need read this header and set
 it as the principal in the authn configuration.
+
+Using GSSAPI to authenticate against IPA
+----------------------------------------
+[This](./ipa-gssapi) example shows how to use GSSAPI instead of standard password to
+authenticate users to IPA server.
+
+Kerberos has to be configured in order to GSSAPI working properly, by default kerberos
+configuration is stored in /etc/krb5.conf. An example krb5.conf can be found [here](./ipa-gssapi/aaa/krb5.conf).
+
+Using GSSAPI with ticket cache to authenticate against IPA
+----------------------------------------------------------
+[This](./ipa-ticketcache-gssapi) example shows how to use GSSAPI with ticket cache to
+authenticate search user against IPA, so search user password doesn't need to be provided
+in aaa-ldap configuration.
+
+1. Create a krb5.conf [file](./ipa-ticketcache-gssapi/aaa/krb5.conf), with appropriate
+kerberos configuration.
+
+2. Run kinit with your search user to create a ticket cache. Also check that ticket cache
+is readable by ovirt user.
+
+```
+  $ klist
+  $ ls -l /tmp/krb5cc_{userUID}
+  $ chown ovirt /tmp/krb5cc_{userUID}
+```
+
+3. Adapt a in configuration file [example](./ipa-ticketcache-gssapi/aaa/99-jaas.conf) by putting
+correct `{userUID}` there and place it to /etc/ovirt-engine/engine.conf.d/ directory.
+
+```
+/etc/ovirt-engine/engine.conf.d/99-jaas.conf
+AAA_JAAS_USE_TICKET_CACHE=true
+AAA_JAAS_TICKET_CACHE_FILE=/tmp/krb5cc_{userUID}
+```
+
+4. Kerberos has to be configured in order to GSSAPI working properly, by default kerberos
+configuration is stored in /etc/krb5.conf. An example krb5.conf can be found [here](./ipa-gssapi/aaa/krb5.conf).
+
+5. Restart oVirt engine.
+
+```
+systemctl restart ovirt-engine
+```
