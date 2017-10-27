@@ -1,5 +1,7 @@
 oVirt LDAP authentication and authorization extension
 
+????-??-?? - Version 1.3.6
+
 2017-10-27 - Version 1.3.5
  * docs: Add examples of GSSAPI configuration
 
