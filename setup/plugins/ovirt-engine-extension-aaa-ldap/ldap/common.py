@@ -744,6 +744,17 @@ class Plugin(plugin.PluginBase):
                 validValues=('startTLS', 'ldaps', 'plain'),
                 default='startTLS',
             )
+            if (
+                self.environment[constants.LDAPEnv.PROTOCOL] == 'ldaps' and
+                self.environment[constants.LDAPEnv.SERVERSET] == 'srvrecord'
+            ):
+                self.logger.warning(
+                    _(
+                        "Ldaps doesn't use any standard SRV record. We preset"
+                        " ldaps, so please make sure your DNS SRV records are"
+                        " set accordingly."
+                    )
+                )
 
         connection = None
 
