@@ -180,6 +180,8 @@ class Plugin(plugin.PluginBase):
                 'pool.default.serverset.srvrecord.domain = '
                 '${{global:vars.domain}}\n'
             )
+            if self.environment[constants.LDAPEnv.PROTOCOL] == 'ldaps':
+                content += 'pool.default.serverset.srvrecord.service = ldaps\n'
         elif self.environment[constants.LDAPEnv.SERVERSET] == 'single':
             content += (
                 'pool.default.serverset.single.server = '
