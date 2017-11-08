@@ -823,7 +823,7 @@ public class Framework implements Closeable {
         log.debug("getConnectionPoolEntry Entry name='{}', dn='{}'", name, dn);
 
         String domainComponent = null;
-        if (dn != null && !dn.isEmpty()) {
+        if (dn != null && !dn.isEmpty() && DN.isValidDN(dn)) {
             domainComponent = getDNDomainComponent(dn);
             if (domainComponent.isEmpty()) {
                 domainComponent = null;
