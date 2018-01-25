@@ -148,6 +148,7 @@ class Plugin(plugin.PluginBase):
                     plugin.command.get('dig'),
                     '+noall',
                     '+answer',
+                    '+ignore',
                     what,
                     record
                 )
