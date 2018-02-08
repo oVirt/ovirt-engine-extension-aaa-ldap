@@ -242,8 +242,8 @@ Pool of LDAP connections, based on specific policy.
     pool.default.ssl.host-name-verify.enable = true
     pool.default.ssl.host-name-verify.wildcards = true
     pool.default.ssl.insecure = false
-    pool.default.ssl.protocol = TLSv1
-    pool.default.ssl.startTLSProtocol = TLSv1
+    pool.default.ssl.protocol = TLSv1.2
+    pool.default.ssl.startTLSProtocol = TLSv1.2
     pool.default.ssl.truststore.provider = (JRE default)
     pool.default.ssl.truststore.type = (JRE default)
     pool.default.ssl.truststore.file = (JRE default)
