@@ -534,7 +534,7 @@ public class Framework implements Closeable {
             if (enableSSL) {
                 log.debug("Creating SocketFactory");
                 socketFactory = new SSLUtil(keyManagers, trustManagers).createSSLContext(
-                    sslProps.getString("TLSv1", "protocol")
+                    sslProps.getString("TLSv1.2", "protocol")
                 ).getSocketFactory();
             }
 
@@ -542,7 +542,7 @@ public class Framework implements Closeable {
                 log.debug("Creating StartTLSPostConnectProcessor");
                 postConnectProcessor =  new StartTLSPostConnectProcessor(
                     new SSLUtil(keyManagers, trustManagers).createSSLContext(
-                        sslProps.getString("TLSv1", "startTLSProtocol")
+                        sslProps.getString("TLSv1.2", "startTLSProtocol")
                     )
                 );
                 log.debug("StartTLSPostConnectProcessor: {}", postConnectProcessor);
