@@ -1,3 +1,3 @@
-ovirt-4.1-snapshot,http://resources.ovirt.org/pub/ovirt-4.1-snapshot/rpm/$distro
-centos-ovirt41-testing,http://cbs.centos.org/repos/virt7-ovirt-41-testing/x86_64/os/
+ovirt-4.2-snapshot,http://resources.ovirt.org/pub/ovirt-4.2-snapshot/rpm/$distro
+centos-ovirt42-testing,http://cbs.centos.org/repos/virt7-ovirt-42-testing/x86_64/os/
 ci-tools,http://resources.ovirt.org/repos/ci-tools/$distro
