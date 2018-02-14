@@ -1,120 +1,128 @@
-Advanced Active Directory configurations
+Advanced Active Directory Configurations
 ========================================
 
-This directory includes advanced configurations, which can't be created
-using `ovirt-engine-extension-aaa-ldap-setup` tool, so users need to
-tweak the configuration manually in order to leverage some advanced
-behaviour of their AD server(s).
+This directory contains examples of advanced configurations that cannot be
+created automatically with the `ovirt-engine-extension-aaa-ldap-setup` tool.
+These manual configurations enable you to use some of the advanced Active
+Directory (AD) features.
 
-Active Directory with selected single server using StartTLS
+Single AD server using StartTLS
 -----------------------------------------------------------
-[This](./ad-singleserver-starttls) example describes how to use single AD server,
-which is specified in aaa-ldap configuration file, so DNS SRV records are not used.
+[This example](./ad-singleserver-starttls) describes how to configure a single
+AD server using StartTLS. The server is specified in the `aaa-ldap`
+configuration file, not in the DNS SRV records.
 
-Connection between aaa-ldap and AD server is secured using StartTLS mechanism.
-To use StartTLS connection it's required to include CA certificate, which
-signed AD server certificate or the AD server certificate itself, into
-Java KeyStore file and then specify a path to this file in configuration.
+The connection between `aaa-ldap` and the AD server is secured with StartTLS.
+The StartTLS connection requires you to import either the CA certificate that
+signed the AD server certificate, or the AD server certificate itself, into
+the Java keystore. The path to the Java keystore is specified
+in the configuration file.
 
-Active Directory with selected multiple servers using StartTLS
+Multiple AD servers using StartTLS
 --------------------------------------------------------------
-[This](./ad-failover-starttls) example describes how to configure multiple AD
-servers. There are available 2 different mechanisms to select concrete AD
-server to fulfil the request:
+[This example](./ad-failover-starttls) describes how to configure multiple AD
+servers using StartTLS. There are two different mechanisms for selecting
+the actual AD server that fulfills the request:
 
- - __failover__: if 1st server fails, then request will be sent to 2nd,
-                 if 2nd fails, then 3rd and so on
+ - __failover__: If the first server fails, the request is passed on to
+   the second server. If the second server fails, the request is passed to
+   the third, and so on.
 
- - __round-robin__: concrete server is selected using round-robin algorithm
+ - __round-robin__: The actual server is selected using a round-robin
+   algorithm.
 
-The example below shows configuration for `failover` mechanism,
-if `round-robin` should be the used, then it's needed just to
-replace all occurences of `failover` string with `round-robin`.
+This example uses the configuration for `failover`. If `round-robin` is
+required, replace all occurrences of `failover` with `round-robin`.
 
-AD servers are specified in aaa-ldap configuration file,
-so DNS SRV records are not used.
+The AD servers are specified in the `aaa-ldap` configuration file, not in
+the DNS SRV records.
 
-Connection between aaa-ldap and AD servers is secured using StartTLS mechanism.
-To use StartTLS connection it's required to include CA certificate, which signed
-all AD servers certificates, into Java KeyStore file and then specify a path to
-this file in configuration.
+The connection between `aaa-ldap` and the AD servers is secured with StartTLS.
+The StartTLS connection requires you to import the CA certificate that signed
+all the AD server certificates into the Java keystore. The path to the Java
+keystore is specified in the configuration.
 
-Active Directory with selected multiple servers using LDAPS
+Multiple AD servers using LDAPS
 -----------------------------------------------------------
-[This](./ad-failover-ldaps) example describes how to configure multiple AD
-servers. There are available 2 different mechanisms to select concrete AD
-server to fulfil the request:
+[This example](./ad-failover-ldaps) describes how to configure multiple AD
+servers using LDAPS. There are two different mechanisms for selecting
+the actual AD server that fulfills the request:
 
- - __failover__: if 1st server fails, then request will be sent to 2nd,
-                 if 2nd fails, then 3rd and so on
+ - __failover__: If the first server fails, the request is passed on to
+   the second server. If the second server fails, the request is passed to
+   the third, and so on.
 
- - __round-robin__: concrete server is selected using round-robin algorithm
+ - __round-robin__: The actual server is selected using a round-robin
+   algorithm.
 
-The example below shows configuration for `failover` mechanism,
-if `round-robin` should be the used, then it's needed just to
-replace all occurences of `failover` string with `round-robin`.
+This example uses the configuration for `failover`. If `round-robin` is
+required, replace all occurrences of `failover` with `round-robin`.
 
-AD servers are specified in aaa-ldap configuration file,
-so DNS SRV records are not used.
+The AD servers are specified in the aaa-ldap configuration file, not in
+the DNS SRV records.
 
-Connection between aaa-ldap and AD servers is secured using LDAPS mechanism,
-which requires to use different ports (636 for LDAP and 3269 for Global
-Catalog communication) than Plain or StartTLS mechanism.
+The connection between `aaa-ldap` and AD servers is secured using LDAPS, which
+requires specific ports (636 for LDAP, 3269 for Global Catalog) that are
+different from those used by plaintext or StartTLS connections.
 
-Also to use LDAPS connection it's required to include CA certificate, which
-signed all AD servers certificates, into Java KeyStore file and then specify
-a path to this file in configuration.
+The LDAPS connection requires you to import the CA certificate that signed all
+the AD server certificates into the Java keystore. The path to the Java
+keystore is specified in the configuration.
 
-Active Directory with server defined in DNS SRV records using LDAPS
+AD servers defined in DNS SRV records using LDAPS
 -------------------------------------------------------------------
-[This](./ad-srvrecord-ldaps) example shows how to use AD servers defined in
-DNS SRV records. Connection between aaa-ldap and AD servers is secured using
-LDAPS mechanism, which requires to use different ports (636 for LDAP and
-3269 for Global Catalog communication) than Plain or StartTLS mechanism.
-Port in DNS SRV record is defined in '_ldap._tcp' SRV record and by default
-it defines port 389. So in order to use port 636, it's required to either:
+[This example](./ad-srvrecord-ldaps) shows how to use AD servers defined in
+DNS SRV records.
 
- - create new _ldaps._tcp SRV record (preferred) containing port 636 and afterwards
-   change SRV record service name (example below) or
- - change the port to 636 in _ldap._tcp SRV record
+The connection between `aaa-ldap` and the AD servers is secured using LDAPS,
+which requires specific ports (636 for LDAP, 3269 for Global Catalog) that are
+different from those used by plaintext or StartTLS connections.
 
-Please consult Active Directory documentation how to configure those DNS SRV records.
+The default port, defined in the '_ldap._tcp' SRV record, is port 389. To use
+port 636, you must do one of the following:
 
-Single sign-on with Active Directory
+ - The preferred method is to create a new _ldaps._tcp SRV record containing
+   port 636 and then change the SRV record's service name (example below)
+ - Alternatively, you can change the port to 636 in the _ldap._tcp SRV record.
+
+See the AD documentation for information on how to configure DNS SRV records.
+
+Single sign-on with AD
 ------------------------------------
-[This](./ad-sso) example shows how to use Active Directory with kerberos for single
-sign-on.
+[This example](./ad-sso) shows how to use AD with Kerberos for single sign-on.
 
-In order the configure single sign-on user need to modify also Apache configuration.
-The Apache performs the authentication and delegate the principal name via HTTP headers
-to aaa-ldap. The example apache configuration is [here](./ad-sso/aaa/ovirt-sso.conf).
+Single sign-on requires some changes to the Apache configuration because
+Apache performs the authentication and specifies the service principal in HTTP
+headers to `aaa-ldap`. Here is an [example](./ad-sso/aaa/ovirt-sso.conf) of
+the Apache configuration.
 
-In order to pass the principal from HTTP header to aaa-ldap we need to setup also
-aaa-misc extension. First we need to configure mapping, if needed which maps the
-kerberos realm to aaa-ldap principal.
+First, configure the mapping of the Kerberos realm to the aaa-ldap principal,
+if necessary. Then configure `ovirt-engine-extension-aaa-misc`, in order
+to pass the principal from the HTTP header to `aaa-ldap`.
 
-As apache configuration set X-Remote-User header, we need read this header and set
-it as the principal in the authn configuration.
+In the Apache configuration, set the X-Remote-User header. This header is read
+and the user is set as the principal in the AuthN configuration.
 
 Using GSSAPI to authenticate against IPA
 ----------------------------------------
-[This](./ipa-gssapi) example shows how to use GSSAPI instead of standard password to
-authenticate users to IPA server.
+[This example](./ipa-gssapi) shows how to use GSSAPI instead of a standard
+password to authenticate users against an IPA server.
 
-Kerberos has to be configured in order to GSSAPI working properly, by default kerberos
-configuration is stored in /etc/krb5.conf. An example krb5.conf can be found [here](./ipa-gssapi/aaa/krb5.conf).
+Kerberos must be configured for GSSAPI. The default Kerberos configuration
+file is `/etc/krb5.conf`, like this [example](./ipa-gssapi/aaa/krb5.conf).
 
 Using GSSAPI with ticket cache to authenticate against IPA
 ----------------------------------------------------------
-[This](./ipa-ticketcache-gssapi) example shows how to use GSSAPI with ticket cache to
-authenticate search user against IPA, so search user password doesn't need to be provided
-in aaa-ldap configuration.
+[This example](./ipa-ticketcache-gssapi) shows how to use GSSAPI with a ticket
+cache to authenticate a search user against the IPA, so that the search user's
+password does not need to be provided in the `aaa-ldap` configuration.
 
-1. Create a krb5.conf [file](./ipa-ticketcache-gssapi/aaa/krb5.conf), with appropriate
-kerberos configuration.
+1. Create an `/etc/krb5.conf` file, like this
+   [example](./ipa-ticketcache-gssapi/aaa/krb5.conf), with the appropriate
+   Kerberos configuration.
 
-2. Run kinit with your search user to create a ticket cache. Also check that ticket cache
-is readable by ovirt user.
+2. Run `kinit` with your search user to create a ticket cache and verify that
+   the ticket cache is readable by the ovirt user:
 
 ```
   $ klist
@@ -122,8 +130,10 @@ is readable by ovirt user.
   $ chown ovirt /tmp/krb5cc_{userUID}
 ```
 
-3. Adapt a in configuration file [example](./ipa-ticketcache-gssapi/aaa/99-jaas.conf) by putting
-correct `{userUID}` there and place it to /etc/ovirt-engine/engine.conf.d/ directory.
+3. Create a configuration file, like this
+   [example](./ipa-ticketcache-gssapi/aaa/99-jaas.conf), with the appropriate
+   `{userUID}`, and save it in the `/etc/ovirt-engine/engine.conf.d/`
+   directory.
 
 ```
 /etc/ovirt-engine/engine.conf.d/99-jaas.conf
@@ -131,10 +141,10 @@ AAA_JAAS_USE_TICKET_CACHE=true
 AAA_JAAS_TICKET_CACHE_FILE=/tmp/krb5cc_{userUID}
 ```
 
-4. Kerberos has to be configured in order to GSSAPI working properly, by default kerberos
-configuration is stored in /etc/krb5.conf. An example krb5.conf can be found [here](./ipa-gssapi/aaa/krb5.conf).
+4. Configure Kerberos for GSSAPI, like this
+   [`/etc/krb5.conf` example](./ipa-gssapi/aaa/krb5.conf).
 
-5. Restart oVirt engine.
+5. Restart the engine:
 
 ```
 systemctl restart ovirt-engine
