@@ -23,6 +23,7 @@ import socket
 import ssl
 import sys
 import tempfile
+import io
 
 from otopi import constants as otopicons
 from otopi import plugin, util
@@ -312,7 +313,7 @@ class Plugin(plugin.PluginBase):
                 prompt=True,
             )
             try:
-                with open(filepath) as f:
+                with io.open(filepath, encoding='ascii', errors='ignore') as f:
                     cacert = f.read().splitlines()
             except IOError as e:
                 raise self.SoftRuntimeError(
