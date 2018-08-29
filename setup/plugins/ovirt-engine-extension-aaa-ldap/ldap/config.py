@@ -202,7 +202,7 @@ class Plugin(plugin.PluginBase):
                 if self.environment[constants.LDAPEnv.PROTOCOL] == 'ldaps':
                     l += (
                         'pool.default.serverset.{{serverset}}.{index:02d}.'
-                        'server = 636\n'
+                        'port = 636\n'
                     )
                 content += l.format(index=i)
 
