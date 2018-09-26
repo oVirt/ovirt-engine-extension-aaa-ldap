@@ -1,5 +1,7 @@
 oVirt LDAP authentication and authorization extension
 
+????-??-?? - Version 1.3.9
+
 2018-09-26 - Version 1.3.8
  * setup: Set correct port for round-robin ldaps conf
  * automation: fix fedora package listing
