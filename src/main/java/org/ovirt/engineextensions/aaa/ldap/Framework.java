@@ -723,7 +723,8 @@ public class Framework implements Closeable {
             );
             Util.setObjectByProperties(connectionPool, cpoolProps, "set");
         } catch (LDAPException ex) {
-            log.warn("Exception: {}", ex.getMessage());
+            log.warn("Error while connecting to '{}': {}", serverset.getConnection().getConnectedAddress(), ex.getExceptionMessage());
+            log.debug("Exception: {}", ex.getExceptionMessage(true, true));
         }
         log.debug("createConnectionPool Return: {}", connectionPool);
 
