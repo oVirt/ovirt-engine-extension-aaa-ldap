@@ -723,8 +723,12 @@ public class Framework implements Closeable {
             );
             Util.setObjectByProperties(connectionPool, cpoolProps, "set");
         } catch (LDAPException ex) {
-            log.warn("Error while connecting to '{}': {}", serverset.getConnection().getConnectedAddress(), ex.getExceptionMessage());
-            log.debug("Exception: {}", ex.getExceptionMessage(true, true));
+            log.warn(
+                "Error while connecting to '{}': {}",
+                serverset.getConnection() != null ? serverset.getConnection().getConnectedAddress() : "N/A",
+                ex.getExceptionMessage()
+            );
+            throw ex;
         }
         log.debug("createConnectionPool Return: {}", connectionPool);
 
@@ -960,6 +964,7 @@ public class Framework implements Closeable {
             vars.put(VARS_RESULT_CODE, resultCodeNameMap.get(ResultCode.SUCCESS));
 
         } catch(LDAPException e) {
+            log.warn("Authentication exception", e.getExceptionMessage());
             log.debug("Authentication exception", e);
 
             vars.put(VARS_RESULT_CODE, resultCodeNameMap.get(e.getResultCode()));
