@@ -149,7 +149,7 @@ class Plugin(plugin.PluginBase):
                     plugin.command.get('dig'),
                     '+noall',
                     '+answer',
-                    '+ignore',
+                    '+tcp',
                     what,
                     record
                 )
