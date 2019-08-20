@@ -1,6 +1,7 @@
 oVirt LDAP authentication and authorization extension
 
-????-??-?? - Version 1.3.10
+2019-08-20 - Version 1.3.10
+ * setup: Use TCP with dig for bigger responses
 
 2019-03-04 - Version 1.3.9
  * setup: Fileter out non-ascii characters from CA file
