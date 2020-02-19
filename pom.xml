@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright oVirt Authors
+  SPDX-License-Identifier: Apache-2.0
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.ovirt.engine</groupId>
+  <artifactId>ovirt-engine-extension-aaa-ldap</artifactId>
+  <version>1.4.0-SNAPSHOT</version>
+
+  <name>oVirt Engine LDAP Users Management Extension</name>
+  <description>
+    This package contains the oVirt Engine LDAP Users Management Extension to manage users stored on LDAP server.
+  </description>
+  <url>http://www.ovirt.org</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Ondra Machacek</name>
+      <email>omachace@redhat.com</email>
+      <organization>oVirt</organization>
+      <organizationUrl>http://www.ovirt.org</organizationUrl>
+    </developer>
+    <developer>
+      <name>Martin Perina</name>
+      <email>mperina@redhat.com</email>
+      <organization>oVirt</organization>
+      <organizationUrl>http://www.ovirt.org</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://gerrit.ovirt.org/ovirt-engine-extension-aaa-ldap.git</connection>
+    <developerConnection>scm:git:git://gerrit.ovirt.org/ovirt-engine-extension-aaa-ldap.git</developerConnection>
+    <url>git://gerrit.ovirt.org/ovirt-engine-extension-aaa-ldap.git</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+
+    <finalName>${project.artifactId}-${project.version}</finalName>
+
+    <unboundid-ldapsdk.version>4.0.14</unboundid-ldapsdk.version>
+    <ovirt-engine-extensions-api.version>1.0.1</ovirt-engine-extensions-api.version>
+    <slf4j.version>1.7.25</slf4j.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.ovirt.engine.api</groupId>
+      <artifactId>ovirt-engine-extensions-api</artifactId>
+      <version>${ovirt-engine-extensions-api.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.unboundid</groupId>
+      <artifactId>unboundid-ldapsdk</artifactId>
+      <version>${unboundid-ldapsdk.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>${finalName}</finalName>
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+        <configuration>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.0.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>3.0.0-M1</version>
+        <configuration>
+          <tagNameFormat>@{version}</tagNameFormat>
+          <pushChanges>false</pushChanges>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <profiles>
+    <!--
+      Generate JAR files without version to ease installing into
+      development environment
+     -->
+     <profile>
+       <id>devenv</id>
+       <properties>
+         <finalName>${project.artifactId}</finalName>
+       </properties>
+     </profile>
+  </profiles>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+    </repository>
+  </distributionManagement>
+
+</project>

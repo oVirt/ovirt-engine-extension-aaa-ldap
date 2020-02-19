@@ -3,11 +3,12 @@ lib/
 target/
 output/
 
+packaging/etc/ovirt-engine/engine.conf.d/50-ovirt-engine-extension-aaa-ldap.conf
+packaging/bin/ovirt-engine-extension-aaa-ldap-setup.env
+
 build.properties
 ovirt-engine-extension-aaa-ldap.spec
 *.iml
 .classpath
 .project
 .bash_history
-exported-artifacts
-mocker*.cfg

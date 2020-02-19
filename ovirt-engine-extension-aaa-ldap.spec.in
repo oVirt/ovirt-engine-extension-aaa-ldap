@@ -1,41 +1,57 @@
 %global make_common_opts \\\
 	PREFIX=%{_prefix} \\\
 	SYSCONF_DIR=%{_sysconfdir} \\\
-	BIN_DIR=%{_bindir} \\\
-	DATA_DIR=%{_datadir} \\\
-	PKG_DATA_DIR=%{_datadir}/%{name} \\\
+	DATAROOT_DIR=%{_datadir} \\\
+	DESTDIR=%{buildroot} \\\
+	PACKAGE_VERSION=%{version} \\\
+	PACKAGE_DISPLAY_NAME=%{name}-%{version}-@RELEASE@ \\\
 	%{nil}
-Name:		@PACKAGE_NAME@
-Version:	@RPM_VERSION@
-Release:	@RPM_RELEASE@%{?release_suffix}%{?dist}
+
+
+Name:		ovirt-engine-extension-aaa-ldap
+Version:	@VERSION@
+Release:	@RELEASE@%{?dist}
+Summary:	oVirt Engine LDAP Users Management Extension
+Group:		%{ovirt_product_group}
 License:	ASL 2.0
-Summary:	oVirt Script Engine Gateway Extension
-Group:		Virtualization/Management
 URL:		http://www.ovirt.org
+Source:		%{name}-%{version}.tar.gz
+
+# We need to disable automatic generation of "Requires: java-headless >= 1:11"
+# by xmvn, becase JDK 11 doesn't provide java-headless artifact, but it
+# provides java-11-headless.
+AutoReq:	no
+
 BuildArch:	noarch
-Source:		http://resources.ovirt.org/pub/src/%{name}/%{name}-@PACKAGE_VERSION@.tar.gz
 
-BuildRequires:	java-1.8.0-openjdk-devel >= 1:1.8.0
-BuildRequires:	slf4j >= 1.7
-BuildRequires:	ant
-BuildRequires:	jpackage-utils
-BuildRequires:	ovirt-engine-extensions-api
-BuildRequires:	unboundid-ldapsdk
+BuildRequires:	java-11-openjdk-devel
+BuildRequires:	maven-local
+BuildRequires:	mvn(org.apache.maven.plugins:maven-compiler-plugin)
+BuildRequires:	mvn(org.apache.maven.plugins:maven-source-plugin)
+
+BuildRequires:	mvn(com.unboundid:unboundid-ldapsdk)
+BuildRequires:	mvn(org.ovirt.engine.api:ovirt-engine-extensions-api)
+BuildRequires:	mvn(org.slf4j:slf4j-api)
+BuildRequires:	mvn(org.slf4j:slf4j-jdk14)
 
 
-Requires:	ovirt-engine >= 3.5
-Requires:	unboundid-ldapsdk >= 2.3.7
+Requires:	java-11-openjdk-headless >= 1:11.0.0
+Requires:	javapackages-filesystem
+Requires:	ovirt-engine-extensions-api
+Requires:	slf4j
+Requires:	slf4j-jdk14
+Requires:	unboundid-ldapsdk >= 4.0.0
 
 %description
-Generic LDAP implementation for oVirt engine.
+This package contains the oVirt Engine LDAP Users Management Extension
+to manage users stored in LDAP server.
 
 %package setup
-Summary:	%{name} setup
+Summary:	oVirt Engine LDAP Users Management Extension Setup Tool
 Requires:	%{name} = %{version}-%{release}
 Requires:	bind-utils
-Requires:	otopi >= 1.4.0
-Requires:	ovirt-engine >= 3.6
-Requires:	python-ldap
+Requires:	python3-ldap
+Requires:	python3-otopi >= 1.9.0
 
 %description setup
 Setup package for Generic LDAP.
@@ -44,32 +60,19 @@ Setup package for Generic LDAP.
 %setup -c -q
 
 %build
-cat > build.properties << __EOF__
-package.display.name=%{name}-%{version}-%{release}
-build.checks.statics.enable=false
-jar.slf4j-api=$(build-classpath slf4j/slf4j-api)
-jar.ovirt-engine-extensions-api=$(build-classpath ovirt-engine/ovirt-engine-extensions-api)
-jar.unboundid-ldapsdk=$(build-classpath unboundid-ldapsdk)
-__EOF__
+# Necessary to override the default for xmvn, which is JDK 8
+export JAVA_HOME="/usr/lib/jvm/java-11-openjdk"
 
-make %{make_common_opts} all
+make %{make_common_opts} generate-files
+%mvn_build -j
 
 %install
-rm -fr "%{buildroot}"
-make %{make_common_opts} install-no-build DESTDIR="%{buildroot}"
+make %{make_common_opts} install
+%mvn_install
 
-rm -f "%{buildroot}/usr/share/ovirt-engine-extension-aaa-ldap/modules/org/ovirt/engine-extensions/aaa/ldap/main/unboundid-ldapsdk.jar"
-ln -s \
-	"$(build-classpath unboundid-ldapsdk)" \
-	"%{buildroot}/usr/share/ovirt-engine-extension-aaa-ldap/modules/org/ovirt/engine-extensions/aaa/ldap/main/unboundid-ldapsdk.jar"
 
-install -d "%{buildroot}%{_sysconfdir}/ovirt-engine-extension-aaa-ldap-setup.conf.d"
-cat > "%{buildroot}%{_sysconfdir}/ovirt-engine-extension-aaa-ldap-setup.conf.d/10-packaging.conf" << __EOF__
-[environment:default]
-OVAAALDAP_LDAP/systemCACerts=str:/etc/pki/tls/certs/ca-bundle.crt
-__EOF__
-
-%files
+%files -f .mfiles
+%dir %{_javadir}/%{name}
 %dir %{_datadir}/%{name}
 %dir %{_sysconfdir}/ovirt-engine-extension-aaa-ldap-setup.conf.d
 %doc README*
@@ -77,7 +80,7 @@ __EOF__
 %{_datadir}/%{name}/modules/
 %{_datadir}/%{name}/profiles/
 %{_sysconfdir}/ovirt-engine-extension-aaa-ldap-setup.conf.d/10-packaging.conf
-%{_sysconfdir}/ovirt-engine/engine.conf.d/50-%{name}.conf
+%{_sysconfdir}/ovirt-engine/engine.conf.d/50-ovirt-engine-extension-aaa-ldap.conf
 
 %files setup
 %{_bindir}/ovirt-engine-extension-aaa-ldap-setup

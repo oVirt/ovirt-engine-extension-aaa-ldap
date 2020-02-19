@@ -1,34 +1,61 @@
 #!/bin/bash -xe
 
-SUFFIX=".git$(git rev-parse --short HEAD)"
+MAVEN_SETTINGS="/etc/maven/settings.xml"
 
-# Remove any previous artifacts
-rm -rf output
-rm -f ./*tar.gz
-make clean
+# Set the location of the JDK that will be used for maven
+export JAVA_HOME="${JAVA_HOME:=/usr/lib/jvm/java-11}"
 
-# Get the tarball
-make dist
+# Use ovirt mirror if able, fall back to central maven
+mkdir -p "${MAVEN_SETTINGS%/*}"
+cat >"$MAVEN_SETTINGS" <<EOS
+<?xml version="1.0"?>
+<settings xmlns="http://maven.apache.org/POM/4.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+          http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-# create the src.rpm
-rpmbuild \
-    -D "_srcrpmdir $PWD/output" \
-    -D "_topmdir $PWD/rpmbuild" \
-    -D "release_suffix ${SUFFIX}" \
-    -ts ./*.gz
-
-# Install any build requirements
-yum-builddep output/*src.rpm
+<mirrors>
+        <mirror>
+                <id>ovirt-maven-repository</id>
+                <name>oVirt artifactory proxy</name>
+                <url>http://artifactory.ovirt.org/artifactory/ovirt-mirror</url>
+                <mirrorOf>*</mirrorOf>
+        </mirror>
+        <mirror>
+                <id>root-maven-repository</id>
+                <name>Official maven repo</name>
+                <url>http://repo.maven.apache.org/maven2</url>
+                <mirrorOf>*</mirrorOf>
+        </mirror>
+</mirrors>
+</settings>
+EOS
 
 # Build RPMs
-rpmbuild \
-    -D "_rpmdir $PWD/output" \
-    -D "_topmdir $PWD/rpmbuild" \
-    -D "release_suffix ${SUFFIX}" \
-    --rebuild output/*.src.rpm
+mvn help:evaluate -Dexpression=project.version -gs "$MAVEN_SETTINGS" # downloads and installs the necessary jars
 
-# Store any relevant artifacts in exported-artifacts for the ci system to
-# archive
+# Prepare the version string (with support for SNAPSHOT versioning)
+VERSION=$(mvn help:evaluate -Dexpression=project.version -gs "$MAVEN_SETTINGS" 2>/dev/null| grep -v "^\[")
+VERSION=${VERSION/-SNAPSHOT/-0.$(git rev-list HEAD | wc -l).$(date +%04Y%02m%02d%02H%02M)}
+IFS='-' read -ra VERSION <<< "$VERSION"
+RELEASE=${VERSION[1]-1}
+
+# Prepare source archive
+[[ -d ${HOME}/rpmbuild/SOURCES ]] || mkdir -p ${HOME}/rpmbuild/SOURCES
+git archive --format=tar HEAD | gzip -9 > ${HOME}/rpmbuild/SOURCES/ovirt-engine-extension-aaa-ldap-$VERSION.tar.gz
+
+# Set version and release
+sed \
+    -e "s|@VERSION@|${VERSION}|g" \
+    -e "s|@RELEASE@|${RELEASE}|g" \
+    < ovirt-engine-extension-aaa-ldap.spec.in \
+    > ovirt-engine-extension-aaa-ldap.spec
+
+rpmbuild \
+    --define "_topmdir $PWD/rpmbuild" \
+    --define "_rpmdir $PWD/rpmbuild" \
+    -ba --nodeps ovirt-engine-extension-aaa-ldap.spec
+
+# Move RPMs to exported artifacts
 [[ -d exported-artifacts ]] || mkdir -p exported-artifacts
-find output -iname \*rpm -exec mv "{}" exported-artifacts/ \;
-mv ./*tar.gz exported-artifacts/
+find rpmbuild -iname \*rpm | xargs mv -t exported-artifacts
