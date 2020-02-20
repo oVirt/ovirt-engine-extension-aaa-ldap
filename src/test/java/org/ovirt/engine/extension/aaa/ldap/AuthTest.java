@@ -14,7 +14,7 @@
  *     limitations under the License.
  *
  */
-package org.ovirt.engineextensions.aaa.ldap;
+package org.ovirt.engine.extension.aaa.ldap;
 
 import java.io.BufferedReader;
 import java.io.File;
