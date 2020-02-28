@@ -865,7 +865,8 @@ class Plugin(plugin.PluginBase):
             )[0][1]
             self.logger.debug('Result: %s', result)
             if result:
-                values = result.values()[0]
+                # Convert items from list of bytes to string
+                values = [x.decode('utf-8') for x in list(result.values())[0]]
                 default = values[0]
                 base_dn = None
                 while self.environment[

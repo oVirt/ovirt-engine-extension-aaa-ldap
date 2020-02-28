@@ -75,7 +75,7 @@ class Plugin(plugin.PluginBase):
                         extensionsDir,
                         e[1]
                     ),
-                    'wb'
+                    'w'
                 ) as f:
                     content = self.environment[e[0]]
                     if content is not None:
