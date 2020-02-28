@@ -108,8 +108,8 @@ Configure authorization extension.
 
 ovirt.engine.extension.name = @AUTHZ_NAME@
 ovirt.engine.extension.bindings.method = jbossmodule
-ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine-extensions.aaa.ldap
-ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engineextensions.aaa.ldap.AuthzExtension
+ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine.extension.aaa.ldap
+ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engine.extension.aaa.ldap.AuthzExtension
 ovirt.engine.extension.provides = org.ovirt.engine.api.extensions.aaa.Authz
 config.profile.file.1 = @PROFILE_CONFIGURATION@
 
@@ -128,8 +128,8 @@ Configure authentication extension.
 
 ovirt.engine.extension.name = @AUTHN_NAME@
 ovirt.engine.extension.bindings.method = jbossmodule
-ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine-extensions.aaa.ldap
-ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engineextensions.aaa.ldap.AuthnExtension
+ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine.extension.aaa.ldap
+ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engine.extension.aaa.ldap.AuthnExtension
 ovirt.engine.extension.provides = org.ovirt.engine.api.extensions.aaa.Authn
 ovirt.engine.aaa.authn.profile.name = @PROFILE@
 ovirt.engine.aaa.authn.authz.plugin = @AUTHZ_NAME@
@@ -388,8 +388,8 @@ principal name.
 
 ovirt.engine.extension.name = http-authn
 ovirt.engine.extension.bindings.method = jbossmodule
-ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine-extensions.aaa.misc
-ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engineextensions.aaa.misc.http.AuthnExtension
+ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine.extension.aaa.misc
+ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engine.extension.aaa.misc.http.AuthnExtension
 ovirt.engine.extension.provides = org.ovirt.engine.api.extensions.aaa.Authn
 ovirt.engine.aaa.authn.profile.name = http
 ovirt.engine.aaa.authn.authz.plugin = ldap-authz
@@ -404,8 +404,8 @@ MAPPING
 ovirt.engine.extension.enabled = true
 ovirt.engine.extension.name = http-mapping
 ovirt.engine.extension.bindings.method = jbossmodule
-ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine-extensions.aaa.misc
-ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engineextensions.aaa.misc.mapping.MappingExtension
+ovirt.engine.extension.binding.jbossmodule.module = org.ovirt.engine.extension.aaa.misc
+ovirt.engine.extension.binding.jbossmodule.class = org.ovirt.engine.extension.aaa.misc.mapping.MappingExtension
 ovirt.engine.extension.provides = org.ovirt.engine.api.extensions.aaa.Mapping
 config.mapAuthRecord.type = regex
 config.mapAuthRecord.regex.mustMatch = true
@@ -468,7 +468,7 @@ $ dig @dc1.@FOREST@ _ldap._tcp.gc._msdcs.@FOREST@ SRV
 
 ENGINE LOG
 
-A logger by the name of org.ovirt.engineextensions.aaa.ldap can be set to
+A logger by the name of org.ovirt.engine.extension.aaa.ldap can be set to
 INFO, DEBUG, FINE, FINER or ALL to receive verbose output.
 
 To modify logger level to ALL while ovirt-engine is running use the following
@@ -480,10 +480,10 @@ command, replace admin@internal with any user with SuperUser role:
         --controller=localhost:8706 \
         --user=admin@internal \
         --commands="
-            if (outcome != success) of /subsystem=logging/logger=org.ovirt.engineextensions.aaa.ldap:read-attribute(name=level),
-              /subsystem=logging/logger=org.ovirt.engineextensions.aaa.ldap:add,
+            if (outcome != success) of /subsystem=logging/logger=org.ovirt.engine.extension.aaa.ldap:read-attribute(name=level),
+              /subsystem=logging/logger=org.ovirt.engine.extension.aaa.ldap:add,
             end-if,
-            /subsystem=logging/logger=org.ovirt.engineextensions.aaa.ldap:write-attribute(name=level,value=ALL)
+            /subsystem=logging/logger=org.ovirt.engine.extension.aaa.ldap:write-attribute(name=level,value=ALL)
         "
 
 ADVANCED EXTENSION CONFIGURATION
