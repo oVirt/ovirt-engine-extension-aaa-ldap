@@ -289,23 +289,48 @@ public class AuthzExtension implements Extension {
                     }
                 }
                 if (attrInfo != null) {
+                    final char ASTERISK = '*';
+                    final String EXPR = "\\*";
+                    final String EXPR2 = "\\*\\*";
                     String fieldValue = filter.<String>get(key);
-                    boolean prefixEquals = false;
-
-                    if (attrInfo.isString()) {
-                        if (fieldValue.endsWith("*")) {
-                            fieldValue = fieldValue.substring(0, fieldValue.length()-1);
-                            prefixEquals = true;
-                        }
-                    }
-
+                    boolean hasAsterisk = (attrInfo.isString() && fieldValue.indexOf(ASTERISK) >= 0);
                     ASN1OctetString value = attrInfo.decode(fieldValue);
                     switch (filter.<Integer>get(Authz.QueryFilterRecord.OPERATOR)) {
                     default:
                         throw new IllegalArgumentException("Invalid search operator");
                     case Authz.QueryFilterOperator.EQ:
-                        if (prefixEquals) {
-                            ret = Filter.createSubstringFilter(attrInfo.getMap(), value.stringValue(), null, null);
+                        if (hasAsterisk) {
+                          // treat "**" as "*"
+                          fieldValue = fieldValue.replaceAll(EXPR2, EXPR);
+                          String subInitial = null;
+                          String subFinal = null;
+                          String[] subAny = {};
+                          String[] tokens = fieldValue.split(EXPR);
+                          int fieldValueLength = fieldValue.length();
+                          int tokensLength = tokens.length;
+                          char firstChar = fieldValue.charAt(0);
+                          char lastChar = fieldValue.charAt(fieldValueLength - 1);
+                          // case of "^[*]<any characters>[*]$"
+                          if (firstChar == ASTERISK && lastChar == ASTERISK) {
+                              subAny = Arrays.copyOfRange(tokens, 1, tokensLength);
+                          }
+                          // case of "!^[*]<any characters>[*]$"
+                          else if (lastChar == ASTERISK) {
+                              subInitial = tokens[0];
+                              subAny = Arrays.copyOfRange(tokens, 1, tokensLength);
+                          }
+                          // case of "^[*]<any characters>![*]$"
+                          else if (firstChar == ASTERISK) {
+                              subFinal = tokens[tokensLength - 1];
+                              subAny = Arrays.copyOfRange(tokens, 1, tokensLength);
+                          }
+                          // case of "!^[*]<any characters including [*]>![*]$"
+                          else {
+                             subInitial = tokens[0];
+                             subFinal = tokens[tokensLength - 1];
+                             subAny = Arrays.copyOfRange(tokens, 1, tokensLength - 1);
+                          }
+                          ret = Filter.createSubstringFilter(attrInfo.getMap(), subInitial, subAny, subFinal);
                         } else {
                             ret = Filter.createEqualityFilter(attrInfo.getMap(), value.getValue());
                         }
