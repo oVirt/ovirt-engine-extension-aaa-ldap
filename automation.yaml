@@ -1,0 +1,4 @@
+distros:
+  - el7
+release_branches:
+  ovirt-engine-extension-aaa-ldap-1.3: ovirt-4.3
