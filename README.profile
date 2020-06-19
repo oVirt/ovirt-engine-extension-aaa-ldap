@@ -226,7 +226,7 @@ Pool of LDAP connections, based on specific policy.
     pool.default.socketfactory.java
     # jndi resolver hack
     # Support IPv6
-    pool.default.socketfactory.resolver.supportIPv6 = false
+    pool.default.socketfactory.resolver.supportIPv6 = true
     # Cache lifetime of resolved addresses
     pool.default.socketfactory.resolver.cacheTTL = 10000
     # jndi URL to use
@@ -436,7 +436,7 @@ SEQUENCE
     sequence.@ID@.@SORT@.condition.compare.result = -1|0|1
     # invert result.
     sequence.@ID@.@SORT@.condition.not = false
-    
+
     # OPCODES
     # Opcode type
     sequence.@ID@.@SORT@.type = noop
@@ -446,7 +446,7 @@ SEQUENCE
     sequence.@ID@.@SORT@.stop
     # Return from a sequence to previous
     sequence.@ID@.@SORT@.return
-    # Call other sequence 
+    # Call other sequence
     sequence.@ID@.@SORT@.call.name = @ID@
     # Iterate collection by calling sequence
     sequence.@ID@.@SORT@.for-each.sequence = @ID@

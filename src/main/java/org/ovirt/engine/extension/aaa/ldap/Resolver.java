@@ -81,7 +81,7 @@ class Resolver implements Closeable {
     protected final Hashtable<String, Object> env = new Hashtable<>();
     private final ConcurrentMap<String, CacheEntry> cache = new ConcurrentHashMap<>();
     private final Random random;
-    private boolean supportIPv6 = false;
+    private boolean supportIPv6 = true;
     private int cacheTTL = 10000;
 
     private DirContext ctx;
