@@ -11,7 +11,7 @@
 
   <groupId>org.ovirt.engine</groupId>
   <artifactId>ovirt-engine-extension-aaa-ldap</artifactId>
-  <version>1.4.1</version>
+  <version>1.4.2-SNAPSHOT</version>
 
   <name>oVirt Engine LDAP Users Management Extension</name>
   <description>
@@ -46,7 +46,7 @@
     <connection>scm:git:git://gerrit.ovirt.org/ovirt-engine-extension-aaa-ldap.git</connection>
     <developerConnection>scm:git:git://gerrit.ovirt.org/ovirt-engine-extension-aaa-ldap.git</developerConnection>
     <url>git://gerrit.ovirt.org/ovirt-engine-extension-aaa-ldap.git</url>
-    <tag>ovirt-engine-extension-aaa-ldap-1.4.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
