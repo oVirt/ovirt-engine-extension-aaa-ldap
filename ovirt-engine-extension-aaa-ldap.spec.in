@@ -87,6 +87,10 @@ make %{make_common_opts} install
 %{_datadir}/%{name}/setup/
 
 %changelog
+* Thu Aug 20 2020 Martin Perina <mperina@redhat.com> 1.4.1-1
+- Enable IPv6 support by default
+- Handle search value with asterisk
+
 * Fri Feb 28 2020 Martin Perina <mperina@redhat.com> 1.4.0-1
 - Moved java classes under org.ovirt.engine.extension.aaa.ldap package
 - Require OpenJDK 11
