@@ -17,6 +17,7 @@
 
 import gettext
 import os
+import re
 import tempfile
 
 from otopi import constants as otopicons
@@ -63,6 +64,17 @@ class Plugin(plugin.PluginBase):
             (constants.LDAPEnv.DOMAIN, 'domain'),
         ):
             mydict[e[1]] = self.environment[e[0]]
+
+        # Escape backslash characters in the password
+        mydict['password'] = mydict['password'].replace('\\', '\\\\')
+
+        # Escape whitespace character at the beginning of the password to
+        # be able to store the password properly in Java properties file
+        m = re.search('^(\s)+(\S)+.*', mydict['password'])
+        if m:
+            mydict['password'] = (
+                '\\' + mydict['password']
+            )
 
         if self.environment[constants.LDAPEnv.HOSTS]:
             mydict['hosts'] = [
