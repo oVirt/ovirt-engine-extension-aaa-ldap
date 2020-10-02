@@ -353,7 +353,7 @@ class Plugin(plugin.PluginBase):
         if cacert is not None:
             _cacertfile = None
             try:
-                _cacertfile = tempfile.NamedTemporaryFile()
+                _cacertfile = tempfile.NamedTemporaryFile(mode='w+')
                 _cacertfile.write('\n'.join(cacert) + '\n')
                 _cacertfile.flush()
 
