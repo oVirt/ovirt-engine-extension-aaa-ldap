@@ -284,7 +284,9 @@ class Plugin(plugin.PluginBase):
                     ],
                 )
                 with open(name, 'rb') as f:
-                    self.environment[constants.LDAPEnv.CONFIG_JKS] = f.read()
+                    self.environment[
+                        constants.LDAPEnv.CONFIG_JKS
+                    ] = bytes(f.read())
             finally:
                 if os.path.exists(name):
                     os.unlink(name)

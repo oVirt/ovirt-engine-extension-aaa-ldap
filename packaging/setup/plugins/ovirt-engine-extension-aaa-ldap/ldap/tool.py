@@ -36,6 +36,18 @@ def _(m):
 @util.export
 class Plugin(plugin.PluginBase):
 
+    def _writeToFile(self, fileName, content, mode):
+        self.logger.debug('Writing: %s', fileName)
+        with open(
+            fileName,
+            mode
+        ) as f:
+            if content is not None:
+                if isinstance(content, (list, tuple)):
+                    f.write('\n'.join(content) + '\n')
+                else:
+                    f.write(content)
+
     def _createToolLayout(self):
         extensionsDir = None
         try:
@@ -49,40 +61,38 @@ class Plugin(plugin.PluginBase):
                     self.environment[
                         constants.LDAPEnv.CONFIG_AUTHN_FILE_NAME
                     ],
+                    'w',
                 ),
                 (
                     constants.LDAPEnv.CONFIG_AUTHZ,
                     self.environment[
                         constants.LDAPEnv.CONFIG_AUTHZ_FILE_NAME
                     ],
+                    'w',
                 ),
                 (
                     constants.LDAPEnv.CONFIG_PROFILE,
                     self.environment[
                         constants.LDAPEnv.CONFIG_PROFILE_FILE_NAME
                     ],
+                    'w',
                 ),
                 (
                     constants.LDAPEnv.CONFIG_JKS,
                     self.environment[
                         constants.LDAPEnv.CONFIG_JKS_FILE_NAME
                     ],
+                    'w+b', # JKS is a binary file
                 ),
             ):
-                self.logger.debug('Writing: %s', e[1])
-                with open(
+                self._writeToFile(
                     os.path.join(
                         extensionsDir,
-                        e[1]
+                        e[1],
                     ),
-                    'w'
-                ) as f:
-                    content = self.environment[e[0]]
-                    if content is not None:
-                        if isinstance(content, (list, tuple)):
-                            f.write('\n'.join(content) + '\n')
-                        else:
-                            f.write(content)
+                    self.environment[e[0]],
+                    e[2],
+                )
 
             ret = extensionsDir
             extensionsDir = None
