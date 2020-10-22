@@ -87,6 +87,12 @@ make %{make_common_opts} install
 %{_datadir}/%{name}/setup/
 
 %changelog
+* Thu Oct 22 2020 Martin Perina <mperina@redhat.com> 1.4.2-1
+- Fix special characters in password when saving to conf file
+- Open temporary files with the correct mode
+- Write configuration files with the correct mode
+- Detect IPv6 availability before using AAAA DNS records
+
 * Thu Aug 20 2020 Martin Perina <mperina@redhat.com> 1.4.1-1
 - Enable IPv6 support by default
 - Handle search value with asterisk
