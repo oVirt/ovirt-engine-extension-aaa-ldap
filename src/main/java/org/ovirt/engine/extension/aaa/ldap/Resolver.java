@@ -19,11 +19,16 @@ package org.ovirt.engine.extension.aaa.ldap;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Inet6Address;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -35,7 +40,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -124,6 +131,24 @@ class Resolver implements Closeable {
         this.supportIPv6 = supportIPv6;
     }
 
+    private boolean isIPv6Available() {
+        boolean available = false;
+        try {
+            available = Stream.of(NetworkInterface.getNetworkInterfaces().nextElement())
+                 .map(NetworkInterface::getInterfaceAddresses)
+                 .flatMap(Collection::stream)
+                 .map(InterfaceAddress::getAddress)
+                 .anyMatch(
+                         ((Predicate<InetAddress>) InetAddress::isLoopbackAddress)
+                         .negate()
+                         .and(address -> address instanceof Inet6Address));
+        } catch (SocketException ex) {
+            log.error("Error detecting IPv6 protocol: {}", ex.getMessage());
+            log.debug("Exception", ex);
+        }
+        return available;
+    }
+
     public void setEnvironment(String expression) {
         String[] comps = expression.split("=", 2);
         env.put(comps[0].trim(), comps[1].trim());
@@ -176,7 +201,7 @@ class Resolver implements Closeable {
         List<String> attrNames = new ArrayList<>();
 
         attrNames.add("A");
-        if (supportIPv6) {
+        if (supportIPv6 && isIPv6Available()) {
             attrNames.add("AAAA");
         }
 
