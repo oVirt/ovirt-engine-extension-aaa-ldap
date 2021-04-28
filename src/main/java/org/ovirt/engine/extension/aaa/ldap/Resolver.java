@@ -18,8 +18,9 @@ package org.ovirt.engine.extension.aaa.ldap;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -40,9 +41,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
+
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -131,22 +132,41 @@ class Resolver implements Closeable {
         this.supportIPv6 = supportIPv6;
     }
 
-    private boolean isIPv6Available() {
-        boolean available = false;
+    private List<InetAddress> getRemoteHostAddresses() {
+        List<InetAddress> addrs;
         try {
-            available = Stream.of(NetworkInterface.getNetworkInterfaces().nextElement())
-                 .map(NetworkInterface::getInterfaceAddresses)
-                 .flatMap(Collection::stream)
-                 .map(InterfaceAddress::getAddress)
-                 .anyMatch(
-                         ((Predicate<InetAddress>) InetAddress::isLoopbackAddress)
-                         .negate()
-                         .and(address -> address instanceof Inet6Address));
+            addrs = Collections.list(NetworkInterface.getNetworkInterfaces())
+                    .stream()
+                    .filter(a -> {
+                        try {
+                            return a.isUp();
+                        } catch (SocketException ex) {
+                            log.error("Error detecting if interface is up: {}", ex.getMessage());
+                            log.debug("Exception", ex);
+                            return false;
+                        }
+                    })
+                    .map(NetworkInterface::getInterfaceAddresses)
+                    .flatMap(Collection::stream)
+                    .map(InterfaceAddress::getAddress)
+                    .filter(a -> !a.isLoopbackAddress())
+                    .collect(Collectors.toList());
         } catch (SocketException ex) {
-            log.error("Error detecting IPv6 protocol: {}", ex.getMessage());
+            log.error("Error fetching host addresses: {}", ex.getMessage());
             log.debug("Exception", ex);
+            addrs = Collections.emptyList();
         }
-        return available;
+        return addrs;
+    }
+
+    protected boolean isIPv4Available(List<InetAddress> addrs) {
+        return addrs.stream()
+                .anyMatch(Inet4Address.class::isInstance);
+    }
+
+    protected boolean isIPv6Available(List<InetAddress> addrs) {
+        return addrs.stream()
+                .anyMatch(Inet6Address.class::isInstance);
     }
 
     public void setEnvironment(String expression) {
@@ -200,8 +220,11 @@ class Resolver implements Closeable {
         Set<String> ret = new HashSet<>();
         List<String> attrNames = new ArrayList<>();
 
-        attrNames.add("A");
-        if (supportIPv6 && isIPv6Available()) {
+        List<InetAddress> hostAddresses = getRemoteHostAddresses();
+        if (isIPv4Available(hostAddresses)) {
+            attrNames.add("A");
+        }
+        if (supportIPv6 && isIPv6Available(hostAddresses)) {
             attrNames.add("AAAA");
         }
 

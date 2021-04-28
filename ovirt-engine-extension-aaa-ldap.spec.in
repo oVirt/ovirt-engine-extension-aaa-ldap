@@ -59,12 +59,17 @@ Setup package for Generic LDAP.
 %prep
 %setup -c -q
 
+# junit5 is not packages on EL8, let's disable it for RPM build
+%pom_remove_dep org.junit.jupiter:
+
 %build
 # Necessary to override the default for xmvn, which is JDK 8
 export JAVA_HOME="/usr/lib/jvm/java-11-openjdk"
 
 make %{make_common_opts} generate-files
-%mvn_build -j
+
+# Don't run tests until junit5 is available
+%mvn_build -j -f
 
 %install
 make %{make_common_opts} install
