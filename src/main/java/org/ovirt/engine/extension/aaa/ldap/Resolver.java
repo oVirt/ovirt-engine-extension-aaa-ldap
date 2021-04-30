@@ -203,19 +203,19 @@ class Resolver implements Closeable {
 
     private Attributes query(String name, String[] attrs) throws NamingException {
         if (log.isDebugEnabled()) {
-            log.debug("Entry: name='{}', attrs={}", name, Arrays.asList(attrs));
+            log.debug("query(): name='{}', attrs={}", name, Arrays.asList(attrs));
         }
 
         Attributes ret = ctx.getAttributes(name, attrs);
 
-        log.debug("Return: {}", ret);
+        log.debug("query() return: {}", ret);
         return ret;
     }
 
     private Set<String> queryARecord(String name)
     throws NamingException {
 
-        log.debug("Entry: name='{}'", name);
+        log.debug("queryARecord(): name='{}'", name);
 
         Set<String> ret = new HashSet<>();
         List<String> attrNames = new ArrayList<>();
@@ -241,14 +241,14 @@ class Resolver implements Closeable {
             }
         }
 
-        log.debug("Return: {}", ret);
+        log.debug("queryARecord() return: {}", ret);
 
         return ret;
     }
 
     private List<InetAddress> _resolveAll(String name) throws UnknownHostException {
         try {
-            log.debug("Entry: name='{}'", name);
+            log.debug("_resolveAll(): name='{}'", name);
             List<InetAddress> ret = null;
             if (isAddress(name)) {
                 log.debug("Not resolving address");
@@ -281,7 +281,7 @@ class Resolver implements Closeable {
                 }
                 ret = entry.addresses;
             }
-            log.debug("Return: {}", ret);
+            log.debug("_resolveAll() return: {}", ret);
             return ret;
         } catch(NamingException e) {
             log.debug("Unable to resolve host '{}'", name);
@@ -291,7 +291,7 @@ class Resolver implements Closeable {
     }
 
     public List<InetAddress> resolveAll(String name) throws UnknownHostException {
-        log.debug("Entry: name='{}'", name);
+        log.debug("resolveAll(): name='{}'", name);
         List<InetAddress> addresses = _resolveAll(name);
         List<InetAddress> ret;
         if (addresses.size() == 1) {
@@ -300,12 +300,12 @@ class Resolver implements Closeable {
             ret = new ArrayList<>(addresses);
             Collections.shuffle(ret, random);
         }
-        log.debug("Return: {}", ret);
+        log.debug("resolveAll() return: {}", ret);
         return ret;
     }
 
     public InetAddress resolve(String name) throws UnknownHostException {
-        log.debug("Entry: name='{}'", name);
+        log.debug("resolve(): name='{}'", name);
         List<InetAddress> addresses = _resolveAll(name);
         InetAddress ret = null;
         if (addresses.size() == 1) {
@@ -315,7 +315,7 @@ class Resolver implements Closeable {
             random.nextBytes(r);
             ret = addresses.get((r[0] & 0xff) % addresses.size());
         }
-        log.debug("Return: {}", ret);
+        log.debug("resolve() return: {}", ret);
         return ret;
     }
 
