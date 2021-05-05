@@ -92,6 +92,9 @@ make %{make_common_opts} install
 %{_datadir}/%{name}/setup/
 
 %changelog
+* Wed May 5 2021 Martin Perina <mperina@redhat.com> 1.4.3-1
+- Fix detection of IP version available
+
 * Thu Oct 22 2020 Martin Perina <mperina@redhat.com> 1.4.2-1
 - Fix special characters in password when saving to conf file
 - Open temporary files with the correct mode
