@@ -16,20 +16,18 @@
  */
 package org.ovirt.engine.extension.aaa.ldap;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -132,41 +130,67 @@ class Resolver implements Closeable {
         this.supportIPv6 = supportIPv6;
     }
 
-    private List<InetAddress> getRemoteHostAddresses() {
-        List<InetAddress> addrs;
+    protected String fetchCommandOutput(String[] command) {
+        String result = null;
+        int exitCode = -1;
+        ProcessBuilder pb = new ProcessBuilder();
+        Process p = null;
+        pb.command(command);
         try {
-            addrs = Collections.list(NetworkInterface.getNetworkInterfaces())
-                    .stream()
-                    .filter(a -> {
-                        try {
-                            return a.isUp();
-                        } catch (SocketException ex) {
-                            log.error("Error detecting if interface is up: {}", ex.getMessage());
-                            log.debug("Exception", ex);
-                            return false;
-                        }
-                    })
-                    .map(NetworkInterface::getInterfaceAddresses)
-                    .flatMap(Collection::stream)
-                    .map(InterfaceAddress::getAddress)
-                    .filter(a -> !a.isLoopbackAddress())
-                    .collect(Collectors.toList());
-        } catch (SocketException ex) {
-            log.error("Error fetching host addresses: {}", ex.getMessage());
+            p = pb.start();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                result = reader.lines().collect(Collectors.joining("\n"));
+            } catch (IOException ex) {
+                log.error("Error fetching output of command '{}': {}", command, ex.getMessage());
+                log.debug("Exception", ex);
+            }
+            exitCode = p.waitFor();
+        } catch (Exception ex) {
+            log.error("Error executing command '{}': {}", command, ex.getMessage());
             log.debug("Exception", ex);
-            addrs = Collections.emptyList();
+        } finally {
+            if (p != null) {
+                p.destroy();
+            }
         }
-        return addrs;
+        log.debug("Execution finished with code {} and stdout: '{}'", exitCode, result);
+        return result;
     }
 
-    protected boolean isIPv4Available(List<InetAddress> addrs) {
-        return addrs.stream()
-                .anyMatch(Inet4Address.class::isInstance);
+    protected InetAddress fetchDefaultGateway(String ipVersion) {
+        InetAddress addr = null;
+        String[] command = {
+                "/usr/sbin/ip",
+                "-o",
+                ipVersion,
+                "route",
+                "show",
+                "default"
+        };
+        String output = fetchCommandOutput(command);
+        if (output != null) {
+            // For example "default via 192.168.75.1 dev wlp61s0 proto dhcp metric 600"
+            String[] parts = output.split(" ");
+
+            // InetAddress created from empty string will return an instance of "127.0.0.1", so we need to omit that
+            if (parts.length > 3 && parts[2] != null && parts[2].length() > 0) {
+                try {
+                    addr = InetAddress.getByName(parts[2]);
+                } catch (UnknownHostException ex) {
+                    log.error("Error instantiating address '{}': {}", parts[2], ex.getMessage());
+                    log.debug("Exception", ex);
+                }
+            }
+        }
+        return addr;
     }
 
-    protected boolean isIPv6Available(List<InetAddress> addrs) {
-        return addrs.stream()
-                .anyMatch(Inet6Address.class::isInstance);
+    protected boolean isIPv4Available() {
+        return fetchDefaultGateway("-4") != null;
+    }
+
+    protected boolean isIPv6Available() {
+        return fetchDefaultGateway("-6") != null;
     }
 
     public void setEnvironment(String expression) {
@@ -220,11 +244,10 @@ class Resolver implements Closeable {
         Set<String> ret = new HashSet<>();
         List<String> attrNames = new ArrayList<>();
 
-        List<InetAddress> hostAddresses = getRemoteHostAddresses();
-        if (isIPv4Available(hostAddresses)) {
+        if (isIPv4Available()) {
             attrNames.add("A");
         }
-        if (supportIPv6 && isIPv6Available(hostAddresses)) {
+        if (supportIPv6 && isIPv6Available()) {
             attrNames.add("AAAA");
         }
 

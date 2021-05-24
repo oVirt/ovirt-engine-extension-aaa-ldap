@@ -59,7 +59,8 @@
     <unboundid-ldapsdk.version>4.0.14</unboundid-ldapsdk.version>
     <ovirt-engine-extensions-api.version>1.0.1</ovirt-engine-extensions-api.version>
     <slf4j.version>1.7.25</slf4j.version>
-    <junit.version>5.3.1</junit.version>
+    <junit.version>5.7.1</junit.version>
+    <mockito.version>3.8.0</mockito.version>
   </properties>
 
   <dependencies>
@@ -95,6 +96,18 @@
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-params</artifactId>
       <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
