@@ -87,7 +87,23 @@ class Resolver implements Closeable {
     protected final Hashtable<String, Object> env = new Hashtable<>();
     private final ConcurrentMap<String, CacheEntry> cache = new ConcurrentHashMap<>();
     private final Random random;
-    private boolean supportIPv6 = true;
+
+    /**
+     * Automatic detection of IP version used for DNS resolution based on what IP version is available on the default
+     * gateway
+     */
+    private boolean detectIPVersion = true;
+
+    /**
+     * Manually enable support for IPv4 address resolution
+     */
+    private boolean supportIPv4 = false;
+
+    /**
+     * Manually enable support for IPv6 address resolution
+     */
+    private boolean supportIPv6 = false;
+
     private int cacheTTL = 10000;
 
     private DirContext ctx;
@@ -122,12 +138,28 @@ class Resolver implements Closeable {
         this.cacheTTL = cacheTTL;
     }
 
+    public boolean getDetectIPVersion() {
+        return detectIPVersion;
+    }
+
+    public void setDetectIPVersion(boolean detectIPVersion) {
+        this.detectIPVersion = detectIPVersion;
+    }
+
     public boolean getSupportIPV6() {
         return supportIPv6;
     }
 
     public void setSupportIPv6(boolean supportIPv6) {
         this.supportIPv6 = supportIPv6;
+    }
+
+    public void setSupportIPv4(boolean supportIPv4) {
+        this.supportIPv4 = supportIPv4;
+    }
+
+    public boolean getSupportIPv4() {
+        return supportIPv4;
     }
 
     protected String fetchCommandOutput(String[] command) {
@@ -236,20 +268,24 @@ class Resolver implements Closeable {
         return ret;
     }
 
+    protected List<String> getDnsRecordTypes() {
+        List<String> attrNames = new ArrayList<>();
+        if (detectIPVersion && isIPv4Available() || supportIPv4) {
+            attrNames.add("A");
+        }
+        if (detectIPVersion && isIPv6Available() || supportIPv6) {
+            attrNames.add("AAAA");
+        }
+        return attrNames;
+    }
+
     private Set<String> queryARecord(String name)
     throws NamingException {
 
         log.debug("queryARecord(): name='{}'", name);
 
         Set<String> ret = new HashSet<>();
-        List<String> attrNames = new ArrayList<>();
-
-        if (isIPv4Available()) {
-            attrNames.add("A");
-        }
-        if (supportIPv6 && isIPv6Available()) {
-            attrNames.add("AAAA");
-        }
+        List<String> attrNames = getDnsRecordTypes();
 
         Attributes attrs = query(name, attrNames.toArray(new String[0]));
         if (attrs != null) {
@@ -345,8 +381,10 @@ class Resolver implements Closeable {
     @Override
     public String toString() {
         return String.format(
-            "Resolver(env='%s', supportIPv6='%s', cacheTTL='%s')",
-            env,
+                "Resolver(env='%s', detectIPVersion='%s', supportIPv4='%s', supportIPv6='%s', cacheTTL='%s')",
+                env,
+                detectIPVersion,
+                supportIPv4,
             supportIPv6,
             cacheTTL
         );

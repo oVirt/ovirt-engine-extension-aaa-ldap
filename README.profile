@@ -225,8 +225,14 @@ Pool of LDAP connections, based on specific policy.
     # standard java
     pool.default.socketfactory.java
     # jndi resolver hack
-    # Support IPv6
-    pool.default.socketfactory.resolver.supportIPv6 = true
+    # Automatically detects usage of IP version for DNS resultion from default gateway
+    pool.default.socketfactory.resolver.detectIPVersion = true
+    # Enables support for IPv4 DNS resolution
+    # (it's applied if automatic detection doesn't work in the specific environment or if it's disabled)
+    pool.default.socketfactory.resolver.supportIPv4 = false
+    # Enables support for IPv6 DNS resolution
+    # (it's applied if automatic detection doesn't work in the specific environment or if it's disabled)
+    pool.default.socketfactory.resolver.supportIPv6 = false
     # Cache lifetime of resolved addresses
     pool.default.socketfactory.resolver.cacheTTL = 10000
     # jndi URL to use

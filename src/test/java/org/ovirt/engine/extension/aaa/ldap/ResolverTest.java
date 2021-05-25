@@ -8,6 +8,9 @@ import static org.mockito.Mockito.spy;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.stream.Stream;
 
@@ -94,5 +97,154 @@ public class ResolverTest {
                         "incorrect result",
                         null));
 
+    }
+
+    @ParameterizedTest
+    @MethodSource("sourceForTestGetDnsRecordTypes")
+    void testGetDnsRecordTypes(
+            boolean detectIpVersion,
+            boolean supportIPv4,
+            boolean supportIPv6,
+            boolean ipV4Available,
+            boolean ipV6Available,
+            List<String> expected) {
+    }
+
+    public static Stream<Arguments> sourceForTestGetDnsRecordTypes() {
+        return Stream.of(
+                Arguments.of(
+                        true,   // enabled automatic detection in config file
+                        false,  // disabled support for IPv4 in config file
+                        false,  // disabled support for IPv6 in config file
+                        true,   // default gateway has IPv4 address
+                        true,   // default gateway has IPv6 address
+                        Arrays.asList("A", "AAAA")),
+                Arguments.of(
+                        true,   // enabled automatic detection in config file
+                        false,  // disabled support for IPv4 in config file
+                        false,  // disabled support for IPv6 in config file
+                        false,  // default gateway doesn't have IPv4 address
+                        true,   // default gateway has IPv6 address
+                        Arrays.asList("AAAA")),
+                Arguments.of(
+                        true,   // enabled automatic detection in config file
+                        false,  // disabled support for IPv4 in config file
+                        false,  // disabled support for IPv6 in config file
+                        true,   // default gateway has IPv4 address
+                        false,  // default gateway doesn't have IPv6 address
+                        Arrays.asList("A")),
+                Arguments.of(
+                        true,   // enabled automatic detection in config file
+                        false,  // disabled support for IPv4 in config file
+                        false,  // disabled support for IPv6 in config file
+                        false,  // no default gateway
+                        false,  // no default gateway
+                        Collections.<List<String>> emptyList()),
+                Arguments.of(
+                        true,   // enabled automatic detection in config file
+                        true,   // enabled support for IPv4 in config file
+                        true,   // enabled support for IPv6 in config file
+                        true,   // default gateway has IPv4 address
+                        true,   // default gateway has IPv6 address
+                        Arrays.asList("A", "AAAA")
+                ),
+                Arguments.of(
+                        true,   // enabled automatic detection in config file
+                        true,   // enabled support for IPv4 in config file
+                        true,   // enabled support for IPv6 in config file
+                        false,  // default gateway doesn't have IPv4 address
+                        true,   // default gateway has IPv6 address
+                        Arrays.asList("A", "AAAA")
+                ),
+                Arguments.of(
+                        true,   // enabled automatic detection in config file
+                        true,   // enabled support for IPv4 in config file
+                        true,   // enabled support for IPv6 in config file
+                        true,   // default gateway has IPv4 address
+                        false,  // default gateway doesn't have IPv6 address
+                        Arrays.asList("A", "AAAA")
+                ),
+                Arguments.of(
+                        true,   // enabled automatic detection in config file
+                        true,   // enabled support for IPv4 in config file
+                        true,   // enabled support for IPv6 in config file
+                        false,  // no default gateway
+                        false,  // no default gateway
+                        Arrays.asList("A", "AAAA")),
+
+                Arguments.of(
+                        false,  // disabled automatic detection in config file
+                        false,  // disabled support for IPv4 in config file
+                        false,  // disabled support for IPv6 in config file
+                        true,   // default gateway has IPv4 address
+                        true,   // default gateway has IPv6 address
+                        Collections.<List<String>> emptyList()),
+                Arguments.of(
+                        false,  // disabled automatic detection in config file
+                        false,  // disabled support for IPv4 in config file
+                        false,  // disabled support for IPv6 in config file
+                        false,  // default gateway doesn't have IPv4 address
+                        true,   // default gateway has IPv6 address
+                        Collections.<List<String>> emptyList()
+                ),
+                Arguments.of(
+                        false,  // disabled automatic detection in config file
+                        false,  // disabled support for IPv4 in config file
+                        false,  // disabled support for IPv6 in config file
+                        true,   // default gateway has IPv4 address
+                        false,  // default gateway doesn't have IPv6 address
+                        Collections.<List<String>> emptyList()
+                ),
+                Arguments.of(
+                        false,  // disabled automatic detection in config file
+                        false,  // disabled support for IPv4 in config file
+                        false,  // disabled support for IPv6 in config file
+                        false,  // no default gateway
+                        false,  // no default gateway
+                        Collections.<List<String>> emptyList()),
+                Arguments.of(
+                        false,  // disabled automatic detection in config file
+                        true,   // enabled support for IPv4 in config file
+                        true,   // enabled support for IPv6 in config file
+                        true,   // default gateway has IPv4 address
+                        true,   // default gateway has IPv6 address
+                        Arrays.asList("A", "AAAA")),
+                Arguments.of(
+                        false,  // disabled automatic detection in config file
+                        true,   // enabled support for IPv4 in config file
+                        true,   // enabled support for IPv6 in config file
+                        false,  // default gateway doesn't have IPv4 address
+                        true,   // default gateway has IPv6 address
+                        Arrays.asList("A", "AAAA")),
+                Arguments.of(
+                        false,  // disabled automatic detection in config file
+                        true,   // enabled support for IPv4 in config file
+                        true,   // enabled support for IPv6 in config file
+                        true,   // default gateway has IPv4 address
+                        false,  // default gateway doesn't have IPv6 address
+                        Arrays.asList("A", "AAAA")),
+                Arguments.of(
+                        false,  // disabled automatic detection in config file
+                        true,   // enabled support for IPv4 in config file
+                        true,   // enabled support for IPv6 in config file
+                        false,  // no default gateway
+                        false,  // no default gateway
+                        Arrays.asList("A", "AAAA")),
+
+                Arguments.of(
+                        false,  // disabled automatic detection in config file
+                        true,   // enabled support for IPv4 in config file
+                        false,  // disabled support for IPv6 in config file
+                        false,  // no default gateway
+                        false,  // no default gateway
+                        Arrays.asList("A")
+                ),
+                Arguments.of(
+                        false,  // disabled automatic detection in config file
+                        false,  // disabled support for IPv4 in config file
+                        true,   // enabled support for IPv6 in config file
+                        false,  // no default gateway
+                        false,  // no default gateway
+                        Arrays.asList("AAAA")));
     }
 }
