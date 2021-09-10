@@ -1,4 +1,4 @@
 distros:
   - el8
 release_branches:
-  master: ovirt-master
+  ovirt-engine-extension-aaa-ldap-1.4: ovirt-4.4
