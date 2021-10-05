@@ -20,8 +20,6 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
@@ -285,15 +283,14 @@ class Resolver implements Closeable {
         log.debug("queryARecord(): name='{}'", name);
 
         Set<String> ret = new HashSet<>();
-        List<String> attrNames = getDnsRecordTypes();
 
-        Attributes attrs = query(name, attrNames.toArray(new String[0]));
-        if (attrs != null) {
-            for (String n : attrNames) {
-                Attribute a = attrs.get(n);
+        for (String recordType : getDnsRecordTypes()) {
+            Attributes attrs = query(name, new String[] { recordType });
+            if (attrs != null) {
+                Attribute a = attrs.get(recordType);
                 if (a != null) {
                     for (Object address : Collections.list(a.getAll())) {
-                        log.debug("{} {}", n, address);
+                        log.debug("Record type '{}', addresses: {}", recordType, address);
                         ret.add(address.toString());
                     }
                 }
