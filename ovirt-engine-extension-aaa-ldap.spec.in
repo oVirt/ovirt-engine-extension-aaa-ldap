@@ -92,6 +92,9 @@ make %{make_common_opts} install
 %{_datadir}/%{name}/setup/
 
 %changelog
+* Wed Oct 6  2021 Martin Perina <mperina@redhat.com> 1.4.5-1
+- Don't use DNS ANY query type
+
 * Thu May 27 2021 Martin Perina <mperina@redhat.com> 1.4.4-1
 - Detect IP version from default gateway
 - Add ability to disable automatic IP version detection
