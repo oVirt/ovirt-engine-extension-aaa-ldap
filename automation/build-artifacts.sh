@@ -24,7 +24,7 @@ cat >"$MAVEN_SETTINGS" <<EOS
         <mirror>
                 <id>root-maven-repository</id>
                 <name>Official maven repo</name>
-                <url>http://repo.maven.apache.org/maven2</url>
+                <url>https://repo.maven.apache.org/maven2</url>
                 <mirrorOf>*</mirrorOf>
         </mirror>
 </mirrors>
