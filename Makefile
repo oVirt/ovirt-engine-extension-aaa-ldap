@@ -132,7 +132,7 @@ install-packaging-files:
 	done
 	install -d -m 755 "$(DESTDIR)$(DOC_DIR)"
 	install -d -m 755 "$(DESTDIR)$(DOC_DIR)/$(PACKAGE_NAME)"
-	install -m 644 README "$(DESTDIR)$(DOC_DIR)/$(PACKAGE_NAME)/README"
+	install -m 644 README.md "$(DESTDIR)$(DOC_DIR)/$(PACKAGE_NAME)/README.md"
 	install -m 644 README.profile "$(DESTDIR)$(DOC_DIR)/$(PACKAGE_NAME)/README.profile"
 	install -m 644 README.unboundid-ldapsdk "$(DESTDIR)$(DOC_DIR)/$(PACKAGE_NAME)/README.unboundid-ldapsdk"
 
