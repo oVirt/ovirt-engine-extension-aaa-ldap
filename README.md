@@ -1,6 +1,8 @@
 oVirt LDAP authentication and authorization extension
 =====================================================
 
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-engine-extension-aaa-ldap/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-engine-extension-aaa-ldap/)
+
 Generic LDAP implementation for oVirt engine.
 
 QUICK START
