@@ -28,6 +28,11 @@ BuildRequires:	mvn(org.apache.maven.plugins:maven-source-plugin)
 BuildRequires:	mvn(com.unboundid:unboundid-ldapsdk)
 BuildRequires:	mvn(org.ovirt.engine.api:ovirt-engine-extensions-api)
 BuildRequires:	mvn(org.slf4j:slf4j-jdk14)
+BuildRequires:	mvn(org.junit.jupiter:junit-jupiter-api)
+BuildRequires:	mvn(org.junit.jupiter:junit-jupiter-engine)
+BuildRequires:	mvn(org.junit.jupiter:junit-jupiter-params)
+BuildRequires:	mvn(org.mockito:mockito-core)
+BuildRequires:	mvn(org.mockito:mockito-junit-jupiter)
 
 
 Requires:	(java-11-openjdk-headless or java-21-openjdk-headless)
@@ -53,15 +58,12 @@ Setup package for Generic LDAP.
 %prep
 %setup -c -q
 
-# junit5 is not packages on EL8, let's disable it for RPM build
-%pom_remove_dep org.junit.jupiter:
-
 %build
 
 make %{make_common_opts} generate-files
 
-# Don't run tests until junit5 is available
-%mvn_build -j -f
+# Skip JavaDoc processing
+%mvn_build -j
 
 %install
 make %{make_common_opts} install
