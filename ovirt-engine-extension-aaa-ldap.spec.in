@@ -25,6 +25,7 @@ AutoReq:	no
 BuildArch:	noarch
 
 BuildRequires:	java-11-openjdk-devel
+BuildRequires:	make
 BuildRequires:	maven-local
 BuildRequires:	mvn(org.apache.maven.plugins:maven-compiler-plugin)
 BuildRequires:	mvn(org.apache.maven.plugins:maven-source-plugin)
