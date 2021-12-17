@@ -1,3 +1,0 @@
-ovirt-master-tested,http://resources.ovirt.org/repos/ovirt/tested/master/rpm/$distro
-ovirt-master-centos-ovirt44-testing,https://buildlogs.centos.org/centos/8/virt/$basearch/ovirt-44/
-ci-tools,http://resources.ovirt.org/repos/ci-tools/$distro

@@ -1,12 +1,13 @@
-oVirt LDAP authentication and authorization extension
-=====================================================
+# oVirt Engine Extension AAA LDAP
 
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-engine-extension-aaa-ldap/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-engine-extension-aaa-ldap/)
 
-Generic LDAP implementation for oVirt engine.
+Welcome to the oVirt Engine AAA LDAP Extension source repository.
+This repository is hosted on [GitHub:ovirt-engine-extension-aaa-ldap](https://github.com/oVirt/ovirt-engine-extension-aaa-ldap)
 
-QUICK START
------------
+This repository contains extension to use LDAP servers to authenticate users to oVirt Engine.
+
+##QUICK START
 
 USING INSTALLER
 
@@ -92,8 +93,7 @@ Content is relative to /etc/ovirt-engine directory.
 
 4. Complete customization of profile, such as enabling startTLS.
 
-IMPLEMENTATION NOTES
---------------------
+## IMPLEMENTATION NOTES
 
 Implementation uses UnboundID LDAP SDK for Java. Many of the terms and
 configuration options derived from the SDK terms. More information can
@@ -103,8 +103,7 @@ Refer to README.unboundid-ldapsdk for known issues and limitations.
 
 [1] https://www.ldap.com/unboundid-ldap-sdk-for-java
 
-EXTENSION CONFIGURATION
------------------------
+## EXTENSION CONFIGURATION
 
 AUTHZ
 
@@ -154,8 +153,7 @@ config.profile.file.1 = @PROFILE_CONFIGURATION@
     Profile configuration file, may be relative to extension configuration.
 ```
 
-REMOVING CONFIGURED PROFILE
----------------------------
+## REMOVING CONFIGURED PROFILE
 
 Following steps describe how to remove a configured LDAP profile (profile name
 'profile1' is assumed in commands, please adapt to profile name that should be
@@ -184,8 +182,7 @@ Note:
     2. Remove all users from the provider you have removed above (they should
        have their Authorization provider set to 'profile1-authz'
 
-PROFILE CONFIGURATION EXAMPLES
-------------------------------
+## PROFILE CONFIGURATION EXAMPLES
 
 OPENLDAP/389DS/IPA/...
 
@@ -227,8 +224,10 @@ Round robin configuration:
 In case sasl mechanism is used, such as gssapi, set the following within
 extension configuration:
 
-# Except of active directory
-config.globals.bindFormat.simple_bindFormat = realm
+```
+   # Except of active directory
+   config.globals.bindFormat.simple_bindFormat = realm
+```
 
 More supported configuration at README.profile.
 
@@ -267,8 +266,8 @@ resolve hosts.
 More supported configuration at `README.profile`.
 
 
-Single Sign-On for Virtual Machines
------------------------------------
+## Single Sign-On for Virtual Machines
+
 If you are going to use Single Sign-On for Virtual Machines, your authz name
 has to match your real domain name.
 
@@ -283,8 +282,7 @@ so please make sure to correct it in your final configuration file.
 Once rhbz#1133137 is resolved, this behaviour would not be longer needed.
 
 
-X.509 CERTIFICATE TRUST STORE
------------------------------
+## X.509 CERTIFICATE TRUST STORE
 
 When using TLS/SSL to communicate with LDAP server an X.509 certificate
 trust store should be provided if the certificate of the LDAP server is
@@ -335,8 +333,7 @@ Check if it is a root certificate:
 $ openssl verify -CAfile myrootca.pem end.pem
 ```
 
-APACHE SSO CONFIGURATION
-------------------------
+## APACHE SSO CONFIGURATION
 
 Authorization extension can be used in an environment in which apache
 preforms the authentication, common example is kerberos. Use the
@@ -448,8 +445,7 @@ config.mapAuthRecord.regex.replacement = ${user}${at}${suffix}
 # END-PLATFORM-DEPENDED
 ```
 
-PROBLEM DETERMINATION
----------------------
+## PROBLEM DETERMINATION
 
 USEFUL LDAP COMMANDS
 
@@ -534,8 +530,7 @@ command, replace admin@internal with any user with SuperUser role:
         "
 ```
 
-ADVANCED EXTENSION CONFIGURATION
---------------------------------
+## ADVANCED EXTENSION CONFIGURATION
 
 `config.profile.searchdir.@SORT@ = DIRECTORY`
 
@@ -585,3 +580,23 @@ config.authz.sequence.query-principals.name = ID [query-principals]
 config.authz.sequence.resolve-groups.name = ID [resolve-groups]
 config.authz.sequence.resolve-principal.name = ID [resolve-principal]
 ```
+
+## How to contribute
+
+All contributions are welcome - patches, bug reports, and documentation issues.
+
+### Submitting patches
+
+Please submit patches to [GitHub:ovirt-engine-extension-aaa-ldap](https://github.com/oVirt/ovirt-engine-extension-aaa-ldap)
+ If you are not familiar with the process, you can read about [collaborating with pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests) on the GitHub website.
+
+### Found a bug or documentation issue?
+To submit a bug or suggest an enhancement for oVirt Engine Extension AAA LDAP please use
+[oVirt Bugzilla for ovirt-engine-extension-aaa-ldap product](https://bugzilla.redhat.com/enter_bug.cgi?product=ovirt-engine-extension-aaa-ldap).
+
+If you don't have a Bugzilla account, you can still report [issues](https://github.com/oVirt/ovirt-engine-extension-aaa-ldap/issues).
+
+## Still need help?
+
+If you have any other questions or suggestions, you can join and contact us on the [oVirt Users forum / mailing list](https://lists.ovirt.org/admin/lists/users.ovirt.org/).
+
