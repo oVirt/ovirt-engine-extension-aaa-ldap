@@ -1,8 +1,0 @@
-dnf-utils
-git
-java-11-openjdk-devel
-maven
-maven-local
-ovirt-engine-extensions-api
-sed
-unboundid-ldapsdk
