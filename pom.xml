@@ -43,9 +43,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://gerrit.ovirt.org/ovirt-engine-extension-aaa-ldap.git</connection>
-    <developerConnection>scm:git:git://gerrit.ovirt.org/ovirt-engine-extension-aaa-ldap.git</developerConnection>
-    <url>git://gerrit.ovirt.org/ovirt-engine-extension-aaa-ldap.git</url>
+    <url>https://github.com/oVirt/ovirt-engine-extension-aaa-ldap</url>
+    <connection>scm:git:https://github.com/oVirt/ovirt-engine-extension-aaa-ldap.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:oVirt/ovirt-engine-extension-aaa-ldap.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
