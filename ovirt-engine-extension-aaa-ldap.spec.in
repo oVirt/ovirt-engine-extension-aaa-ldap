@@ -40,7 +40,7 @@ Requires:	javapackages-filesystem
 Requires:	ovirt-engine-extensions-api
 Requires:	slf4j
 Requires:	slf4j-jdk14
-Requires:	unboundid-ldapsdk >= 4.0.0
+Requires:	unboundid-ldapsdk >= 6.0.4
 
 %description
 This package contains the oVirt Engine LDAP Users Management Extension
