@@ -56,7 +56,7 @@
 
     <finalName>${project.artifactId}-${project.version}</finalName>
 
-    <unboundid-ldapsdk.version>4.0.14</unboundid-ldapsdk.version>
+    <unboundid-ldapsdk.version>6.0.4</unboundid-ldapsdk.version>
     <ovirt-engine-extensions-api.version>1.0.1</ovirt-engine-extensions-api.version>
     <slf4j.version>1.7.25</slf4j.version>
     <junit.version>5.7.1</junit.version>
