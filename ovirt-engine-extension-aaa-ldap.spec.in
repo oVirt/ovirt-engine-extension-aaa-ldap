@@ -34,6 +34,8 @@ BuildRequires:	mvn(com.unboundid:unboundid-ldapsdk)
 BuildRequires:	mvn(org.ovirt.engine.api:ovirt-engine-extensions-api)
 BuildRequires:	mvn(org.slf4j:slf4j-jdk14)
 
+# Required because of old xmvn version in COPR
+BuildRequires:	maven
 
 Requires:	java-11-openjdk-headless >= 1:11.0.0
 Requires:	javapackages-filesystem
