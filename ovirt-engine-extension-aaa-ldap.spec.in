@@ -32,14 +32,12 @@ BuildRequires:	mvn(org.apache.maven.plugins:maven-source-plugin)
 
 BuildRequires:	mvn(com.unboundid:unboundid-ldapsdk)
 BuildRequires:	mvn(org.ovirt.engine.api:ovirt-engine-extensions-api)
-BuildRequires:	mvn(org.slf4j:slf4j-api)
 BuildRequires:	mvn(org.slf4j:slf4j-jdk14)
 
 
 Requires:	java-11-openjdk-headless >= 1:11.0.0
 Requires:	javapackages-filesystem
 Requires:	ovirt-engine-extensions-api
-Requires:	slf4j
 Requires:	slf4j-jdk14
 Requires:	unboundid-ldapsdk >= 4.0.0
 
