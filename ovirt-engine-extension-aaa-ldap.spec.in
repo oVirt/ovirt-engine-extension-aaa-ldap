@@ -136,7 +136,7 @@ make %{make_common_opts} install
 * Mon Aug 28 2017 Martin Perina <mperina@redhat.com> 1.3.4-1
 - Fixed bugs: BZ1482940
 
-* Wed Aug 08 2017 Martin Perina <mperina@redhat.com> 1.3.3-1
+* Tue Aug 08 2017 Martin Perina <mperina@redhat.com> 1.3.3-1
 - Fixed bugs: BZ1462815, BZ1476980, BZ1462294, BZ1472254
 
 * Fri May 19 2017 Martin Perina <mperina@redhat.com> 1.3.2-1
@@ -151,7 +151,7 @@ make %{make_common_opts} install
 * Mon Oct 31 2016 Martin Perina <mperina@redhat.com> 1.2.2-1
 - Fixed bug: BZ1388083
 
-* Fri Jun 30 2016 Martin Perina <mperina@redhat.com> 1.2.1-1
+* Thu Jun 30 2016 Martin Perina <mperina@redhat.com> 1.2.1-1
 - Fixed bugs: BZ1349178, BZ1349305, BZ1340380
 
 * Thu May 26 2016 Martin Perina <mperina@redhat.com> 1.2.0-1
