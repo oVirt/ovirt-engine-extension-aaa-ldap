@@ -92,6 +92,9 @@ make %{make_common_opts} install
 %{_datadir}/%{name}/setup/
 
 %changelog
+* Tue Aug 02 2022 Martin Perina <mperina@redhat.com> 1.4.6-1
+- Bump unboundid-ldapsdk to 6.0.4
+
 * Wed Oct 6  2021 Martin Perina <mperina@redhat.com> 1.4.5-1
 - Don't use DNS ANY query type
 
