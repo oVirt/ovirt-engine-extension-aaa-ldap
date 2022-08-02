@@ -1,0 +1,47 @@
+name: build
+on:
+  push:
+    branches: [ovirt-engine-extension-aaa-ldap-1.4]
+  pull_request:
+    branches: [ovirt-engine-extension-aaa-ldap-1.4]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: centos-stream-8
+            shortcut: cs8
+            container-name: el8stream
+
+    name: ${{ matrix.name }}
+
+    env:
+      ARTIFACTS_DIR: exported-artifacts
+
+    container:
+      image: quay.io/ovirt/buildcontainer:${{ matrix.container-name }}
+
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@v2
+
+    - name: Use cache for maven
+      uses: actions/cache@v2
+      with:
+        path: /root/.m2/repository
+        key: ${{ matrix.shortcut }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ matrix.shortcut }}-maven-
+
+    - name: Perform build
+      run: |
+        .automation/build-rpm.sh $ARTIFACTS_DIR
+
+    - name: Upload artifacts
+      uses: ovirt/upload-rpms-action@v2
+      with:
+        directory: ${{ env.ARTIFACTS_DIR }}
