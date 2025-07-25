@@ -13,12 +13,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: centos-stream-8
-            shortcut: cs8
-            container-name: el8stream
           - name: centos-stream-9
             shortcut: cs9
             container-name: el9stream
+          - name: centos-stream-10
+            shortcut: cs10
+            container-name: el10stream
 
     name: ${{ matrix.name }}
 
@@ -29,11 +29,15 @@ jobs:
       image: quay.io/ovirt/buildcontainer:${{ matrix.container-name }}
 
     steps:
+
+    - name: Mark repository as safe
+      run: git config --global --add safe.directory "$(pwd)"
+
     - name: Checkout sources
-      uses: actions/checkout@v2
+      uses: ovirt/checkout-action@main
 
     - name: Use cache for maven
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: /root/.m2/repository
         key: ${{ matrix.shortcut }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -45,6 +49,6 @@ jobs:
         .automation/build-rpm.sh $ARTIFACTS_DIR
 
     - name: Upload artifacts
-      uses: ovirt/upload-rpms-action@v2
+      uses: ovirt/upload-rpms-action@main
       with:
         directory: ${{ env.ARTIFACTS_DIR }}
