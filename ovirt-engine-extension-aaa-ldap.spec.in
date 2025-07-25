@@ -17,16 +17,11 @@ License:	ASL 2.0
 URL:		http://www.ovirt.org
 Source:		%{name}-%{version}.tar.gz
 
-# We need to disable automatic generation of "Requires: java-headless >= 1:11"
-# by xmvn, becase JDK 11 doesn't provide java-headless artifact, but it
-# provides java-11-headless.
-AutoReq:	no
-
 BuildArch:	noarch
 
-BuildRequires:	java-11-openjdk-devel
+BuildRequires:	java-21-openjdk-devel
 BuildRequires:	make
-BuildRequires:	maven-local
+BuildRequires:	maven-local-openjdk21
 BuildRequires:	mvn(org.apache.maven.plugins:maven-compiler-plugin)
 BuildRequires:	mvn(org.apache.maven.plugins:maven-source-plugin)
 
@@ -34,10 +29,8 @@ BuildRequires:	mvn(com.unboundid:unboundid-ldapsdk)
 BuildRequires:	mvn(org.ovirt.engine.api:ovirt-engine-extensions-api)
 BuildRequires:	mvn(org.slf4j:slf4j-jdk14)
 
-# Required because of old xmvn version in COPR
-BuildRequires:	maven
 
-Requires:	java-11-openjdk-headless >= 1:11.0.0
+Requires:	(java-11-openjdk-headless or java-21-openjdk-headless)
 Requires:	javapackages-filesystem
 Requires:	ovirt-engine-extensions-api
 Requires:	slf4j-jdk14
@@ -64,8 +57,6 @@ Setup package for Generic LDAP.
 %pom_remove_dep org.junit.jupiter:
 
 %build
-# Necessary to override the default for xmvn, which is JDK 8
-export JAVA_HOME="/usr/lib/jvm/java-11-openjdk"
 
 make %{make_common_opts} generate-files
 
