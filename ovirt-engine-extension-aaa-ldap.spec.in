@@ -86,6 +86,17 @@ make %{make_common_opts} install
 %{_datadir}/%{name}/setup/
 
 %changelog
+* Fri Oct 17 2025 Jean-Louis Dupond <jean-louis@dupond.be> - 1.5.0-1
+- Execute tests during rpm build
+- Build on Java 21
+- Build for CentOS 10
+
+* Tue Aug 02 2022 Martin Perina <mperina@redhat.com> 1.4.6-1
+- Bump unboundid-ldapsdk to 6.0.4
+
+* Wed Oct 6  2021 Martin Perina <mperina@redhat.com> 1.4.5-1
+- Don't use DNS ANY query type
+
 * Thu May 27 2021 Martin Perina <mperina@redhat.com> 1.4.4-1
 - Detect IP version from default gateway
 - Add ability to disable automatic IP version detection
