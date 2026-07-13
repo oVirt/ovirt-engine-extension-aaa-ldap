@@ -1,33 +1,29 @@
 #!/bin/bash -xe
 
-# git hash of current commit should be passed as the 1st paraameter
-if [ "${GITHUB_SHA}" == "" ]; then
-  GIT_HASH=$(git rev-list HEAD | wc -l)
-else
-  GIT_HASH=$(git rev-parse --short $GITHUB_SHA)
-fi
-
 # Directory, where build artifacts will be stored, should be passed as the 1st parameter
 ARTIFACTS_DIR=${1:-exported-artifacts}
 
-# Prepare the version string (with support for SNAPSHOT versioning)
-VERSION=$(mvn help:evaluate  -q -DforceStdout -Dexpression=project.version)
-VERSION=${VERSION/-SNAPSHOT/-0.${GIT_HASH}.$(date +%04Y%02m%02d%02H%02M)}
-IFS='-' read -ra VERSION <<< "$VERSION"
-RELEASE=${VERSION[1]-1}
+# Extract version from Maven project (strip -SNAPSHOT suffix)
+PACKAGE_RPM_VERSION=$(mvn help:evaluate -q -DforceStdout -Dexpression=project.version)
+PACKAGE_RPM_VERSION=${PACKAGE_RPM_VERSION%-SNAPSHOT}
+
+# Default RPM release
+PACKAGE_RPM_RELEASE=${PACKAGE_RPM_RELEASE:-0.master}
 
 # Prepare source archive
 [[ -d rpmbuild/SOURCES ]] || mkdir -p rpmbuild/SOURCES
-git archive --format=tar HEAD | gzip -9 > rpmbuild/SOURCES/ovirt-engine-extension-aaa-ldap-$VERSION.tar.gz
+git archive --format=tar HEAD | gzip -9 > "rpmbuild/SOURCES/ovirt-engine-extension-aaa-ldap-${PACKAGE_RPM_VERSION}.tar.gz"
 
-# Set version and release
+# Generate spec file
 sed \
-    -e "s|@VERSION@|${VERSION}|g" \
-    -e "s|@RELEASE@|${RELEASE}|g" \
+    -e "s|@PACKAGE_RPM_VERSION@|${PACKAGE_RPM_VERSION}|g" \
+    -e "s|@PACKAGE_RPM_RELEASE@|${PACKAGE_RPM_RELEASE}|g" \
     < ovirt-engine-extension-aaa-ldap.spec.in \
     > ovirt-engine-extension-aaa-ldap.spec
 
 # Build source package
+[[ -n "${RELEASE_SUFFIX}" ]] && RELEASE_SUFFIX_ARGS=(--define "release_suffix ${RELEASE_SUFFIX}") || RELEASE_SUFFIX_ARGS=()
 rpmbuild \
-    -D "_topdir rpmbuild" \
+    --define "_topdir $(pwd)/rpmbuild" \
+    "${RELEASE_SUFFIX_ARGS[@]}" \
     -bs ovirt-engine-extension-aaa-ldap.spec
