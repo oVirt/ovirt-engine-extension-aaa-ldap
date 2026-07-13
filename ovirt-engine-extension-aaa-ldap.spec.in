@@ -4,13 +4,13 @@
 	DATAROOT_DIR=%{_datadir} \\\
 	DESTDIR=%{buildroot} \\\
 	PACKAGE_VERSION=%{version} \\\
-	PACKAGE_DISPLAY_NAME=%{name}-%{version}-@RELEASE@ \\\
+	PACKAGE_DISPLAY_NAME=%{name}-%{version}-%{release} \\\
 	%{nil}
 
 
 Name:		ovirt-engine-extension-aaa-ldap
-Version:	@VERSION@
-Release:	@RELEASE@%{?dist}
+Version:	@PACKAGE_RPM_VERSION@
+Release:	@PACKAGE_RPM_RELEASE@%{?release_suffix}%{?dist}
 Summary:	oVirt Engine LDAP Users Management Extension
 Group:		%{ovirt_product_group}
 License:	ASL 2.0
